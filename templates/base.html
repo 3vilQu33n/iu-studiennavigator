@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon/favicon-32x32.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon/favicon-96x96.png') }}">
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static', filename='favicon/apple-touch-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ url_for('static', filename='favicon/apple-touch-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='favicon/apple-touch-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='favicon/apple-touch-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='favicon/apple-touch-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static', filename='favicon/apple-touch-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static', filename='favicon/apple-touch-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='favicon/apple-touch-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon/apple-touch-icon-180x180.png') }}">
+
+    <title>{% block title %}Studiennavigator{% endblock %}</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- CSS Files - Modular -->
+    <!-- Base: Variables & Theme -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}?v={{ range(1, 999999) | random }}">
+
+    <!-- Base: Layout & Core Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v={{ range(1, 999999) | random }}">
+
+    <!-- Features: Infotainment Popup -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/infotainment.css') }}?v={{ range(1, 999999) | random }}">
+
+    <!-- Components: Modals (Semester & Exam) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}?v={{ range(1, 999999) | random }}">
+
+    <!-- Features: Exam System (Forms) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/exam-system.css') }}?v={{ range(1, 999999) | random }}">
+
+    <!-- Components: Notifications -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}?v={{ range(1, 999999) | random }}">
+
+    <!-- Pages: Auth (Login, Password Reset) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}?v={{ range(1, 999999) | random }}">
+
+    <!-- Layout: Responsive -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}?v={{ range(1, 999999) | random }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body{% block body_class %}{% endblock %}>
+    {% block content %}{% endblock %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

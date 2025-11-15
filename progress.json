@@ -1,0 +1,66 @@
+{
+  "order": {
+    "grade": [
+      "fast",
+      "medium",
+      "slow"
+    ],
+    "time": [
+      "ahead",
+      "plus",
+      "minus"
+    ],
+    "fee": [
+      "open",
+      "zero"
+    ]
+  },
+  "grade": {
+    "fast": {
+      "de": "Note: %{value} – Stabile Fahrt auf der Überholspur.",
+      "en": "Grade: %{value} – Stable ride in the fast lane."
+    },
+    "medium": {
+      "de": "Note: %{value} – Konstante Fahrt auf der Route.",
+      "en": "Grade: %{value} – Steady drive on route."
+    },
+    "slow": {
+      "de": "Note: %{value} – Gang hochschalten empfohlen!",
+      "en": "Grade: %{value} – Time to shift up a gear!"
+    },
+    "unknown": {
+      "de": "Noch keine Noten – Fahrt beginnt!",
+      "en": "No grades yet – Journey begins!"
+    }
+  },
+  "time": {
+    "ahead": {
+      "de": "+ %{days} Tage Vorsprung – Akku voll geladen!",
+      "en": "+ %{days} days ahead – Battery fully charged!",
+      "icon": "akku_voll.svg",
+      "color": "green"
+    },
+    "plus": {
+      "de": "+ %{days} Tage Puffer – AC-Laden (11-22 kW).",
+      "en": "+ %{days} days buffer – AC charging (11-22 kW).",
+      "icon": "ac_laden.svg",
+      "color": "blue"
+    },
+    "minus": {
+      "de": "- %{days} Tage Verzug – DC-Schnellladen erforderlich!",
+      "en": "- %{days} days delay – DC fast charging required!",
+      "icon": "dc_laden.svg",
+      "color": "red"
+    }
+  },
+  "fee": {
+    "open": {
+      "de": "%{amount} Ladekosten offen.",
+      "en": "%{amount} in charging costs outstanding."
+    },
+    "zero": {
+      "de": "Akku voll – alle Ladekosten beglichen.",
+      "en": "Battery full – all charging costs settled."
+    }
+  }
+}

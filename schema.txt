@@ -1,0 +1,205 @@
+CREATE TABLE sqlite_sequence(name,seq);
+CREATE TABLE studiengang (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    name            TEXT    NOT NULL,
+    grad            TEXT    NOT NULL,     -- z. B. B.Sc.
+    regel_semester  INTEGER NOT NULL
+);
+CREATE TABLE modul (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    name        TEXT    NOT NULL,
+    beschreibung TEXT,
+    ects        INTEGER NOT NULL
+);
+CREATE TABLE gebuehr (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    einschreibung_id INTEGER NOT NULL,
+    art         TEXT    NOT NULL,     -- Semestergebühr, Prüfungsgebühr …
+    betrag      DECIMAL(10,2) NOT NULL,
+    faellig_am  DATE    NOT NULL,
+    bezahlt_am  DATE,
+
+    FOREIGN KEY (einschreibung_id) REFERENCES einschreibung (id)
+);
+CREATE TABLE zeitmodell (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    name          TEXT    NOT NULL UNIQUE,          -- Vollzeit | Teilzeit I | Teilzeit II
+    dauer_monate  INTEGER NOT NULL,                 -- Regelstudienzeit
+    kosten_monat  DECIMAL(10,2) NOT NULL            -- EUR / Monat
+);
+CREATE UNIQUE INDEX idx_gebuehr_einschreibung_faellig
+       ON gebuehr (einschreibung_id, faellig_am);
+CREATE TABLE pruefungsanmeldung (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    modulbuchung_id     INTEGER NOT NULL UNIQUE,
+    pruefungstermin_id  INTEGER NOT NULL,
+    status              TEXT    NOT NULL CHECK (status IN ('angemeldet','storniert','absolviert')) DEFAULT 'angemeldet',
+    angemeldet_am       DATETIME NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (modulbuchung_id)    REFERENCES "modulbuchung_old"(id),
+    FOREIGN KEY (pruefungstermin_id) REFERENCES pruefungstermin(id)
+);
+CREATE INDEX idx_pruefungsanmeldung_termin
+ON pruefungsanmeldung(pruefungstermin_id, status);
+CREATE TABLE modulbuchung (
+  id               INTEGER PRIMARY KEY AUTOINCREMENT,
+  einschreibung_id INTEGER NOT NULL,
+  modul_id         INTEGER NOT NULL,
+  buchungsdatum    DATE,  -- NULL jetzt erlaubt
+  status           TEXT NOT NULL CHECK (status IN ('gebucht','bestanden','anerkannt')),
+  FOREIGN KEY (einschreibung_id) REFERENCES einschreibung (id),
+  FOREIGN KEY (modul_id)         REFERENCES modul (id)
+);
+CREATE TABLE login (
+    id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id           INTEGER NOT NULL,                 -- Komposition: Login gehört zu Student
+    email                TEXT    NOT NULL UNIQUE,
+    benutzername         TEXT    NOT NULL UNIQUE,
+    password_hash        TEXT    NOT NULL,
+    is_active            INTEGER DEFAULT 1,
+    role                 TEXT    DEFAULT 'student' CHECK (role IN ('student','admin','tutor')),
+    created_at           TEXT,
+    must_change_password INTEGER DEFAULT 0,
+    last_login           TEXT,
+    FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE
+);
+CREATE TABLE pruefungsleistung (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    modulbuchung_id INTEGER NOT NULL,
+    pruefungsdatum DATE,  -- NULL erlaubt für anerkannte Leistungen!
+    note DECIMAL(3,1) CHECK(note >= 1.0 AND note <= 5.0),
+    versuch INTEGER DEFAULT 1,
+    max_versuche INTEGER DEFAULT 3,
+    anmeldemodus TEXT,
+    thema TEXT, pruefungsanmeldung_id INTEGER
+REFERENCES pruefungsanmeldung(id),
+    FOREIGN KEY (modulbuchung_id) REFERENCES modulbuchung(id) ON DELETE CASCADE
+);
+CREATE INDEX idx_pruefungsleistung_modulbuchung 
+ON pruefungsleistung(modulbuchung_id);
+CREATE VIEW v_modulstatus AS
+SELECT
+    mb.id                     AS modulbuchung_id,
+    mb.einschreibung_id,
+    mb.modul_id,
+    mb.buchungsdatum,
+    mb.status                 AS modulbuchung_status,
+
+    -- Modul-Infos
+    m.name                    AS modul_name,
+    m.beschreibung            AS modul_beschreibung,
+    m.ects                    AS modul_ects,
+
+    -- Prüfungsleistung (kann NULL sein!)
+    pl.id                     AS pruefungsleistung_id,
+    pl.note,
+    pl.pruefungsdatum,
+    pl.versuch,
+    pl.anmeldemodus,
+
+    -- Status-Anzeige (mit Logik)
+    CASE
+        WHEN mb.status = 'anerkannt' AND pl.note IS NOT NULL
+            THEN 'bestanden (anerkannt mit Note)'
+        WHEN mb.status = 'anerkannt' AND pl.note IS NULL
+            THEN 'anerkannt (ohne Note)'
+        WHEN mb.status = 'bestanden' AND pl.note IS NOT NULL
+            THEN 'bestanden'
+        WHEN mb.status = 'nicht_bestanden'
+            THEN 'nicht bestanden'
+        WHEN mb.status = 'gebucht'
+            THEN 'gebucht'
+        ELSE mb.status
+    END                       AS status_anzeige,
+
+    -- Bestanden? (Hilfsspalte)
+    CASE
+        WHEN mb.status IN ('bestanden', 'anerkannt') THEN 1
+        ELSE 0
+    END                       AS ist_bestanden,
+
+    -- Datum-Anzeige (für Frontend)
+    CASE
+        WHEN pl.pruefungsdatum IS NULL AND mb.status = 'anerkannt'
+            THEN 'Anerkannt'
+        WHEN pl.pruefungsdatum IS NULL
+            THEN 'Kein Datum'
+        ELSE DATE(pl.pruefungsdatum)
+    END                       AS datum_anzeige
+
+FROM modulbuchung mb
+INNER JOIN modul m ON m.id = mb.modul_id
+LEFT JOIN pruefungsleistung pl ON pl.modulbuchung_id = mb.id
+/* v_modulstatus(modulbuchung_id,einschreibung_id,modul_id,buchungsdatum,modulbuchung_status,modul_name,modul_beschreibung,modul_ects,pruefungsleistung_id,note,pruefungsdatum,versuch,anmeldemodus,status_anzeige,ist_bestanden,datum_anzeige) */;
+CREATE TABLE IF NOT EXISTS "student" (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    vorname TEXT NOT NULL,
+    nachname TEXT NOT NULL,
+    matrikel_nr TEXT UNIQUE NOT NULL,
+    login_id INTEGER UNIQUE,
+    FOREIGN KEY (login_id) REFERENCES login(id)
+);
+CREATE TABLE IF NOT EXISTS "einschreibung" (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id      INTEGER NOT NULL,
+    studiengang_id  INTEGER NOT NULL,
+    zeitmodell_id   INTEGER NOT NULL,
+    start_datum     DATE    NOT NULL,
+    exmatrikulations_datum DATE,
+    status          TEXT    NOT NULL DEFAULT 'aktiv'
+                     CHECK (status IN ('aktiv','pausiert','exmatrikuliert')),
+    FOREIGN KEY (student_id)     REFERENCES "student" (id),
+    FOREIGN KEY (studiengang_id) REFERENCES studiengang (id),
+    FOREIGN KEY (zeitmodell_id)  REFERENCES zeitmodell (id)
+);
+CREATE TABLE studiengang_modul (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    studiengang_id  INTEGER NOT NULL,
+    modul_id        INTEGER NOT NULL,
+    semester        INTEGER NOT NULL CHECK (semester BETWEEN 1 AND 7),  -- 1-7
+    pflichtgrad     TEXT    NOT NULL           -- 'Pflicht' | 'Wahl'
+                   CHECK (pflichtgrad IN ('Pflicht','Wahl')),
+    wahlbereich     TEXT                       -- NULL | 'A' | 'B' | 'C'
+                   CHECK (wahlbereich IS NULL OR wahlbereich IN ('A', 'B', 'C')),
+
+    FOREIGN KEY (studiengang_id) REFERENCES studiengang (id),
+    FOREIGN KEY (modul_id)       REFERENCES modul (id),
+
+    -- UNIQUE erlaubt mehrere NULL-Werte UND unterscheidet Wahlbereiche!
+    UNIQUE(studiengang_id, modul_id, semester, wahlbereich)
+);
+CREATE TABLE IF NOT EXISTS "pruefungstermin" (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    modul_id        INTEGER NOT NULL,
+    datum           DATE    NOT NULL,
+    beginn          TIME,
+    ende            TIME,
+    art             TEXT NOT NULL CHECK (art IN ('online','praesenz','projekt','workbook')),
+    ort             TEXT,
+    anmeldeschluss  DATETIME,
+    kapazitaet      INTEGER,
+    beschreibung    TEXT,
+    FOREIGN KEY (modul_id) REFERENCES modul(id)
+);
+CREATE INDEX idx_pruefungstermin_modul ON pruefungstermin(modul_id, datum);
+CREATE TABLE pruefungsart (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    kuerzel             TEXT    NOT NULL UNIQUE,  -- 'K', 'AWB', 'PO', 'F', 'FP', 'PB', etc.
+    name                TEXT    NOT NULL,         -- 'Klausur', 'Advanced Workbook', etc.
+    anzeigename         TEXT    NOT NULL,         -- Für Frontend-Anzeige
+    hat_unterteilung    BOOLEAN DEFAULT FALSE,    -- TRUE wenn Klausur (online/praesenz)
+    beschreibung        TEXT
+);
+CREATE TABLE modul_pruefungsart (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    modul_id            INTEGER NOT NULL,
+    pruefungsart_id     INTEGER NOT NULL,
+    ist_standard        BOOLEAN DEFAULT FALSE,    -- TRUE = Standardoption bei mehreren Möglichkeiten
+    reihenfolge         INTEGER DEFAULT 0,        -- Für Sortierung im Dropdown
+
+    FOREIGN KEY (modul_id) REFERENCES modul (id) ON DELETE CASCADE,
+    FOREIGN KEY (pruefungsart_id) REFERENCES pruefungsart (id) ON DELETE RESTRICT,
+
+    UNIQUE(modul_id, pruefungsart_id)  -- Ein Modul kann eine Prüfungsart nur einmal haben
+);
+CREATE INDEX idx_modul_pruefungsart_modul ON modul_pruefungsart(modul_id);
+CREATE INDEX idx_modul_pruefungsart_art ON modul_pruefungsart(pruefungsart_id);

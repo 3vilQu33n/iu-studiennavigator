@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Header mit Studentenname + LOGOUT BUTTON -->
+    <div class="student-info">
+        <h2>Willkommen, {{ student_name }}!</h2>
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Abmelden
+        </a>
+    </div>
+
+    <!-- SVG-Container mit allen Ebenen -->
+    <div class="svg-wrapper">
+        <!-- 1. Infotainment-Hintergrund -->
+        <img src="{{ url_for('static', filename='uploads/Infotainment.svg') }}"
+             alt="Infotainment Display"
+             class="infotainment-bg"
+             style="width: 100%; height: auto; display: block;">
+
+        <!-- 2. Header -->
+        <div class="studiennavigator-header">
+            {{ student_name.split()[0] }}'s Studiennavigator
+        </div>
+
+        <!-- 3. Pfad -->
+        <img src="{{ url_for('static', filename='uploads/Pfad.svg') }}"
+             alt="Studienpfad"
+             class="path-overlay"
+             style="position: absolute;
+                    top: 12%;
+                    left: 25%;
+                    width: 70%;
+                    height: 75%;
+                    pointer-events: none;">
+
+        <!-- 4. Auto -->
+        <img src="{{ url_for('static', filename='uploads/Car.svg') }}"
+             alt="Auto"
+             class="car-overlay"
+             style="position: absolute;
+                    left: {{ car_x_percent * 100 }}%;
+                    top: {{ car_y_percent * 100 }}%;
+                    width: 4%;
+                    transform: translate(-50%, -50%) rotate({{ car_rotation }}deg){% if car_flip %} scaleX(-1){% endif %};
+                    cursor: pointer;
+                    z-index: 10;">
+    </div>
+</div>
+
+<!-- JavaScript-Variablen fuer Popup -->
+<script>
+// Progress-Daten
+const progressGrade = "{{ progress_grade }}";
+const progressTime = "{{ progress_time }}";
+const progressFee = "{{ progress_fee }}";
+const gradeCategory = "{{ grade_category }}";
+const timeStatus = "{{ time_status }}";
+
+// Auto-Position fuer Miniatur
+const carXPercent = {{ car_x_percent }};
+const carYPercent = {{ car_y_percent }};
+const carData = {
+    x_percent: {{ car_x_percent }},
+    y_percent: {{ car_y_percent }},
+    angle: {{ car_rotation }},
+    flip: {{ 'true' if car_flip else 'false' }}
+};
+
+// Naechste Pruefung
+const nextExam = {{ next_exam | tojson if next_exam else 'null' }};
+
+console.log('Auto-Position:', carXPercent, carYPercent);
+console.log('Naechste Pruefung:', nextExam);
+</script>
+
+<!-- VERSTECKTES TEMPLATE FUER INFOTAINMENT-POPUP -->
+<template id="infotainment-popup-template">
+    <div class="infotainment-popup">
+        <div class="infotainment-content">
+            <button class="close-popup-btn">
+                <img src="{{ url_for('static', filename='uploads/lock-50.svg') }}" alt="Schliessen">
+            </button>
+
+            <div class="infotainment-grid">
+                <!-- LINKE SEITE: Progress-Daten -->
+                <div class="progress-section">
+                    <div class="progress-title">
+                        Aktueller Kurs: <span class="title-value" id="popup-grade-value"></span>
+                    </div>
+
+                    <!-- Ladestatus (dynamisches Icon) -->
+                    <div class="progress-line eco">
+                        <img id="popup-time-icon" class="progress-icon" alt="Status">
+                        <div class="progress-content">
+                            <span class="label">Ladestatus:</span>
+                            <span class="value" id="popup-time-text"></span>
+                        </div>
+                    </div>
+
+                    <!-- Ladekosten -->
+                    <div class="progress-line cost">
+                        <img src="{{ url_for('static', filename='uploads/geldschein.svg') }}"
+                             class="progress-icon icon-yellow" alt="Gebuehren">
+                        <div class="progress-content">
+                            <span class="label">Ladekosten voraus:</span>
+                            <span class="value" id="popup-fee-text"></span>
+                        </div>
+                    </div>
+
+                    <!-- Blitzer - DYNAMISCH -->
+                    <div class="progress-line exam">
+                        <img src="{{ url_for('static', filename='uploads/blitzer.svg') }}"
+                             class="progress-icon icon-red icon-large" alt="Blitzer">
+                        <div class="progress-content">
+                            <span class="label">Blitzer voraus!</span>
+                            <span class="value" id="popup-exam-text">Keine Pruefung angemeldet</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECHTE SEITE: Miniatur Dashboard -->
+                <div class="miniature-dashboard">
+                    <div class="miniature-wrapper">
+                        <img src="{{ url_for('static', filename='uploads/Pfad_Popup.svg') }}"
+                             alt="Studienpfad" class="miniature-pfad">
+                        <img src="{{ url_for('static', filename='uploads/Car.svg') }}"
+                             alt="Deine Position" class="miniature-car" id="popup-car">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}

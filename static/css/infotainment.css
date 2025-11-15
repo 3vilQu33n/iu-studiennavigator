@@ -1,0 +1,227 @@
+/* =================================================================
+   INFOTAINMENT.CSS - Popup & Progress Display
+   ================================================================= */
+
+/* === INFOTAINMENT-POPUP === */
+.infotainment-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.infotainment-popup.show {
+    opacity: 1;
+}
+
+.infotainment-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 15px solid #0f3460;
+    border-radius: 30px;
+    padding: 50px;
+    max-width: 1400px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 30px 100px rgba(0, 0, 0, 0.9);
+}
+
+/* Splitscreen Layout */
+.infotainment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: stretch;
+}
+
+/* === LINKE SEITE: Progress-Daten === */
+.progress-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Titel-Zeile */
+.progress-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 35px;
+    line-height: 1.4;
+    display: block !important;
+    padding-bottom: 20px;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.title-value {
+    font-weight: 800;
+    display: inline !important;
+}
+
+.title-value.fast {
+    color: #4ade80;
+}
+
+.title-value.medium {
+    color: #fbbf24;
+}
+
+.title-value.slow {
+    color: #f87171;
+}
+
+/* Progress Line Layout */
+.progress-line {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.progress-line:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
+
+/* Labels (vor dem ":") */
+.progress-line .label {
+    color: #e5e7eb;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Werte (nach dem ":") - IMMER GOLD */
+.progress-line .value {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fbbf24;
+}
+
+/* Progress Icons */
+.progress-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.progress-icon.icon-large {
+    width: 48px;
+    height: 48px;
+}
+
+/* Icon-Farben */
+.icon-yellow {
+    filter: brightness(0) saturate(100%) invert(79%) sepia(73%) saturate(424%) hue-rotate(2deg) brightness(102%) contrast(101%);
+}
+
+.icon-red {
+    filter: brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(6417%) hue-rotate(357deg) brightness(96%) contrast(117%);
+}
+
+.icon-green {
+    filter: brightness(0) saturate(100%) invert(64%) sepia(84%) saturate(450%) hue-rotate(94deg);
+}
+
+.icon-blue {
+    filter: brightness(0) saturate(100%) invert(47%) sepia(96%) saturate(1993%) hue-rotate(202deg);
+}
+
+/* Progress Content */
+.progress-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* === RECHTE SEITE: Miniatur Dashboard === */
+.miniature-dashboard {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.miniature-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 75%;
+    overflow: visible;
+    border-radius: 15px;
+    background: transparent;
+    box-shadow: none;
+}
+
+.miniature-pfad {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: translate(-50%, -50%) scale(1.08);
+    transform-origin: center center;
+}
+
+.miniature-car {
+    position: absolute;
+    width: 95px;
+    height: auto;
+    filter: none;
+    z-index: 10;
+}
+
+/* Close Button */
+.close-popup,
+.close-popup-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(239, 68, 68, 0.9);
+    border: 3px solid #dc2626;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 100;
+    padding: 15px;
+}
+
+.close-popup img,
+.close-popup-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.close-popup:hover,
+.close-popup-btn:hover {
+    transform: scale(1.1) rotate(15deg);
+    background: #dc2626;
+    border-color: #b91c1c;
+}

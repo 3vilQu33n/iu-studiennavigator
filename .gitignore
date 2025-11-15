@@ -1,0 +1,18 @@
+# Database files
+*.db
+*.sqlite
+dashboard.db
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# IDE
+.idea/
+
+# Environment
+.env
+
+# macOS
+.DS_Store

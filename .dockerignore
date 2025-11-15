@@ -1,0 +1,15 @@
+# Git-Verzeichnis
+.git
+.gitignore
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Docker-Dateien
+Dockerfile
+.dockerignore
+
+# Lokale Entwicklungs-Tools (falls vorhanden)
+.venv
+.idea

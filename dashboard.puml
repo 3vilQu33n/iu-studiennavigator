@@ -1,0 +1,736 @@
+@startuml Dashboard Project - Complete Class Diagram
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FEFEFE
+skinparam packageStyle rectangle
+
+title Dashboard Project - Vollständiges Klassendiagramm\n(IU Studentenverwaltung - Stand November 2025)
+
+' ============================================================================
+' LAYER 1: FLASK APPLICATION
+' ============================================================================
+package "Flask Application" <<Cloud>> {
+  class app.py <<application>> {
+    + app: Flask
+    + login_manager: LoginManager
+    + DB_PATH: Path
+    --
+    **Routes:**
+    + /login [GET, POST]
+    + /logout
+    + /dashboard
+    + /semester/<int>
+    + /api/book-module [POST]
+    + /api/pruefungstermine/<int:modul_id> [GET]
+    + /api/pruefung-anmelden [POST]
+    --
+    **Controllers:**
+    + auth_ctrl: AuthController
+    + dashboard_ctrl: DashboardController
+    + semester_ctrl: SemesterController
+    --
+    **Repositories:**
+    + pruefungstermin_repo: PruefungsterminRepository
+    + pruefungsanmeldung_repo: PruefungsanmeldungRepository
+  }
+}
+
+' ============================================================================
+' LAYER 2: CONTROLLERS (Business Logic)
+' ============================================================================
+package "controllers/" <<Folder>> {
+
+  class AuthController <<control>> {
+    - __student_repo: StudentRepository
+    --
+    + __init__(db_path: str)
+    + login(email: str, password: str): dict
+    + logout(): dict
+  }
+
+  class DashboardController <<control>> {
+    - __student_repo: StudentRepository
+    - __einschreibung_repo: EinschreibungRepository
+    - __progress_repo: ProgressRepository
+    - __path_detector: PathDetector
+    - __progress_text: ProgressTextService
+    --
+    + __init__(db_path: str)
+    + get_dashboard_data(login_id: int): dict
+  }
+
+  class SemesterController <<control>> {
+    - __student_repo: StudentRepository
+    - __einschreibung_repo: EinschreibungRepository
+    - __modul_repo: ModulRepository
+    - __modulbuchung_repo: ModulbuchungRepository
+    --
+    + __init__(db_path: str)
+    + get_modules_for_semester(login_id: int, semester_nr: int): dict
+    + book_module(login_id: int, modul_id: int): dict
+  }
+}
+
+' ============================================================================
+' LAYER 3: REPOSITORIES (Data Access)
+' ============================================================================
+package "repositories/" <<Folder>> {
+
+  class StudentRepository <<repository>> {
+    - __gateway: DBGateway
+    --
+    + __init__(db_path: str)
+    + get_by_id(student_id: int): Student | None
+    + get_by_login_id(login_id: int): Student | None
+    + get_by_email(email: str): Student | None
+  }
+
+  class ModulRepository <<repository>> {
+    - db_path: str
+    --
+    + __init__(db_path: str)
+    + get_modules_for_semester(studiengang_id: int, semester: int, student_id: int): List[ModulDTO]
+  }
+
+  class EinschreibungRepository <<repository>> {
+    - __gateway: DBGateway
+    --
+    + __init__(db_path: str)
+    + get_by_id(einschreibung_id: int): Einschreibung | None
+    + get_aktive_by_student(student_id: int): Einschreibung
+  }
+
+  class ModulbuchungRepository <<repository>> {
+    - __gateway: DBGateway
+    --
+    + __init__(db_path: str)
+    + get_by_id(modulbuchung_id: int): Modulbuchung | None
+    + get_by_einschreibung(einschreibung_id: int): List[Modulbuchung]
+  }
+
+  class GebuehrRepository <<repository>> {
+    - __gateway: DBGateway
+    --
+    + __init__(db_path: str)
+    + get_offene_by_einschreibung(einschreibung_id: int): List[Gebuehr]
+    + get_gesamt_offen(einschreibung_id: int): float
+  }
+
+  class ProgressRepository <<repository>> {
+    - __gateway: DBGateway
+    - __gebuehr_repo: GebuehrRepository
+    --
+    + __init__(db_path: str)
+    + get_progress_for_student(student: Student, einschreibung_id: int): Progress
+    - __calculate_average_grade(conn, einschreibung_id): Decimal
+    - __count_passed_modules(conn, einschreibung_id): int
+    - __count_booked_modules(conn, einschreibung_id): int
+    - __sum_open_fees(conn, einschreibung_id): Decimal
+    - __calculate_progress_based_semester(conn, einschreibung_id): int
+  }
+
+  class PruefungsterminRepository <<repository>> {
+    - db_path: str
+    --
+    + __init__(db_path: str)
+    + find_by_id(termin_id: int): Pruefungstermin | None
+    + find_by_modul(modul_id: int): List[Pruefungstermin]
+    + find_verfuegbare_termine(modul_id: int): List[Pruefungstermin]
+    + create(termin: Pruefungstermin): int
+    + update(termin: Pruefungstermin): bool
+    - __get_connection(): Connection
+  }
+
+  class PruefungsanmeldungRepository <<repository>> {
+    - db_path: str
+    --
+    + __init__(db_path: str)
+    + find_by_id(anmeldung_id: int): Pruefungsanmeldung | None
+    + find_by_modulbuchung(modulbuchung_id: int): Pruefungsanmeldung | None
+    + create(anmeldung: Pruefungsanmeldung): int
+    + update_status(anmeldung_id: int, status: str): bool
+    + stornieren(anmeldung_id: int): bool
+    - __get_connection(): Connection
+  }
+
+  class DBGateway <<persistence>> {
+    - db_path: str
+    --
+    + __init__(db_path: str)
+    + execute_query(query: str, params: tuple): List[Row]
+    + execute_insert(query: str, params: tuple): int
+    + execute_update(query: str, params: tuple): int
+    - __get_connection(): Connection
+  }
+
+  note right of PruefungsterminRepository
+    **Neu in Phase 2:**
+    Verwaltet Prüfungstermine
+    inkl. Kapazitätsprüfung und
+    Anmeldeschluss-Validierung
+  end note
+
+  note right of PruefungsanmeldungRepository
+    **Neu in Phase 2:**
+    Verwaltet Prüfungsanmeldungen
+    mit Statusverwaltung
+    (angemeldet, storniert)
+  end note
+}
+
+' ============================================================================
+' LAYER 4: MODELS (Domain Objects)
+' ============================================================================
+package "models/" <<Folder>> {
+
+  class Student <<entity>> {
+    + id: int
+    + vorname: str
+    + nachname: str
+    + matrikelnr: str
+    + login_id: int
+    --
+    + get_full_name(): str
+    + calculate_semester(einschreibung): int
+    + validate(): tuple[bool, str]
+    + to_dict(): dict
+    + {static} from_db_row(row): Student
+    --
+    - __get_display_name(): str
+  }
+
+  class Studiengang <<entity>> {
+    + id: int
+    + name: str
+    + abschluss: str
+    + ects_gesamt: int
+    + regel_semester: int
+    --
+    + to_dict(): dict
+  }
+
+  class Modul <<entity>> {
+    + id: int
+    + name: str
+    + ects: int
+    + beschreibung: str
+    --
+    + to_dict(): dict
+  }
+
+  class StudiengangModul <<entity>> {
+    + id: int
+    + studiengang_id: int
+    + modul_id: int
+    + semester: int
+    + pflichtgrad: str
+  }
+
+  class Einschreibung <<entity>> {
+    + id: int | None
+    + student_id: int
+    + studiengang_id: int
+    + zeitmodell_id: int
+    + start_datum: date
+    + exmatrikulations_datum: date | None
+    + status: str
+    --
+    + get_study_duration_months(): int
+    + validate(): None
+    + to_dict(): dict
+    + {static} from_db_row(row): Einschreibung
+    --
+    - __calculate_months_since_start(reference_date: date): int
+  }
+
+  note left of Einschreibung
+    **AGGREGATION zu Student:**
+    Lebt unabhängig vom Student
+    (Archiv, Buchhaltung)
+
+    **KOMPOSITION:**
+    Modulbuchungen sterben
+    mit der Einschreibung
+
+    **AGGREGATION:**
+    Gebühren leben unabhängig
+  end note
+
+  class Modulbuchung <<entity>> {
+    + id: int
+    + einschreibung_id: int
+    + modul_id: int
+    + buchungsdatum: date | None
+    + status: str
+    --
+    + is_open(): bool
+    + is_passed(): bool
+    + is_recognized(): bool
+    + to_dict(): dict
+    + {static} from_row(row): Modulbuchung
+  }
+
+  class Pruefungsleistung <<entity>> {
+    + note: Decimal | None
+    + pruefungsdatum: date | None
+    + versuch: int
+    + max_versuche: int
+    + anmeldemodus: str
+    + thema: str | None
+    --
+    + has_grade(): bool
+    + is_passed(): bool
+    + can_retry(): bool
+    + get_grade_category(): str
+    + to_dict(): dict
+  }
+
+  note right of Pruefungsleistung
+    **VERERBUNG:**
+    Erbt von Modulbuchung
+
+    **POLYMORPHIE:**
+    is_passed() überschreibt
+    Basisklassen-Methode
+
+    Note ≤ 4.0 → bestanden
+  end note
+
+  class Pruefungstermin <<entity>> {
+    + id: int | None
+    + modul_id: int
+    + datum: date
+    + beginn: time | None
+    + ende: time | None
+    + art: str
+    + ort: str | None
+    + anmeldeschluss: datetime | None
+    + kapazitaet: int | None
+    + beschreibung: str | None
+    --
+    + is_anmeldung_moeglich(): bool
+    + ist_voll(): bool
+    + to_dict(): dict
+    + {static} from_row(row): Pruefungstermin
+  }
+
+  note left of Pruefungstermin
+    **Neu in Phase 2:**
+
+    **Prüfungsarten:**
+    - online
+    - praesenz
+    - projekt
+    - workbook
+
+    **Validierung:**
+    - Anmeldeschluss-Prüfung
+    - Kapazitätsprüfung
+  end note
+
+  class Pruefungsanmeldung <<entity>> {
+    + id: int | None
+    + modulbuchung_id: int
+    + pruefungstermin_id: int
+    + anmeldedatum: datetime
+    + status: str
+    --
+    + ist_aktiv(): bool
+    + kann_storniert_werden(): bool
+    + to_dict(): dict
+    + {static} from_row(row): Pruefungsanmeldung
+  }
+
+  note right of Pruefungsanmeldung
+    **Neu in Phase 2:**
+
+    **Status-Werte:**
+    - angemeldet
+    - storniert
+    - teilgenommen
+
+    **Beziehungen:**
+    1 Modulbuchung → N Anmeldungen
+    (bei Wiederholung möglich)
+  end note
+
+  class Gebuehr <<entity>> {
+    + id: int | None
+    + einschreibung_id: int
+    + art: str
+    + betrag: Decimal
+    + faellig_am: date
+    + bezahlt_am: date | None
+    --
+    + is_paid(): bool
+    + is_overdue(): bool
+    + days_until_due(): int
+    + validate(): None
+    + to_dict(): dict
+    + {static} from_db_row(row): Gebuehr
+    --
+    - __calculate_days_until(target_date: date): int
+    - __format_currency(): str
+  }
+
+  class Progress <<dto>> {
+    + ects_erworben: int
+    + ects_gesamt: int
+    + ects_percent: float
+    + anzahl_bestandene_module: int
+    + anzahl_gebuchte_module: int
+    + durchschnittsnote: Decimal
+    + offene_gebuehren: Decimal
+    + aktuelles_semester: int
+    + erwartetes_semester: int
+    --
+    + to_dict(): dict
+  }
+
+  note left of Progress
+    **DATA TRANSFER OBJECT**
+
+    Aggregiert Daten aus:
+    - Modulbuchungen
+    - Prüfungsleistungen
+    - Gebühren
+
+    **Semester-Unterscheidung:**
+    • aktuelles_semester = Fortschritt
+      (für Pfad-Position)
+    • erwartetes_semester = Zeit
+      (für Progress-Texte)
+  end note
+
+  class Login <<entity>> {
+    + id: int | None
+    + student_id: int
+    + email: str
+    + password_hash: str
+    + is_active: int
+    + role: str
+    + created_at: str | None
+    + must_change_password: int
+    + last_login: str | None
+    --
+    + verify_password(password: str): bool
+    + {static} hash_password(password: str): str
+    + is_active_account(): bool
+    + validate(): None
+    + to_dict(): dict
+    + {static} from_db_row(row): Login
+    --
+    - __normalize_email(email: str): str
+    - __validate_email_format(): bool
+    - __get_email_domain(): str
+    - __is_password_hash_argon2(): bool
+    - __calculate_account_age_days(): int
+    - __is_recently_created(days: int): bool
+    - __has_logged_in_before(): bool
+  }
+
+  note right of Login
+    **KOMPOSITION zu Student:**
+    Login gehört zum Student
+    und stirbt mit ihm.
+
+    **Argon2 Password Hashing**
+    Sicher verschlüsselte Passwörter
+
+    **ENCAPSULATION:**
+    • 7 PUBLIC Methoden
+    • 7 PRIVATE Methoden (__)
+    Private Helper für interne Logik
+  end note
+}
+
+' ============================================================================
+' LAYER 5: SERVICES & UTILITIES
+' ============================================================================
+package "services/" <<Folder>> {
+  class ProgressTextService <<service>> {
+    + get_grade_text(note: float): tuple[str, str]
+    + get_time_text(progress: Progress): tuple[str, str]
+    + get_fee_text(offene_gebuehren: float): str
+  }
+}
+
+package "processing/" <<Folder>> {
+  class PathDetector <<service>> {
+    - WAYPOINTS: List[dict]
+    --
+    + calculate_position(progress: Progress): dict
+    - __interpolate(p1: dict, p2: dict, t: float): dict
+  }
+}
+
+package "utils/" <<Folder>> {
+  class User <<entity>> {
+    + id: int
+    + email: str
+    --
+    + __init__(user_id: int, email: str)
+    + {static} get(user_id: int, db_path: str): User | None
+    + is_authenticated(): bool
+    + is_active(): bool
+    + is_anonymous(): bool
+    + get_id(): str
+  }
+}
+
+' ============================================================================
+' DATABASE
+' ============================================================================
+class SQLite3 <<database>> {
+  + **dashboard.db**
+  --
+  **Tabellen:**
+  - login
+  - student
+  - studiengang
+  - modul
+  - studiengang_modul
+  - einschreibung
+  - modulbuchung
+  - pruefungsleistung
+  - gebuehr
+  **Neu in Phase 2:**
+  - pruefungsart
+  - modul_pruefungsart
+  - pruefungstermin
+  - pruefungsanmeldung
+}
+
+note right of SQLite3
+  **Prüfungssystem (Phase 2):**
+
+  pruefungsart:
+  • Kürzel (K, AWB, PO, F, FP, PB)
+  • Name, Anzeigename
+  • hat_unterteilung (Klausur → online/präsenz)
+
+  modul_pruefungsart:
+  • many-to-many Beziehung
+  • ist_standard Flag
+  • reihenfolge für Dropdown
+
+  pruefungstermin:
+  • Datum, Uhrzeit, Art, Ort
+  • Anmeldeschluss, Kapazität
+
+  pruefungsanmeldung:
+  • Status (angemeldet, storniert)
+  • Referenzen zu Modulbuchung & Termin
+end note
+
+' ============================================================================
+' FLASK APP → CONTROLLERS
+' ============================================================================
+app.py --> AuthController : creates & uses
+app.py --> DashboardController : creates & uses
+app.py --> SemesterController : creates & uses
+app.py --> User : uses (Flask-Login)
+app.py --> PruefungsterminRepository : uses
+app.py --> PruefungsanmeldungRepository : uses
+
+' ============================================================================
+' CONTROLLER → REPOSITORY CONNECTIONS
+' ============================================================================
+AuthController --> StudentRepository : uses
+
+DashboardController --> StudentRepository : uses
+DashboardController --> EinschreibungRepository : uses
+DashboardController --> ProgressRepository : uses
+DashboardController --> PathDetector : uses
+DashboardController --> ProgressTextService : uses
+
+SemesterController --> StudentRepository : uses
+SemesterController --> EinschreibungRepository : uses
+SemesterController --> ModulRepository : uses
+SemesterController --> ModulbuchungRepository : uses
+
+' ============================================================================
+' REPOSITORY → GATEWAY & DATABASE
+' ============================================================================
+StudentRepository --> DBGateway : uses
+EinschreibungRepository --> DBGateway : uses
+ModulbuchungRepository --> DBGateway : uses
+GebuehrRepository --> DBGateway : uses
+ProgressRepository --> DBGateway : uses
+
+ModulRepository ..> SQLite3 : direct SQL access
+PruefungsterminRepository ..> SQLite3 : direct SQL access
+PruefungsanmeldungRepository ..> SQLite3 : direct SQL access
+
+DBGateway --> SQLite3 : queries
+
+' ============================================================================
+' REPOSITORY DEPENDENCIES
+' ============================================================================
+ProgressRepository --> GebuehrRepository : uses
+
+' ============================================================================
+' REPOSITORY → MODEL CONNECTIONS
+' ============================================================================
+StudentRepository ..> Student : creates
+ModulRepository ..> Modul : uses
+EinschreibungRepository ..> Einschreibung : creates
+ModulbuchungRepository ..> Modulbuchung : creates
+GebuehrRepository ..> Gebuehr : creates
+ProgressRepository ..> Progress : creates
+PruefungsterminRepository ..> Pruefungstermin : creates
+PruefungsanmeldungRepository ..> Pruefungsanmeldung : creates
+
+' ============================================================================
+' USER & LOGIN CONNECTION
+' ============================================================================
+User ..> Login : authenticates via
+Student *-- "1" Login : besitzt
+
+' ============================================================================
+' DOMAIN MODEL RELATIONSHIPS
+' ============================================================================
+' KOMPOSITION (gefüllte Raute ◆) = Lebensdauerabhängigkeit, "stirbt mit"
+Student *-- "1" Login : besitzt
+Einschreibung *-- "0..*" Modulbuchung : enthält
+
+' AGGREGATION (leere Raute ◇) = Lockere Kopplung, "lebt unabhängig"
+Student o-- "0..*" Einschreibung : hat
+Einschreibung o-- "0..*" Gebuehr : erzeugt
+
+' VERERBUNG (inheritance)
+Pruefungsleistung --|> Modulbuchung : erbt von
+
+' ASSOZIATIONEN (fachliche Referenzen)
+Einschreibung --> "1" Studiengang : bezieht sich auf
+Modulbuchung --> "1" Modul : betrifft
+Studiengang o-- "1..*" StudiengangModul : definiert
+Modul o-- "1..*" StudiengangModul : wird verwendet in
+
+' NEUE BEZIEHUNGEN (Phase 2)
+Modul o-- "0..*" Pruefungstermin : hat
+Modulbuchung o-- "0..*" Pruefungsanmeldung : ermöglicht
+Pruefungsanmeldung --> "1" Pruefungstermin : bezieht sich auf
+
+' ============================================================================
+' NOTES
+' ============================================================================
+note right of app.py
+  **Flask Application (Entry Point)**
+  - Flask-Login Integration
+  - Session Management
+  - Route Definitions
+  - Controller Orchestration
+  --
+  **Wichtige Routen:**
+  • GET/POST /login
+  • GET /dashboard
+  • GET /semester/<int:nr>
+  • POST /api/book-module
+  **Neu in Phase 2:**
+  • GET /api/pruefungstermine/<int:modul_id>
+  • POST /api/pruefung-anmelden
+end note
+
+note right of DashboardController
+  **Dashboard-Logik:**
+  1. Student laden
+  2. Einschreibung ermitteln
+  3. Progress berechnen
+  4. Auto-Position bestimmen
+  5. Texte formatieren
+  6. Alle Daten aggregieren
+end note
+
+note right of SemesterController
+  **Semester & Modulbuchung:**
+  1. Module für Semester laden
+  2. Buchungsstatus prüfen
+  3. Prüfungsdaten hinzufügen
+  4. Modulbuchung ermöglichen
+end note
+
+note right of ProgressRepository
+  **Aggregiert Fortschrittsdaten:**
+  • ECTS-Fortschritt
+  • Durchschnittsnote
+  • Offene Gebühren
+  • Semester-Berechnung (Fortschritt vs. Zeit)
+  --
+  Verwendet:
+  - GebuehrRepository
+  - Direkte SQL-Queries
+end note
+
+note bottom of SQLite3
+  **Datenbankstruktur:**
+  Haupttabellen für:
+  - Authentifizierung (login)
+  - Stammdaten (student, studiengang, modul)
+  - Beziehungen (studiengang_modul, einschreibung)
+  - Transaktionen (modulbuchung, pruefungsleistung, gebuehr)
+  **Phase 2 Erweiterungen:**
+  - Prüfungsarten-Verwaltung (pruefungsart, modul_pruefungsart)
+  - Termin-Management (pruefungstermin)
+  - Anmelde-System (pruefungsanmeldung)
+end note
+
+' ============================================================================
+' LEGEND
+' ============================================================================
+legend right
+  |= Symbol |= Bedeutung |
+  | <<application>> | Flask Application |
+  | <<control>> | Controller (Business Logic) |
+  | <<repository>> | Repository (Data Access) |
+  | <<entity>> | Domain Model / Entity |
+  | <<dto>> | Data Transfer Object |
+  | <<service>> | Service Class |
+  | <<persistence>> | Database Gateway |
+  | <<database>> | Database |
+  | ---> | uses / depends on |
+  | ...> | creates / returns |
+  | *-- | Komposition (◆) - stirbt mit |
+  | o-- | Aggregation (◇) - lebt unabhängig |
+  | --|> | Vererbung (Inheritance) |
+  | --> | Assoziation (Referenz) |
+  | + | Public (öffentlich) |
+  | - | Private (__double_underscore) |
+
+  **OOP-Prinzipien im Projekt:**
+  • Komposition: Student ◆→ Login, Einschreibung ◆→ Modulbuchung
+  • Aggregation: Student ◇→ Einschreibung, Einschreibung ◇→ Gebuehr
+  • Vererbung: Pruefungsleistung extends Modulbuchung
+  • Polymorphie: Pruefungsleistung.is_passed() überschreibt Modulbuchung.is_passed()
+  • Encapsulation: Public (+) / Private (-) Methoden in allen Models
+
+  **Architektur-Pattern:**
+  • Repository Pattern
+  • MVC (Controller)
+  • Gateway Pattern
+  • DTO Pattern
+
+  **Projektstruktur:**
+  dashboardProject/
+  ├── controllers/
+  ├── models/
+  ├── repositories/
+  ├── services/
+  ├── processing/
+  ├── utils/
+  ├── static/
+  ├── templates/
+  ├── tests/
+  ├── docs/
+  └── app.py
+
+  **Phase 2 Highlights:**
+  ✅ Prüfungsanmeldungs-System
+  ✅ Prüfungsarten-Verwaltung (6 Typen)
+  ✅ Termin-Management mit Kapazitätsprüfung
+  ✅ Two-Stage Dropdown (Klausur → online/präsenz)
+  ✅ Many-to-Many Relationships
+
+  **Stand:** November 2025
+endlegend
+
+@enduml

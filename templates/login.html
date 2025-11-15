@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Login - IU Dashboard{% endblock %}
+
+{% block body_class %} class="auth"{% endblock %}
+
+{% block content %}
+<main class="auth-card">
+    <h1>Login</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                        <button type="button" class="flash-close" onclick="this.parentElement.style.display='none'">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('login') }}" id="loginForm">
+        <div class="form-group">
+            <label for="email">E-Mail</label>
+            <input type="email" id="email" name="email" required autofocus />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Passwort</label>
+            <input type="password" id="password" name="password" required />
+        </div>
+
+        <button type="submit">Einloggen</button>
+
+        <div class="form-footer">
+            <a href="{{ url_for('forgot_password') }}" class="forgot-password-link">
+                Passwort vergessen?
+            </a>
+        </div>
+    </form>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='login_validation.js') }}" defer></script>
+{% endblock %}

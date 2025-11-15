@@ -1,0 +1,362 @@
+/* =================================================================
+  MODALS.CSS - Auto-generated from style.css
+  ================================================================= */
+
+/* === SEMESTER-MODAL === */
+.semester-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.semester-modal.show {
+    opacity: 1;
+}
+
+.semester-modal-content {
+    background: #1a1a1a;
+    border: 2px solid #00ccff;
+    border-radius: 15px;
+    max-width: 900px;
+    width: 95%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 60px rgba(0, 204, 255, 0.4);
+    animation: modalSlideIn 0.4s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* âœ… STICKY HEADER beim Scrollen */
+.modal-header {
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 13px 13px 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 24px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.close-modal {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.close-modal:hover {
+    transform: rotate(90deg);
+}
+
+/* Modal Body mit Scroll */
+.modal-body {
+    padding: 30px;
+    min-height: 200px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.loading {
+    text-align: center;
+    color: #00ccff;
+    font-size: 18px;
+    padding: 40px;
+}
+
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* âœ… MODUL CARDS: Kompakter + Buttons auf gleicher HÃ¶he */
+.modul-card {
+    background: #2a2a2a;
+    border: 2px solid #444;
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+}
+
+.modul-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 204, 255, 0.2);
+    border-color: #00ccff;
+}
+
+.modul-card.bestanden {
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.05);
+}
+
+.modul-card.gebucht {
+    border-color: #ffaa00;
+    background: rgba(255, 170, 0, 0.05);
+}
+
+.modul-card.offen {
+    border-color: #666;
+}
+
+.modul-card.nicht_bestanden {
+    border-color: #ff4444;
+    background: rgba(255, 68, 68, 0.05);
+}
+
+/* === STATUS: ANERKANNT (Ohne Note) === */
+.modul-card.anerkannt {
+    border-color: #00ccff;
+    background: rgba(0, 204, 255, 0.05);
+}
+
+.status-badge.recognized {
+    background: rgba(0, 204, 255, 0.2);
+    color: #00ccff;
+}
+
+.modul-card.anerkannt:hover {
+    border-color: #00ddff;
+    box-shadow: 0 8px 25px rgba(0, 204, 255, 0.3);
+}
+
+/* === MODUL CARD ELEMENTS === */
+.modul-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    min-height: 48px;
+}
+
+/* âœ… MODULNAME ZENTRIERT */
+.modul-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 17px;
+    line-height: 1.3;
+    flex: 1;
+    text-align: center;
+}
+
+.ects-badge {
+    background: #0088cc;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 10px;
+    flex-shrink: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.modul-info {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.pflichtgrad {
+    color: #aaa;
+    font-size: 13px;
+}
+
+.note {
+    color: #00ff88;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* âœ… Status nimmt flexiblen Raum ein */
+.modul-status {
+    margin-bottom: 12px;
+    flex-grow: 1;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.status-badge.passed {
+    background: rgba(0, 255, 136, 0.2);
+    color: #00ff88;
+}
+
+.status-badge.booked {
+    background: rgba(255, 170, 0, 0.2);
+    color: #ffaa00;
+}
+
+.status-badge.open {
+    background: rgba(255, 255, 255, 0.1);
+    color: #aaa;
+}
+
+.status-badge.failed {
+    background: rgba(255, 68, 68, 0.2);
+    color: #ff4444;
+}
+
+/* âœ… BUTTON immer am unteren Ende */
+.book-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #00ccff 0%, #0088cc 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: auto;
+}
+
+.book-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(0, 204, 255, 0.4);
+}
+
+.book-btn:active {
+    transform: scale(0.98);
+}
+
+.no-modules {
+    text-align: center;
+    color: #888;
+    padding: 40px;
+    font-size: 16px;
+}
+
+.error {
+    color: #ff4444;
+    text-align: center;
+    padding: 40px;
+    font-size: 16px;
+}
+
+/* === PRÃœFUNGSANMELDUNGS-MODAL === */
+.exam-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.exam-modal.show {
+    opacity: 1;
+}
+
+.exam-modal-content {
+    background: #1a1a1a;
+    border: 2px solid #00ccff;
+    border-radius: 15px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 60px rgba(0, 204, 255, 0.5);
+    animation: modalSlideIn 0.4s ease;
+}
+
+.exam-modal-header {
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 13px 13px 0 0;
+}
+
+.exam-modal-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 22px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.exam-modal-body {
+    padding: 30px;
+}
+
+.exam-modul-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #00ccff;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+/* === EXAM BUTTON (auf Modulkarte) === */
+.exam-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+}
+
+.exam-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+}
+
+.exam-btn:active {
+    transform: scale(0.98);
+}

@@ -1,0 +1,233 @@
+/* =================================================================
+   BASE.CSS - Dashboard Layout & Core Styles
+   ================================================================= */
+
+/* === Dashboard Container === */
+.dashboard-container {
+    position: relative;
+    width: 100%;
+    max-width: 100vw;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.svg-wrapper {
+    position: relative;
+    width: 100%;
+    background: #1a1a1a;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* === SVG Layers === */
+.infotainment-bg {
+    position: relative;
+    width: 100%;
+    height: auto;
+    display: block;
+    z-index: 1;
+}
+
+.path-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.car-overlay {
+    position: absolute;
+    width: 150px !important;
+    height: auto;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 5px 15px rgba(0, 204, 255, 0.6));
+    z-index: 10;
+    cursor: pointer;
+}
+
+.car-overlay:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 8px 25px rgba(0, 204, 255, 0.9));
+}
+
+/* === Student Info Header === */
+.student-info {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%);
+    border: 2px solid #00ccff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.student-info h2 {
+    margin: 0;
+    color: #00ccff;
+}
+
+/* === Logout Button === */
+.logout-btn {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    cursor: pointer;
+}
+
+.logout-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: white;
+    transition: transform 0.3s ease;
+}
+
+.logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.logout-btn:hover svg {
+    transform: translateX(3px);
+}
+
+.logout-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+/* === Studiennavigator Header === */
+.studiennavigator-header {
+    position: absolute;
+    top: 8%;
+    left: 60%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    text-shadow: 0 3px 15px rgba(0, 0, 0, 0.8);
+    z-index: 15;
+    letter-spacing: 1px;
+}
+
+/* === Module Grid === */
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+/* === Buttons Base === */
+.book-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #024177 0%, #013a68 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.book-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(2, 65, 119, 0.4);
+}
+
+.book-btn:active {
+    transform: scale(0.98);
+}
+
+.exam-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+}
+
+.exam-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+}
+
+.exam-btn:active {
+    transform: scale(0.98);
+}
+
+/* === Info Badge (für Module ohne Prüfungsart) === */
+.info-badge {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    border-radius: 8px;
+    color: white;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 8px;
+    opacity: 0.8;
+}
+
+/* === Status Badges === */
+.status {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status.verfuegbar {
+    background: rgba(156, 163, 175, 0.2);
+    color: #9ca3af;
+}
+
+.status.gebucht {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.status.angemeldet {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.status.bestanden {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.status.anerkannt {
+    background: rgba(168, 85, 247, 0.2);
+    color: #a855f7;
+}
+
+.status.nicht_bestanden {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}

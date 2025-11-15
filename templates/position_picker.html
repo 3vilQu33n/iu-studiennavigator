@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Auto-Position Picker – Studiennavigator{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='position_picker.css') }}">
+{% endblock %}
+
+{% block content %}
+<div id="info">
+    <h2>Auto-Position Picker</h2>
+    <div class="current-semester">Aktuell: <span id="current-sem">Semester 1</span></div>
+    <p>Klicke auf die Position, wo das Auto sein soll:</p>
+    <div id="positions"></div>
+    <button id="copy-btn">📋 Python-Code kopieren</button>
+    <button id="reset-btn">🔄 Zurücksetzen</button>
+</div>
+
+<div id="container">
+    <img id="svg-image" src="{{ url_for('static', filename='uploads/Pfad.svg') }}" alt="Pfad">
+    <div id="marker"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='position_picker.js') }}" defer></script>
+{% endblock %}

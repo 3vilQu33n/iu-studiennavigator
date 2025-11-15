@@ -1,0 +1,4870 @@
+====================================================================================================
+DASHBOARD PROJECT - VOLLSTÄNDIGE WARNING-ANALYSE
+Erstellt: 2025-11-05 13:14:31
+====================================================================================================
+
+📊 ZUSAMMENFASSUNG
+----------------------------------------------------------------------------------------------------
+
+Gesamt-Warnings: 1314
+
+Warnings nach Kategorie:
+   656  Missing Return Type
+   544  Missing Type Hint
+    64  Duplicated Code
+    33  Unused Import
+     9  Line Too Long
+     6  Trailing Whitespace
+     2  Missing Whitespace
+
+
+📁 WARNINGS NACH DATEI
+====================================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: app.py (16 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   50 | [MISSING TYPE HINT]
+           Parameter 'user_id' has no type hint
+
+  Line   50 | [MISSING RETURN TYPE]
+           Function 'load_user' has no return type hint
+
+  Line   60 | [MISSING RETURN TYPE]
+           Function 'login' has no return type hint
+
+  Line   93 | [MISSING RETURN TYPE]
+           Function 'logout' has no return type hint
+
+  Line  107 | [MISSING RETURN TYPE]
+           Function 'dashboard' has no return type hint
+
+  Line  130 | [MISSING TYPE HINT]
+           Parameter 'semester_nr' has no type hint
+
+  Line  130 | [MISSING RETURN TYPE]
+           Function 'get_semester_modules' has no return type hint
+
+  Line  161 | [MISSING TYPE HINT]
+           Parameter 'semester_nr' has no type hint
+
+  Line  161 | [MISSING TYPE HINT]
+           Parameter 'modul_id' has no type hint
+
+  Line  161 | [MISSING RETURN TYPE]
+           Function 'book_module' has no return type hint
+
+  Line  197 | [MISSING RETURN TYPE]
+           Function 'api_book_module' has no return type hint
+
+  Line  256 | [MISSING RETURN TYPE]
+           Function 'register_exam' has no return type hint
+
+  Line  374 | [MISSING TYPE HINT]
+           Parameter 'e' has no type hint
+
+  Line  374 | [MISSING RETURN TYPE]
+           Function 'not_found' has no return type hint
+
+  Line  380 | [MISSING TYPE HINT]
+           Parameter 'e' has no type hint
+
+  Line  380 | [MISSING RETURN TYPE]
+           Function 'internal_error' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: config.py (2 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line  122 | [MISSING TYPE HINT]
+           Parameter 'level' has no type hint
+
+  Line  122 | [MISSING RETURN TYPE]
+           Function 'setup_logging' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: controllers/auth_controller.py (1 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   37 | [MISSING RETURN TYPE]
+           Function '_con' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: controllers/dashboard_controller.py (1 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: controllers/semester_controller.py (6 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line    3 | [UNUSED IMPORT]
+           Unused import: 'Optional'
+
+  Line    6 | [LINE TOO LONG]
+           Line too long (132 > 120 characters)
+
+  Line   99 | [LINE TOO LONG]
+           Line too long (127 > 120 characters)
+
+  Line  147 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  148 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: models/einschreibung.py (3 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   12 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line  166 | [MISSING TYPE HINT]
+           Parameter 'cls' has no type hint
+
+  Line  166 | [MISSING TYPE HINT]
+           Parameter 'row' has no type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: models/gebuehr.py (3 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   10 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line  195 | [MISSING TYPE HINT]
+           Parameter 'cls' has no type hint
+
+  Line  195 | [MISSING TYPE HINT]
+           Parameter 'row' has no type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: models/login.py (3 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   14 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line  177 | [MISSING TYPE HINT]
+           Parameter 'cls' has no type hint
+
+  Line  177 | [MISSING TYPE HINT]
+           Parameter 'row' has no type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: models/modul.py (3 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line   30 | [MISSING TYPE HINT]
+           Parameter 'cls' has no type hint
+
+  Line   30 | [MISSING TYPE HINT]
+           Parameter 'row' has no type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: models/modulbuchung.py (4 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line   23 | [MISSING RETURN TYPE]
+           Function '__post_init__' has no return type hint
+
+  Line   56 | [MISSING TYPE HINT]
+           Parameter 'cls' has no type hint
+
+  Line   56 | [MISSING TYPE HINT]
+           Parameter 'row' has no type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: models/progress.py (2 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line   23 | [MISSING RETURN TYPE]
+           Function '__post_init__' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: models/pruefungsleistung.py (4 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line   25 | [MISSING RETURN TYPE]
+           Function '__post_init__' has no return type hint
+
+  Line   92 | [MISSING TYPE HINT]
+           Parameter 'cls' has no type hint
+
+  Line   92 | [MISSING TYPE HINT]
+           Parameter 'row' has no type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: models/student.py (3 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   14 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line  113 | [MISSING TYPE HINT]
+           Parameter 'cls' has no type hint
+
+  Line  113 | [MISSING TYPE HINT]
+           Parameter 'row' has no type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: models/studiengang.py (4 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   12 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line   43 | [MISSING RETURN TYPE]
+           Function '__post_init__' has no return type hint
+
+  Line  107 | [MISSING TYPE HINT]
+           Parameter 'cls' has no type hint
+
+  Line  107 | [MISSING TYPE HINT]
+           Parameter 'row' has no type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: models/studiengang_modul.py (5 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   16 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line   52 | [MISSING RETURN TYPE]
+           Function '__post_init__' has no return type hint
+
+  Line  113 | [MISSING TYPE HINT]
+           Parameter 'cls' has no type hint
+
+  Line  113 | [MISSING TYPE HINT]
+           Parameter 'row' has no type hint
+
+  Line  125 | [LINE TOO LONG]
+           Line too long (133 > 120 characters)
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: processing/path_detector.py (14 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    3 | [UNUSED IMPORT]
+           Unused import: 'np'
+
+  Line    6 | [MISSING TYPE HINT]
+           Parameter 'image_path' has no type hint
+
+  Line   13 | [MISSING RETURN TYPE]
+           Function 'process_and_save' has no return type hint
+
+  Line   34 | [MISSING TYPE HINT]
+           Parameter 'semester_count' has no type hint
+
+  Line   34 | [MISSING RETURN TYPE]
+           Function 'get_position_for_semester' has no return type hint
+
+  Line   50 | [MISSING TYPE HINT]
+           Parameter 'hsv_img' has no type hint
+
+  Line   50 | [MISSING RETURN TYPE]
+           Function 'get_dark_mask' has no return type hint
+
+  Line   66 | [MISSING TYPE HINT]
+           Parameter 'hsv_img' has no type hint
+
+  Line   66 | [MISSING RETURN TYPE]
+           Function 'get_sign_mask' has no return type hint
+
+  Line   98 | [MISSING TYPE HINT]
+           Parameter 'px' has no type hint
+
+  Line   98 | [MISSING TYPE HINT]
+           Parameter 'py' has no type hint
+
+  Line   98 | [MISSING TYPE HINT]
+           Parameter 'masks' has no type hint
+
+  Line   98 | [MISSING TYPE HINT]
+           Parameter 'radius' has no type hint
+
+  Line   98 | [MISSING RETURN TYPE]
+           Function 'is_near_masked' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: repositories/db_gateway.py (2 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line    8 | [UNUSED IMPORT]
+           Unused import: 'date'
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: repositories/einschreibung_repository.py (5 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line    5 | [UNUSED IMPORT]
+           Unused import: 'Optional'
+
+  Line    6 | [UNUSED IMPORT]
+           Unused import: 'EinschreibungError'
+
+  Line   40 | [LINE TOO LONG]
+           Line too long (134 > 120 characters)
+
+  Line   48 | [LINE TOO LONG]
+           Line too long (123 > 120 characters)
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: repositories/gebuehr_repository.py (2 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line  201 | [LINE TOO LONG]
+           Line too long (122 > 120 characters)
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: repositories/modul_repository.py (2 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line  113 | [MISSING TYPE HINT]
+           Parameter 'row' has no type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: repositories/modulbuchung_repository.py (1 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: repositories/progress_repository.py (4 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line  151 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  152 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  153 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: repositories/student_repository.py (2 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line  102 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  127 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: reset_password.py (2 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   73 | [MISSING RETURN TYPE]
+           Function 'list_users' has no return type hint
+
+  Line   98 | [MISSING RETURN TYPE]
+           Function 'interactive_mode' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: services/progress_text_service.py (1 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/conftest.py (43 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   22 | [UNUSED IMPORT]
+           Unused import: 'ModulBuchung'
+
+  Line   29 | [UNUSED IMPORT]
+           Unused import: 'StudiengangModul'
+
+  Line   37 | [MISSING RETURN TYPE]
+           Function 'temp_db' has no return type hint
+
+  Line   59 | [MISSING RETURN TYPE]
+           Function '_init_real_schema' has no return type hint
+
+  Line  168 | [LINE TOO LONG]
+           Line too long (135 > 120 characters)
+
+  Line  197 | [MISSING WHITESPACE]
+           Missing whitespace after ','
+
+  Line  211 | [LINE TOO LONG]
+           Line too long (145 > 120 characters)
+
+  Line  238 | [MISSING TYPE HINT]
+           Parameter 'temp_db' has no type hint
+
+  Line  238 | [MISSING RETURN TYPE]
+           Function 'db_with_data' has no return type hint
+
+  Line  265 | [TRAILING WHITESPACE]
+           Trailing whitespace
+
+  Line  278 | [TRAILING WHITESPACE]
+           Trailing whitespace
+
+  Line  287 | [TRAILING WHITESPACE]
+           Trailing whitespace
+
+  Line  319 | [MISSING TYPE HINT]
+           Parameter 'temp_db' has no type hint
+
+  Line  319 | [MISSING RETURN TYPE]
+           Function 'app' has no return type hint
+
+  Line  342 | [MISSING TYPE HINT]
+           Parameter 'app' has no type hint
+
+  Line  342 | [MISSING RETURN TYPE]
+           Function 'client' has no return type hint
+
+  Line  348 | [MISSING TYPE HINT]
+           Parameter 'client' has no type hint
+
+  Line  348 | [MISSING TYPE HINT]
+           Parameter 'db_with_data' has no type hint
+
+  Line  348 | [MISSING RETURN TYPE]
+           Function 'authenticated_client' has no return type hint
+
+  Line  362 | [MISSING TYPE HINT]
+           Parameter 'temp_db' has no type hint
+
+  Line  362 | [MISSING RETURN TYPE]
+           Function 'app_client' has no return type hint
+
+  Line  369 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  370 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  371 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  372 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  373 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  374 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  375 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  376 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  409 | [MISSING TYPE HINT]
+           Parameter 'temp_db' has no type hint
+
+  Line  409 | [MISSING RETURN TYPE]
+           Function 'db_connection' has no return type hint
+
+  Line  425 | [MISSING RETURN TYPE]
+           Function 'sample_student' has no return type hint
+
+  Line  439 | [MISSING RETURN TYPE]
+           Function 'sample_modul' has no return type hint
+
+  Line  450 | [MISSING RETURN TYPE]
+           Function 'sample_modulbuchung' has no return type hint
+
+  Line  462 | [MISSING RETURN TYPE]
+           Function 'sample_pruefungsleistung' has no return type hint
+
+  Line  480 | [MISSING RETURN TYPE]
+           Function 'sample_gebuehr' has no return type hint
+
+  Line  493 | [MISSING RETURN TYPE]
+           Function 'sample_einschreibung' has no return type hint
+
+  Line  506 | [MISSING RETURN TYPE]
+           Function 'sample_studiengang' has no return type hint
+
+  Line  518 | [MISSING RETURN TYPE]
+           Function 'sample_progress' has no return type hint
+
+  Line  532 | [MISSING RETURN TYPE]
+           Function 'sample_dates' has no return type hint
+
+  Line  543 | [MISSING RETURN TYPE]
+           Function 'sample_notes' has no return type hint
+
+  Line  558 | [MISSING TYPE HINT]
+           Parameter 'config' has no type hint
+
+  Line  558 | [MISSING RETURN TYPE]
+           Function 'pytest_configure' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/integration/test_db_gateway.py (57 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    6 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line   22 | [MISSING RETURN TYPE]
+           Function '_reload_gateway_with_env' has no return type hint
+
+  Line   61 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   61 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line   61 | [MISSING RETURN TYPE]
+           Function 'test_data_source_points_to_same_file' has no return type hint
+
+  Line   74 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   74 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line   74 | [MISSING RETURN TYPE]
+           Function 'test_db_path_is_absolute' has no return type hint
+
+  Line   89 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   89 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line   89 | [MISSING RETURN TYPE]
+           Function 'test_foreign_keys_enforced' has no return type hint
+
+  Line  104 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  104 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  104 | [MISSING RETURN TYPE]
+           Function 'test_connection_has_row_factory' has no return type hint
+
+  Line  118 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  118 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  118 | [MISSING RETURN TYPE]
+           Function 'test_multiple_connections' has no return type hint
+
+  Line  137 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  137 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  137 | [MISSING RETURN TYPE]
+           Function 'test_backward_compatible_connect' has no return type hint
+
+  Line  160 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  160 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  160 | [MISSING RETURN TYPE]
+           Function 'test_db_gateway_class_exists' has no return type hint
+
+  Line  176 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  176 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  176 | [MISSING RETURN TYPE]
+           Function 'test_db_gateway_class_default_path' has no return type hint
+
+  Line  190 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  190 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  190 | [MISSING RETURN TYPE]
+           Function 'test_db_gateway_class_custom_path' has no return type hint
+
+  Line  209 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  209 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  209 | [MISSING RETURN TYPE]
+           Function 'test_can_create_table' has no return type hint
+
+  Line  237 | [MISSING TYPE HINT]
+           Parameter 'temp_db' has no type hint
+
+  Line  237 | [MISSING RETURN TYPE]
+           Function 'test_schema_tables_exist' has no return type hint
+
+  Line  272 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  272 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  272 | [MISSING RETURN TYPE]
+           Function 'test_foreign_key_constraints_work' has no return type hint
+
+  Line  314 | [MISSING RETURN TYPE]
+           Function 'test_db_error_exception' has no return type hint
+
+  Line  330 | [MISSING RETURN TYPE]
+           Function 'test_db_error_has_message' has no return type hint
+
+  Line  353 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  353 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  353 | [MISSING RETURN TYPE]
+           Function 'test_transaction_commit' has no return type hint
+
+  Line  387 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  387 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  387 | [MISSING RETURN TYPE]
+           Function 'test_transaction_rollback' has no return type hint
+
+  Line  420 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  420 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  420 | [MISSING RETURN TYPE]
+           Function 'test_transaction_isolation' has no return type hint
+
+  Line  472 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  472 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  472 | [MISSING RETURN TYPE]
+           Function 'test_insert_and_retrieve' has no return type hint
+
+  Line  507 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  507 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  507 | [MISSING RETURN TYPE]
+           Function 'test_update_operation' has no return type hint
+
+  Line  536 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  536 | [MISSING TYPE HINT]
+           Parameter 'monkeypatch' has no type hint
+
+  Line  536 | [MISSING RETURN TYPE]
+           Function 'test_delete_operation' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/integration/test_routes.py (35 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   20 | [MISSING TYPE HINT]
+           Parameter 'db_connection' has no type hint
+
+  Line   20 | [MISSING TYPE HINT]
+           Parameter 'db_path' has no type hint
+
+  Line   20 | [MISSING TYPE HINT]
+           Parameter 'email' has no type hint
+
+  Line   20 | [MISSING TYPE HINT]
+           Parameter 'password' has no type hint
+
+  Line   20 | [MISSING RETURN TYPE]
+           Function 'create_test_user' has no return type hint
+
+  Line   56 | [LINE TOO LONG]
+           Line too long (125 > 120 characters)
+
+  Line   75 | [MISSING TYPE HINT]
+           Parameter 'app_client' has no type hint
+
+  Line   75 | [MISSING RETURN TYPE]
+           Function 'test_login_redirects_to_dashboard' has no return type hint
+
+  Line  139 | [MISSING TYPE HINT]
+           Parameter 'app_client' has no type hint
+
+  Line  139 | [MISSING RETURN TYPE]
+           Function 'test_login_wrong_password_shows_error' has no return type hint
+
+  Line  165 | [MISSING TYPE HINT]
+           Parameter 'app_client' has no type hint
+
+  Line  165 | [MISSING RETURN TYPE]
+           Function 'test_login_nonexistent_user_shows_error' has no return type hint
+
+  Line  174 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  175 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  176 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  186 | [MISSING TYPE HINT]
+           Parameter 'app_client' has no type hint
+
+  Line  186 | [MISSING RETURN TYPE]
+           Function 'test_dashboard_requires_login' has no return type hint
+
+  Line  198 | [MISSING TYPE HINT]
+           Parameter 'app_client' has no type hint
+
+  Line  198 | [MISSING RETURN TYPE]
+           Function 'test_logout_redirects_to_login' has no return type hint
+
+  Line  222 | [MISSING TYPE HINT]
+           Parameter 'app_client' has no type hint
+
+  Line  222 | [MISSING RETURN TYPE]
+           Function 'test_logout_requires_relogin' has no return type hint
+
+  Line  225 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  226 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  227 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  228 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  229 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  230 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  253 | [MISSING TYPE HINT]
+           Parameter 'app_client' has no type hint
+
+  Line  253 | [MISSING RETURN TYPE]
+           Function 'test_dashboard_loads_for_authenticated_user' has no return type hint
+
+  Line  308 | [MISSING TYPE HINT]
+           Parameter 'app_client' has no type hint
+
+  Line  308 | [MISSING RETURN TYPE]
+           Function 'test_404_page' has no return type hint
+
+  Line  325 | [MISSING TYPE HINT]
+           Parameter 'app_client' has no type hint
+
+  Line  325 | [MISSING RETURN TYPE]
+           Function 'test_semester_api_requires_login' has no return type hint
+
+  Line  343 | [MISSING TYPE HINT]
+           Parameter 'app_client' has no type hint
+
+  Line  343 | [MISSING RETURN TYPE]
+           Function 'test_complete_login_dashboard_logout_flow' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_auth_controller.py (30 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   24 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   24 | [MISSING RETURN TYPE]
+           Function 'temp_test_db' has no return type hint
+
+  Line   70 | [MISSING TYPE HINT]
+           Parameter 'temp_test_db' has no type hint
+
+  Line   70 | [MISSING RETURN TYPE]
+           Function 'auth_ctrl' has no return type hint
+
+  Line   79 | [MISSING TYPE HINT]
+           Parameter 'temp_test_db' has no type hint
+
+  Line   79 | [MISSING RETURN TYPE]
+           Function 'test_auth_controller_initialization' has no return type hint
+
+  Line   85 | [MISSING TYPE HINT]
+           Parameter 'auth_ctrl' has no type hint
+
+  Line   85 | [MISSING TYPE HINT]
+           Parameter 'temp_test_db' has no type hint
+
+  Line   85 | [MISSING RETURN TYPE]
+           Function 'test_register_new_user' has no return type hint
+
+  Line  110 | [MISSING TYPE HINT]
+           Parameter 'auth_ctrl' has no type hint
+
+  Line  110 | [MISSING TYPE HINT]
+           Parameter 'temp_test_db' has no type hint
+
+  Line  110 | [MISSING RETURN TYPE]
+           Function 'test_register_duplicate_email' has no return type hint
+
+  Line  133 | [MISSING TYPE HINT]
+           Parameter 'auth_ctrl' has no type hint
+
+  Line  133 | [MISSING TYPE HINT]
+           Parameter 'temp_test_db' has no type hint
+
+  Line  133 | [MISSING RETURN TYPE]
+           Function 'test_login_success' has no return type hint
+
+  Line  157 | [MISSING TYPE HINT]
+           Parameter 'auth_ctrl' has no type hint
+
+  Line  157 | [MISSING TYPE HINT]
+           Parameter 'temp_test_db' has no type hint
+
+  Line  157 | [MISSING RETURN TYPE]
+           Function 'test_login_wrong_password' has no return type hint
+
+  Line  179 | [MISSING TYPE HINT]
+           Parameter 'auth_ctrl' has no type hint
+
+  Line  179 | [MISSING RETURN TYPE]
+           Function 'test_login_nonexistent_user' has no return type hint
+
+  Line  187 | [MISSING TYPE HINT]
+           Parameter 'auth_ctrl' has no type hint
+
+  Line  187 | [MISSING TYPE HINT]
+           Parameter 'temp_test_db' has no type hint
+
+  Line  187 | [MISSING RETURN TYPE]
+           Function 'test_change_password_success' has no return type hint
+
+  Line  189 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  190 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  217 | [MISSING TYPE HINT]
+           Parameter 'auth_ctrl' has no type hint
+
+  Line  217 | [MISSING TYPE HINT]
+           Parameter 'temp_test_db' has no type hint
+
+  Line  217 | [MISSING RETURN TYPE]
+           Function 'test_change_password_wrong_old_password' has no return type hint
+
+  Line  219 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  220 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_dashboard_controller.py (80 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   18 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   18 | [MISSING RETURN TYPE]
+           Function 'mock_db_path' has no return type hint
+
+  Line   24 | [MISSING TYPE HINT]
+           Parameter 'mock_db_path' has no type hint
+
+  Line   24 | [MISSING RETURN TYPE]
+           Function 'controller' has no return type hint
+
+  Line   34 | [MISSING RETURN TYPE]
+           Function 'sample_student' has no return type hint
+
+  Line   46 | [MISSING RETURN TYPE]
+           Function 'sample_einschreibung' has no return type hint
+
+  Line   59 | [MISSING RETURN TYPE]
+           Function 'sample_progress' has no return type hint
+
+  Line   74 | [MISSING TYPE HINT]
+           Parameter 'mock_db_path' has no type hint
+
+  Line   74 | [MISSING RETURN TYPE]
+           Function 'test_controller_initialization' has no return type hint
+
+  Line   87 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line   87 | [MISSING RETURN TYPE]
+           Function 'test_semester_positions_defined' has no return type hint
+
+  Line  101 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  101 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  101 | [MISSING RETURN TYPE]
+           Function 'test_get_student_by_auth_user_success' has no return type hint
+
+  Line  113 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  113 | [MISSING RETURN TYPE]
+           Function 'test_get_student_by_auth_user_not_found' has no return type hint
+
+  Line  122 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  122 | [MISSING RETURN TYPE]
+           Function 'test_get_student_by_auth_user_exception_handling' has no return type hint
+
+  Line  135 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  135 | [MISSING RETURN TYPE]
+           Function 'test_get_car_position_semester_1' has no return type hint
+
+  Line  146 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  146 | [MISSING RETURN TYPE]
+           Function 'test_get_car_position_semester_7' has no return type hint
+
+  Line  154 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  154 | [MISSING RETURN TYPE]
+           Function 'test_get_car_position_intermediate' has no return type hint
+
+  Line  166 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  166 | [MISSING RETURN TYPE]
+           Function 'test_get_car_position_boundaries' has no return type hint
+
+  Line  178 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  178 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  178 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  178 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  178 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_complete' has no return type hint
+
+  Line  214 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  214 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_no_student' has no return type hint
+
+  Line  226 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  226 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  226 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_no_einschreibung' has no return type hint
+
+  Line  247 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  247 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  247 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  247 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_time_status_ahead' has no return type hint
+
+  Line  278 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  278 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  278 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  278 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_time_status_minus' has no return type hint
+
+  Line  295 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  308 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  308 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  308 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  308 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  308 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_includes_next_exam' has no return type hint
+
+  Line  339 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  339 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  339 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  339 | [MISSING RETURN TYPE]
+           Function 'test_get_next_exam_found' has no return type hint
+
+  Line  365 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  365 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  365 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  365 | [MISSING RETURN TYPE]
+           Function 'test_get_next_exam_not_found' has no return type hint
+
+  Line  381 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  381 | [MISSING RETURN TYPE]
+           Function 'test_get_next_exam_no_student' has no return type hint
+
+  Line  390 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  390 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  390 | [MISSING RETURN TYPE]
+           Function 'test_get_next_exam_no_einschreibung' has no return type hint
+
+  Line  402 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  402 | [MISSING RETURN TYPE]
+           Function 'test_get_next_exam_exception_handling' has no return type hint
+
+  Line  415 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  415 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  415 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  415 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  415 | [MISSING RETURN TYPE]
+           Function 'test_dashboard_data_structure_complete' has no return type hint
+
+  Line  422 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  444 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  444 | [MISSING RETURN TYPE]
+           Function 'test_car_position_interpolation_accuracy' has no return type hint
+
+  Line  459 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  459 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  459 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  459 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  459 | [MISSING RETURN TYPE]
+           Function 'test_max_semester_calculation' has no return type hint
+
+  Line  481 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  481 | [MISSING RETURN TYPE]
+           Function 'test_fallback_data_on_exception' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_einschreibung.py (30 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   29 | [MISSING RETURN TYPE]
+           Function 'test_einschreibung_create_valid' has no return type hint
+
+  Line   48 | [MISSING RETURN TYPE]
+           Function 'test_einschreibung_create_with_string_date' has no return type hint
+
+  Line   63 | [MISSING RETURN TYPE]
+           Function 'test_einschreibung_default_status' has no return type hint
+
+  Line   76 | [MISSING RETURN TYPE]
+           Function 'test_einschreibung_invalid_status' has no return type hint
+
+  Line   89 | [MISSING RETURN TYPE]
+           Function 'test_einschreibung_invalid_student_id' has no return type hint
+
+  Line  102 | [MISSING RETURN TYPE]
+           Function 'test_einschreibung_invalid_studiengang_id' has no return type hint
+
+  Line  115 | [MISSING RETURN TYPE]
+           Function 'test_einschreibung_invalid_zeitmodell_id' has no return type hint
+
+  Line  128 | [MISSING RETURN TYPE]
+           Function 'test_einschreibung_invalid_date_string' has no return type hint
+
+  Line  145 | [MISSING RETURN TYPE]
+           Function 'test_is_active' has no return type hint
+
+  Line  160 | [MISSING RETURN TYPE]
+           Function 'test_is_paused' has no return type hint
+
+  Line  175 | [MISSING RETURN TYPE]
+           Function 'test_is_exmatriculated' has no return type hint
+
+  Line  194 | [MISSING RETURN TYPE]
+           Function 'test_get_study_duration_months' has no return type hint
+
+  Line  206 | [MISSING RETURN TYPE]
+           Function 'test_get_study_duration_months_same_month' has no return type hint
+
+  Line  217 | [MISSING RETURN TYPE]
+           Function 'test_get_study_duration_months_default_today' has no return type hint
+
+  Line  229 | [MISSING RETURN TYPE]
+           Function 'test_get_study_duration_months_negative_prevented' has no return type hint
+
+  Line  245 | [MISSING RETURN TYPE]
+           Function 'test_to_dict' has no return type hint
+
+  Line  269 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_pausiert' has no return type hint
+
+  Line  286 | [MISSING RETURN TYPE]
+           Function 'test_from_row_with_dict' has no return type hint
+
+  Line  307 | [MISSING RETURN TYPE]
+           Function 'test_from_row_with_date_object' has no return type hint
+
+  Line  323 | [MISSING RETURN TYPE]
+           Function 'test_from_row_without_id' has no return type hint
+
+  Line  339 | [MISSING RETURN TYPE]
+           Function 'test_from_row_default_status' has no return type hint
+
+  Line  355 | [MISSING RETURN TYPE]
+           Function 'test_from_row_invalid_data' has no return type hint
+
+  Line  374 | [MISSING RETURN TYPE]
+           Function 'test_str_representation' has no return type hint
+
+  Line  387 | [MISSING RETURN TYPE]
+           Function 'test_repr_representation' has no return type hint
+
+  Line  407 | [MISSING RETURN TYPE]
+           Function 'test_validation_error_is_einschreibung_error' has no return type hint
+
+  Line  412 | [MISSING RETURN TYPE]
+           Function 'test_database_error_is_einschreibung_error' has no return type hint
+
+  Line  417 | [MISSING RETURN TYPE]
+           Function 'test_not_found_error_is_einschreibung_error' has no return type hint
+
+  Line  422 | [MISSING RETURN TYPE]
+           Function 'test_validation_error_can_be_raised' has no return type hint
+
+  Line  434 | [MISSING RETURN TYPE]
+           Function 'test_einschreibung_with_all_statuses' has no return type hint
+
+  Line  444 | [MISSING RETURN TYPE]
+           Function 'test_einschreibung_validates_on_creation' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_einschreibung_repository.py (80 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   15 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   15 | [MISSING RETURN TYPE]
+           Function 'db_path' has no return type hint
+
+  Line   22 | [MISSING TYPE HINT]
+           Parameter 'db_path' has no type hint
+
+  Line   22 | [MISSING RETURN TYPE]
+           Function 'setup_db' has no return type hint
+
+  Line   55 | [MISSING WHITESPACE]
+           Missing whitespace after ','
+
+  Line   98 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line   98 | [MISSING RETURN TYPE]
+           Function 'repo' has no return type hint
+
+  Line  104 | [MISSING RETURN TYPE]
+           Function 'sample_einschreibung' has no return type hint
+
+  Line  119 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  119 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  119 | [MISSING RETURN TYPE]
+           Function 'test_insert_valid_einschreibung' has no return type hint
+
+  Line  127 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  127 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  127 | [MISSING RETURN TYPE]
+           Function 'test_insert_returns_new_id' has no return type hint
+
+  Line  139 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  139 | [MISSING RETURN TYPE]
+           Function 'test_insert_with_all_fields' has no return type hint
+
+  Line  159 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  159 | [MISSING RETURN TYPE]
+           Function 'test_insert_invalid_student_fails' has no return type hint
+
+  Line  177 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  177 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  177 | [MISSING RETURN TYPE]
+           Function 'test_get_by_id_existing' has no return type hint
+
+  Line  188 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  188 | [MISSING RETURN TYPE]
+           Function 'test_get_by_id_not_found' has no return type hint
+
+  Line  194 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  194 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  194 | [MISSING RETURN TYPE]
+           Function 'test_get_by_id_correct_status' has no return type hint
+
+  Line  205 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  205 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  205 | [MISSING RETURN TYPE]
+           Function 'test_get_aktive_by_student_single' has no return type hint
+
+  Line  215 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  215 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  215 | [MISSING RETURN TYPE]
+           Function 'test_get_aktive_by_student_multiple_returns_latest' has no return type hint
+
+  Line  231 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  231 | [MISSING RETURN TYPE]
+           Function 'test_get_aktive_by_student_not_found' has no return type hint
+
+  Line  237 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  237 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  237 | [MISSING RETURN TYPE]
+           Function 'test_get_aktive_ignores_paused_and_exmatrikuliert' has no return type hint
+
+  Line  249 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  249 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  249 | [MISSING RETURN TYPE]
+           Function 'test_update_status_to_pausiert' has no return type hint
+
+  Line  258 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  258 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  258 | [MISSING RETURN TYPE]
+           Function 'test_update_status_to_exmatrikuliert' has no return type hint
+
+  Line  267 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  267 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  267 | [MISSING RETURN TYPE]
+           Function 'test_update_status_invalid_status' has no return type hint
+
+  Line  275 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  275 | [MISSING RETURN TYPE]
+           Function 'test_update_status_not_found' has no return type hint
+
+  Line  283 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  283 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  283 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  283 | [MISSING RETURN TYPE]
+           Function 'test_wechsel_zeitmodell_valid' has no return type hint
+
+  Line  300 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  300 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  300 | [MISSING RETURN TYPE]
+           Function 'test_wechsel_zeitmodell_invalid_id_type' has no return type hint
+
+  Line  308 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  308 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  308 | [MISSING RETURN TYPE]
+           Function 'test_wechsel_zeitmodell_negative_id' has no return type hint
+
+  Line  316 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  316 | [MISSING RETURN TYPE]
+           Function 'test_wechsel_zeitmodell_not_found' has no return type hint
+
+  Line  324 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  324 | [MISSING RETURN TYPE]
+           Function 'test_get_all_by_student_empty' has no return type hint
+
+  Line  331 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  331 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  331 | [MISSING RETURN TYPE]
+           Function 'test_get_all_by_student_single' has no return type hint
+
+  Line  341 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  341 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  341 | [MISSING RETURN TYPE]
+           Function 'test_get_all_by_student_multiple' has no return type hint
+
+  Line  357 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  357 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  357 | [MISSING RETURN TYPE]
+           Function 'test_get_all_by_student_sorted_by_date' has no return type hint
+
+  Line  373 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  373 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  373 | [MISSING RETURN TYPE]
+           Function 'test_get_all_by_student_includes_all_statuses' has no return type hint
+
+  Line  401 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  401 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  401 | [MISSING RETURN TYPE]
+           Function 'test_full_lifecycle' has no return type hint
+
+  Line  430 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  430 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  430 | [MISSING RETURN TYPE]
+           Function 'test_concurrent_einschreibungen' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_gebuehr.py (40 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    8 | [UNUSED IMPORT]
+           Unused import: 'timedelta'
+
+  Line   24 | [MISSING RETURN TYPE]
+           Function 'test_gebuehr_create_valid' has no return type hint
+
+  Line   42 | [MISSING RETURN TYPE]
+           Function 'test_gebuehr_create_with_payment' has no return type hint
+
+  Line   56 | [MISSING RETURN TYPE]
+           Function 'test_gebuehr_create_with_float_betrag' has no return type hint
+
+  Line   70 | [MISSING RETURN TYPE]
+           Function 'test_gebuehr_create_with_string_dates' has no return type hint
+
+  Line   87 | [MISSING RETURN TYPE]
+           Function 'test_gebuehr_allowed_art' has no return type hint
+
+  Line  102 | [MISSING RETURN TYPE]
+           Function 'test_gebuehr_invalid_art_warning' has no return type hint
+
+  Line  116 | [MISSING RETURN TYPE]
+           Function 'test_gebuehr_negative_betrag_raises' has no return type hint
+
+  Line  128 | [MISSING RETURN TYPE]
+           Function 'test_gebuehr_invalid_betrag_raises' has no return type hint
+
+  Line  140 | [MISSING RETURN TYPE]
+           Function 'test_gebuehr_invalid_date_raises' has no return type hint
+
+  Line  156 | [MISSING RETURN TYPE]
+           Function 'test_is_paid_true' has no return type hint
+
+  Line  170 | [MISSING RETURN TYPE]
+           Function 'test_is_paid_false' has no return type hint
+
+  Line  183 | [MISSING RETURN TYPE]
+           Function 'test_mark_as_paid_default_today' has no return type hint
+
+  Line  185 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  201 | [MISSING RETURN TYPE]
+           Function 'test_mark_as_paid_custom_date' has no return type hint
+
+  Line  222 | [MISSING RETURN TYPE]
+           Function 'test_is_overdue_true' has no return type hint
+
+  Line  238 | [MISSING RETURN TYPE]
+           Function 'test_is_overdue_false_not_due_yet' has no return type hint
+
+  Line  253 | [MISSING RETURN TYPE]
+           Function 'test_is_overdue_false_already_paid' has no return type hint
+
+  Line  269 | [MISSING RETURN TYPE]
+           Function 'test_get_days_overdue_positive' has no return type hint
+
+  Line  284 | [MISSING RETURN TYPE]
+           Function 'test_get_days_overdue_zero_not_overdue' has no return type hint
+
+  Line  299 | [MISSING RETURN TYPE]
+           Function 'test_get_days_overdue_zero_already_paid' has no return type hint
+
+  Line  319 | [MISSING RETURN TYPE]
+           Function 'test_is_due_soon_true' has no return type hint
+
+  Line  334 | [MISSING RETURN TYPE]
+           Function 'test_is_due_soon_false_too_far' has no return type hint
+
+  Line  349 | [MISSING RETURN TYPE]
+           Function 'test_is_due_soon_false_already_paid' has no return type hint
+
+  Line  365 | [MISSING RETURN TYPE]
+           Function 'test_get_days_until_due_positive' has no return type hint
+
+  Line  380 | [MISSING RETURN TYPE]
+           Function 'test_get_days_until_due_negative' has no return type hint
+
+  Line  399 | [MISSING RETURN TYPE]
+           Function 'test_get_formatted_amount_basic' has no return type hint
+
+  Line  412 | [MISSING RETURN TYPE]
+           Function 'test_get_formatted_amount_thousands' has no return type hint
+
+  Line  425 | [MISSING RETURN TYPE]
+           Function 'test_get_status_text_paid' has no return type hint
+
+  Line  439 | [MISSING RETURN TYPE]
+           Function 'test_get_status_text_overdue' has no return type hint
+
+  Line  456 | [MISSING RETURN TYPE]
+           Function 'test_get_status_text_due_soon' has no return type hint
+
+  Line  473 | [MISSING RETURN TYPE]
+           Function 'test_get_status_text_open' has no return type hint
+
+  Line  492 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_unpaid' has no return type hint
+
+  Line  514 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_paid' has no return type hint
+
+  Line  535 | [MISSING RETURN TYPE]
+           Function 'test_from_row_basic' has no return type hint
+
+  Line  556 | [MISSING RETURN TYPE]
+           Function 'test_from_row_with_payment' has no return type hint
+
+  Line  573 | [MISSING RETURN TYPE]
+           Function 'test_from_row_with_string_dates' has no return type hint
+
+  Line  596 | [MISSING RETURN TYPE]
+           Function 'test_str_representation_unpaid' has no return type hint
+
+  Line  613 | [MISSING RETURN TYPE]
+           Function 'test_str_representation_paid' has no return type hint
+
+  Line  631 | [MISSING RETURN TYPE]
+           Function 'test_repr_representation' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_gebuer_repository.py (87 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   16 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   16 | [MISSING RETURN TYPE]
+           Function 'db_path' has no return type hint
+
+  Line   23 | [MISSING TYPE HINT]
+           Parameter 'db_path' has no type hint
+
+  Line   23 | [MISSING RETURN TYPE]
+           Function 'setup_db' has no return type hint
+
+  Line   80 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line   80 | [MISSING RETURN TYPE]
+           Function 'repo' has no return type hint
+
+  Line   86 | [MISSING RETURN TYPE]
+           Function 'sample_gebuehr' has no return type hint
+
+  Line  100 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  100 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  100 | [MISSING RETURN TYPE]
+           Function 'test_insert_valid_gebuehr' has no return type hint
+
+  Line  108 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  108 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  108 | [MISSING RETURN TYPE]
+           Function 'test_insert_returns_new_id' has no return type hint
+
+  Line  119 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  119 | [MISSING RETURN TYPE]
+           Function 'test_insert_with_payment_date' has no return type hint
+
+  Line  136 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  136 | [MISSING RETURN TYPE]
+           Function 'test_insert_decimal_precision' has no return type hint
+
+  Line  155 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  155 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  155 | [MISSING RETURN TYPE]
+           Function 'test_get_by_id_existing' has no return type hint
+
+  Line  167 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  167 | [MISSING RETURN TYPE]
+           Function 'test_get_by_id_not_found' has no return type hint
+
+  Line  174 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  174 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  174 | [MISSING RETURN TYPE]
+           Function 'test_get_by_id_correct_dates' has no return type hint
+
+  Line  185 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  185 | [MISSING RETURN TYPE]
+           Function 'test_get_by_einschreibung_empty' has no return type hint
+
+  Line  192 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  192 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  192 | [MISSING RETURN TYPE]
+           Function 'test_get_by_einschreibung_single' has no return type hint
+
+  Line  202 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  202 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  202 | [MISSING RETURN TYPE]
+           Function 'test_get_by_einschreibung_multiple' has no return type hint
+
+  Line  218 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  218 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  218 | [MISSING RETURN TYPE]
+           Function 'test_get_by_einschreibung_sorted_by_date' has no return type hint
+
+  Line  236 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  236 | [MISSING RETURN TYPE]
+           Function 'test_get_open_fees_empty' has no return type hint
+
+  Line  243 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  243 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  243 | [MISSING RETURN TYPE]
+           Function 'test_get_open_fees_only_unpaid' has no return type hint
+
+  Line  261 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  261 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  261 | [MISSING RETURN TYPE]
+           Function 'test_get_open_fees_sorted_ascending' has no return type hint
+
+  Line  279 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  279 | [MISSING RETURN TYPE]
+           Function 'test_calculate_total_zero' has no return type hint
+
+  Line  286 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  286 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  286 | [MISSING RETURN TYPE]
+           Function 'test_calculate_total_single' has no return type hint
+
+  Line  294 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  294 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  294 | [MISSING RETURN TYPE]
+           Function 'test_calculate_total_multiple' has no return type hint
+
+  Line  311 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  311 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  311 | [MISSING RETURN TYPE]
+           Function 'test_calculate_total_ignores_paid' has no return type hint
+
+  Line  332 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  332 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  332 | [MISSING RETURN TYPE]
+           Function 'test_mark_as_paid_success' has no return type hint
+
+  Line  343 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  343 | [MISSING RETURN TYPE]
+           Function 'test_mark_as_paid_not_found' has no return type hint
+
+  Line  350 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  350 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  350 | [MISSING RETURN TYPE]
+           Function 'test_mark_as_paid_default_today' has no return type hint
+
+  Line  359 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  359 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  359 | [MISSING RETURN TYPE]
+           Function 'test_mark_as_paid_removes_from_open_fees' has no return type hint
+
+  Line  377 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  377 | [MISSING RETURN TYPE]
+           Function 'test_get_overdue_fees_empty' has no return type hint
+
+  Line  384 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  384 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  384 | [MISSING RETURN TYPE]
+           Function 'test_get_overdue_fees_only_past' has no return type hint
+
+  Line  402 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  402 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  402 | [MISSING RETURN TYPE]
+           Function 'test_get_overdue_ignores_paid' has no return type hint
+
+  Line  414 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  414 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  414 | [MISSING RETURN TYPE]
+           Function 'test_get_overdue_sorted_ascending' has no return type hint
+
+  Line  431 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  431 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  431 | [MISSING RETURN TYPE]
+           Function 'test_full_payment_lifecycle' has no return type hint
+
+  Line  456 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  456 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  456 | [MISSING RETURN TYPE]
+           Function 'test_mixed_fees_scenario' has no return type hint
+
+  Line  490 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  490 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  490 | [MISSING TYPE HINT]
+           Parameter 'sample_gebuehr' has no type hint
+
+  Line  490 | [MISSING RETURN TYPE]
+           Function 'test_multiple_einschreibungen_isolated' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_login.py (116 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   12 | [UNUSED IMPORT]
+           Unused import: 'VerifyMismatchError'
+
+  Line   19 | [MISSING RETURN TYPE]
+           Function 'valid_login_data' has no return type hint
+
+  Line   35 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line   35 | [MISSING RETURN TYPE]
+           Function 'sample_login' has no return type hint
+
+  Line   42 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line   42 | [MISSING RETURN TYPE]
+           Function 'test_login_init_with_all_fields' has no return type hint
+
+  Line   53 | [MISSING RETURN TYPE]
+           Function 'test_login_init_with_id' has no return type hint
+
+  Line   67 | [MISSING RETURN TYPE]
+           Function 'test_login_init_sets_created_at_if_none' has no return type hint
+
+  Line   83 | [MISSING RETURN TYPE]
+           Function 'test_login_post_init_normalizes_email' has no return type hint
+
+  Line   99 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line   99 | [MISSING RETURN TYPE]
+           Function 'test_login_email_valid' has no return type hint
+
+  Line  106 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  106 | [MISSING RETURN TYPE]
+           Function 'test_login_email_invalid_no_at' has no return type hint
+
+  Line  116 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  116 | [MISSING RETURN TYPE]
+           Function 'test_login_email_empty' has no return type hint
+
+  Line  124 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  124 | [MISSING RETURN TYPE]
+           Function 'test_login_email_no_domain' has no return type hint
+
+  Line  132 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  132 | [MISSING RETURN TYPE]
+           Function 'test_login_email_no_dot_in_domain' has no return type hint
+
+  Line  140 | [MISSING RETURN TYPE]
+           Function 'test_login_email_normalization' has no return type hint
+
+  Line  156 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  156 | [MISSING RETURN TYPE]
+           Function 'test_login_student_id_required' has no return type hint
+
+  Line  166 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  166 | [MISSING RETURN TYPE]
+           Function 'test_login_student_id_must_be_positive' has no return type hint
+
+  Line  174 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  174 | [MISSING RETURN TYPE]
+           Function 'test_login_student_id_negative' has no return type hint
+
+  Line  184 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  184 | [MISSING RETURN TYPE]
+           Function 'test_login_password_hash_required' has no return type hint
+
+  Line  192 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  192 | [MISSING RETURN TYPE]
+           Function 'test_login_password_hash_too_short' has no return type hint
+
+  Line  202 | [MISSING RETURN TYPE]
+           Function 'test_login_password_hash_argon2_format' has no return type hint
+
+  Line  218 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  218 | [MISSING RETURN TYPE]
+           Function 'test_login_role_student' has no return type hint
+
+  Line  227 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  227 | [MISSING RETURN TYPE]
+           Function 'test_login_role_admin' has no return type hint
+
+  Line  236 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  236 | [MISSING RETURN TYPE]
+           Function 'test_login_role_invalid' has no return type hint
+
+  Line  246 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  246 | [MISSING RETURN TYPE]
+           Function 'test_login_role_case_sensitive' has no return type hint
+
+  Line  254 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  254 | [MISSING RETURN TYPE]
+           Function 'test_login_role_empty' has no return type hint
+
+  Line  264 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  264 | [MISSING RETURN TYPE]
+           Function 'test_verify_password_correct' has no return type hint
+
+  Line  271 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  271 | [MISSING RETURN TYPE]
+           Function 'test_verify_password_incorrect' has no return type hint
+
+  Line  278 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  278 | [MISSING RETURN TYPE]
+           Function 'test_verify_password_empty' has no return type hint
+
+  Line  285 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  285 | [MISSING RETURN TYPE]
+           Function 'test_verify_password_none' has no return type hint
+
+  Line  296 | [MISSING TYPE HINT]
+           Parameter 'valid_login_data' has no type hint
+
+  Line  296 | [MISSING RETURN TYPE]
+           Function 'test_verify_password_with_unicode' has no return type hint
+
+  Line  309 | [MISSING RETURN TYPE]
+           Function 'test_hash_password_returns_string' has no return type hint
+
+  Line  316 | [MISSING RETURN TYPE]
+           Function 'test_hash_password_is_argon2' has no return type hint
+
+  Line  323 | [MISSING RETURN TYPE]
+           Function 'test_hash_password_different_for_same_password' has no return type hint
+
+  Line  331 | [MISSING RETURN TYPE]
+           Function 'test_hash_password_verifiable' has no return type hint
+
+  Line  342 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  342 | [MISSING RETURN TYPE]
+           Function 'test_is_active_account_true' has no return type hint
+
+  Line  349 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  349 | [MISSING RETURN TYPE]
+           Function 'test_is_active_account_false' has no return type hint
+
+  Line  358 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  358 | [MISSING RETURN TYPE]
+           Function 'test_needs_password_change_false' has no return type hint
+
+  Line  365 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  365 | [MISSING RETURN TYPE]
+           Function 'test_needs_password_change_true' has no return type hint
+
+  Line  374 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  374 | [MISSING RETURN TYPE]
+           Function 'test_is_admin_true' has no return type hint
+
+  Line  381 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  381 | [MISSING RETURN TYPE]
+           Function 'test_is_admin_false' has no return type hint
+
+  Line  388 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  388 | [MISSING RETURN TYPE]
+           Function 'test_is_student_true' has no return type hint
+
+  Line  395 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  395 | [MISSING RETURN TYPE]
+           Function 'test_is_student_false' has no return type hint
+
+  Line  404 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  404 | [MISSING RETURN TYPE]
+           Function 'test_update_last_login_sets_timestamp' has no return type hint
+
+  Line  414 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  414 | [MISSING RETURN TYPE]
+           Function 'test_update_last_login_updates_timestamp' has no return type hint
+
+  Line  426 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  426 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_contains_all_fields' has no return type hint
+
+  Line  440 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  440 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_excludes_password_hash' has no return type hint
+
+  Line  447 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  447 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_converts_is_active_to_bool' has no return type hint
+
+  Line  456 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  456 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_includes_computed_fields' has no return type hint
+
+  Line  464 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  464 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_with_must_change_password' has no return type hint
+
+  Line  475 | [MISSING RETURN TYPE]
+           Function 'test_from_db_row_with_all_fields' has no return type hint
+
+  Line  478 | [MISSING TYPE HINT]
+           Parameter 'key' has no type hint
+
+  Line  478 | [MISSING RETURN TYPE]
+           Function '__getitem__' has no return type hint
+
+  Line  501 | [MISSING RETURN TYPE]
+           Function 'test_from_db_row_with_missing_optional_fields' has no return type hint
+
+  Line  504 | [MISSING TYPE HINT]
+           Parameter 'key' has no type hint
+
+  Line  504 | [MISSING RETURN TYPE]
+           Function '__getitem__' has no return type hint
+
+  Line  526 | [MISSING RETURN TYPE]
+           Function 'test_create_login_for_student_default_role' has no return type hint
+
+  Line  541 | [MISSING RETURN TYPE]
+           Function 'test_create_login_for_student_custom_role' has no return type hint
+
+  Line  553 | [MISSING RETURN TYPE]
+           Function 'test_create_login_for_student_hashes_password' has no return type hint
+
+  Line  567 | [MISSING RETURN TYPE]
+           Function 'test_create_login_for_student_sets_defaults' has no return type hint
+
+  Line  583 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  583 | [MISSING RETURN TYPE]
+           Function 'test_str_representation' has no return type hint
+
+  Line  593 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  593 | [MISSING RETURN TYPE]
+           Function 'test_str_representation_inactive' has no return type hint
+
+  Line  601 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  601 | [MISSING RETURN TYPE]
+           Function 'test_repr_representation' has no return type hint
+
+  Line  612 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  612 | [MISSING RETURN TYPE]
+           Function 'test_private_get_email_domain' has no return type hint
+
+  Line  619 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  619 | [MISSING RETURN TYPE]
+           Function 'test_private_is_password_hash_argon2' has no return type hint
+
+  Line  626 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  626 | [MISSING RETURN TYPE]
+           Function 'test_private_calculate_account_age_days' has no return type hint
+
+  Line  634 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  634 | [MISSING RETURN TYPE]
+           Function 'test_private_has_logged_in_before_false' has no return type hint
+
+  Line  643 | [MISSING TYPE HINT]
+           Parameter 'sample_login' has no type hint
+
+  Line  643 | [MISSING RETURN TYPE]
+           Function 'test_private_has_logged_in_before_true' has no return type hint
+
+  Line  654 | [MISSING RETURN TYPE]
+           Function 'test_full_login_lifecycle' has no return type hint
+
+  Line  681 | [MISSING RETURN TYPE]
+           Function 'test_admin_vs_student_roles' has no return type hint
+
+  Line  706 | [MISSING RETURN TYPE]
+           Function 'test_login_with_very_long_email' has no return type hint
+
+  Line  722 | [MISSING RETURN TYPE]
+           Function 'test_login_with_special_chars_in_email' has no return type hint
+
+  Line  736 | [MISSING RETURN TYPE]
+           Function 'test_password_verification_after_hash_update' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_login_utils.py (92 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   10 | [UNUSED IMPORT]
+           Unused import: 'Path'
+
+  Line   21 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   21 | [MISSING RETURN TYPE]
+           Function 'db_path' has no return type hint
+
+  Line   28 | [MISSING TYPE HINT]
+           Parameter 'db_path' has no type hint
+
+  Line   28 | [MISSING RETURN TYPE]
+           Function 'setup_db' has no return type hint
+
+  Line   46 | [TRAILING WHITESPACE]
+           Trailing whitespace
+
+  Line   59 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line   59 | [MISSING RETURN TYPE]
+           Function 'test_user_get_existing' has no return type hint
+
+  Line   69 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line   69 | [MISSING RETURN TYPE]
+           Function 'test_user_get_not_found' has no return type hint
+
+  Line   76 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line   76 | [MISSING RETURN TYPE]
+           Function 'test_user_get_returns_correct_type' has no return type hint
+
+  Line   86 | [MISSING RETURN TYPE]
+           Function 'test_user_get_with_invalid_db_path' has no return type hint
+
+  Line   93 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line   93 | [MISSING RETURN TYPE]
+           Function 'test_user_get_normalizes_email' has no return type hint
+
+  Line  103 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  103 | [MISSING RETURN TYPE]
+           Function 'test_user_get_by_email_existing' has no return type hint
+
+  Line  112 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  112 | [MISSING RETURN TYPE]
+           Function 'test_user_get_by_email_case_insensitive' has no return type hint
+
+  Line  122 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  122 | [MISSING RETURN TYPE]
+           Function 'test_user_get_by_email_not_found' has no return type hint
+
+  Line  129 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  129 | [MISSING RETURN TYPE]
+           Function 'test_user_get_by_email_with_whitespace' has no return type hint
+
+  Line  137 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  137 | [MISSING RETURN TYPE]
+           Function 'test_user_get_by_email_empty_string' has no return type hint
+
+  Line  146 | [MISSING RETURN TYPE]
+           Function 'test_user_init_normalizes_email' has no return type hint
+
+  Line  153 | [MISSING RETURN TYPE]
+           Function 'test_user_init_with_valid_data' has no return type hint
+
+  Line  161 | [MISSING RETURN TYPE]
+           Function 'test_user_init_with_empty_email' has no return type hint
+
+  Line  170 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  170 | [MISSING RETURN TYPE]
+           Function 'test_user_get_id_returns_string' has no return type hint
+
+  Line  180 | [MISSING RETURN TYPE]
+           Function 'test_user_get_id_with_large_id' has no return type hint
+
+  Line  189 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  189 | [MISSING RETURN TYPE]
+           Function 'test_user_is_authenticated' has no return type hint
+
+  Line  197 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  197 | [MISSING RETURN TYPE]
+           Function 'test_user_is_active' has no return type hint
+
+  Line  205 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  205 | [MISSING RETURN TYPE]
+           Function 'test_user_is_anonymous' has no return type hint
+
+  Line  215 | [MISSING RETURN TYPE]
+           Function 'test_user_repr' has no return type hint
+
+  Line  226 | [MISSING RETURN TYPE]
+           Function 'test_user_str' has no return type hint
+
+  Line  237 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_format_valid' has no return type hint
+
+  Line  246 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_format_no_at' has no return type hint
+
+  Line  255 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_format_no_domain' has no return type hint
+
+  Line  264 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_format_no_dot_in_domain' has no return type hint
+
+  Line  275 | [MISSING RETURN TYPE]
+           Function 'test_password_meets_policy_valid' has no return type hint
+
+  Line  283 | [MISSING RETURN TYPE]
+           Function 'test_password_meets_policy_too_short' has no return type hint
+
+  Line  291 | [MISSING RETURN TYPE]
+           Function 'test_password_meets_policy_no_uppercase' has no return type hint
+
+  Line  299 | [MISSING RETURN TYPE]
+           Function 'test_password_meets_policy_no_lowercase' has no return type hint
+
+  Line  307 | [MISSING RETURN TYPE]
+           Function 'test_password_meets_policy_no_digit' has no return type hint
+
+  Line  315 | [MISSING RETURN TYPE]
+           Function 'test_password_meets_policy_no_special' has no return type hint
+
+  Line  323 | [MISSING RETURN TYPE]
+           Function 'test_password_meets_policy_empty' has no return type hint
+
+  Line  331 | [MISSING RETURN TYPE]
+           Function 'test_password_meets_policy_none' has no return type hint
+
+  Line  339 | [MISSING RETURN TYPE]
+           Function 'test_password_meets_policy_whitespace_only' has no return type hint
+
+  Line  346 | [MISSING RETURN TYPE]
+           Function 'test_password_meets_policy_all_requirements' has no return type hint
+
+  Line  363 | [MISSING RETURN TYPE]
+           Function 'test_generate_strong_password_returns_string' has no return type hint
+
+  Line  370 | [MISSING RETURN TYPE]
+           Function 'test_generate_strong_password_meets_policy' has no return type hint
+
+  Line  379 | [MISSING RETURN TYPE]
+           Function 'test_generate_strong_password_default_length' has no return type hint
+
+  Line  386 | [MISSING RETURN TYPE]
+           Function 'test_generate_strong_password_custom_length' has no return type hint
+
+  Line  393 | [MISSING RETURN TYPE]
+           Function 'test_generate_strong_password_minimum_length' has no return type hint
+
+  Line  402 | [MISSING RETURN TYPE]
+           Function 'test_generate_strong_password_uniqueness' has no return type hint
+
+  Line  410 | [MISSING RETURN TYPE]
+           Function 'test_generate_strong_password_multiple_times' has no return type hint
+
+  Line  418 | [MISSING RETURN TYPE]
+           Function 'test_generate_strong_password_contains_all_types' has no return type hint
+
+  Line  436 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_valid' has no return type hint
+
+  Line  444 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_with_subdomain' has no return type hint
+
+  Line  451 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_with_plus' has no return type hint
+
+  Line  458 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_no_at' has no return type hint
+
+  Line  466 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_no_dot_in_domain' has no return type hint
+
+  Line  474 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_empty' has no return type hint
+
+  Line  481 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_too_short' has no return type hint
+
+  Line  489 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_no_local_part' has no return type hint
+
+  Line  496 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_no_domain' has no return type hint
+
+  Line  503 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_with_whitespace' has no return type hint
+
+  Line  510 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_invalid_chars' has no return type hint
+
+  Line  517 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_multiple_at' has no return type hint
+
+  Line  524 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_none_type' has no return type hint
+
+  Line  534 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  534 | [MISSING RETURN TYPE]
+           Function 'test_full_user_lifecycle' has no return type hint
+
+  Line  553 | [MISSING RETURN TYPE]
+           Function 'test_password_policy_integration' has no return type hint
+
+  Line  567 | [MISSING RETURN TYPE]
+           Function 'test_email_validation_integration' has no return type hint
+
+  Line  581 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  581 | [MISSING RETURN TYPE]
+           Function 'test_user_get_with_sql_injection' has no return type hint
+
+  Line  588 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  588 | [MISSING RETURN TYPE]
+           Function 'test_user_get_by_email_with_sql_injection' has no return type hint
+
+  Line  595 | [MISSING RETURN TYPE]
+           Function 'test_password_policy_with_unicode' has no return type hint
+
+  Line  602 | [MISSING RETURN TYPE]
+           Function 'test_user_with_very_long_email' has no return type hint
+
+  Line  610 | [MISSING RETURN TYPE]
+           Function 'test_validate_email_with_unicode_domain' has no return type hint
+
+  Line  622 | [MISSING RETURN TYPE]
+           Function 'test_user_get_with_corrupted_db' has no return type hint
+
+  Line  629 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line  629 | [MISSING RETURN TYPE]
+           Function 'test_user_get_with_readonly_db' has no return type hint
+
+  Line  656 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line  656 | [MISSING RETURN TYPE]
+           Function 'test_multiple_user_loads_same_time' has no return type hint
+
+  Line  666 | [MISSING RETURN TYPE]
+           Function 'test_generate_password_performance' has no return type hint
+
+  Line  679 | [MISSING RETURN TYPE]
+           Function 'test_password_policy_check_performance' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_modul.py (22 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   22 | [MISSING RETURN TYPE]
+           Function 'test_modul_create_valid' has no return type hint
+
+  Line   37 | [MISSING RETURN TYPE]
+           Function 'test_modul_create_minimal' has no return type hint
+
+  Line   52 | [MISSING RETURN TYPE]
+           Function 'test_modul_high_ects' has no return type hint
+
+  Line   68 | [MISSING RETURN TYPE]
+           Function 'test_modul_to_dict' has no return type hint
+
+  Line   85 | [MISSING RETURN TYPE]
+           Function 'test_modul_to_dict_empty_description' has no return type hint
+
+  Line  103 | [MISSING RETURN TYPE]
+           Function 'test_modul_from_db_row' has no return type hint
+
+  Line  120 | [MISSING RETURN TYPE]
+           Function 'test_modul_from_db_row_empty_description' has no return type hint
+
+  Line  134 | [MISSING RETURN TYPE]
+           Function 'test_modul_from_db_row_none_description' has no return type hint
+
+  Line  145 | [TRAILING WHITESPACE]
+           Trailing whitespace
+
+  Line  155 | [MISSING RETURN TYPE]
+           Function 'test_modul_str_representation' has no return type hint
+
+  Line  170 | [MISSING RETURN TYPE]
+           Function 'test_modul_repr_representation' has no return type hint
+
+  Line  191 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_create' has no return type hint
+
+  Line  214 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_with_note' has no return type hint
+
+  Line  236 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_is_passed' has no return type hint
+
+  Line  244 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_is_not_passed' has no return type hint
+
+  Line  252 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_is_booked' has no return type hint
+
+  Line  260 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_is_not_booked' has no return type hint
+
+  Line  272 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_to_dict' has no return type hint
+
+  Line  275 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  300 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_to_dict_unbuchbar' has no return type hint
+
+  Line  327 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_str_with_status' has no return type hint
+
+  Line  339 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_str_without_status' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_modul_repository.py (80 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   18 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   18 | [MISSING RETURN TYPE]
+           Function 'mock_db_path' has no return type hint
+
+  Line   24 | [MISSING TYPE HINT]
+           Parameter 'mock_db_path' has no type hint
+
+  Line   24 | [MISSING RETURN TYPE]
+           Function 'controller' has no return type hint
+
+  Line   34 | [MISSING RETURN TYPE]
+           Function 'sample_student' has no return type hint
+
+  Line   46 | [MISSING RETURN TYPE]
+           Function 'sample_einschreibung' has no return type hint
+
+  Line   59 | [MISSING RETURN TYPE]
+           Function 'sample_progress' has no return type hint
+
+  Line   74 | [MISSING TYPE HINT]
+           Parameter 'mock_db_path' has no type hint
+
+  Line   74 | [MISSING RETURN TYPE]
+           Function 'test_controller_initialization' has no return type hint
+
+  Line   87 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line   87 | [MISSING RETURN TYPE]
+           Function 'test_semester_positions_defined' has no return type hint
+
+  Line  101 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  101 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  101 | [MISSING RETURN TYPE]
+           Function 'test_get_student_by_auth_user_success' has no return type hint
+
+  Line  113 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  113 | [MISSING RETURN TYPE]
+           Function 'test_get_student_by_auth_user_not_found' has no return type hint
+
+  Line  122 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  122 | [MISSING RETURN TYPE]
+           Function 'test_get_student_by_auth_user_exception_handling' has no return type hint
+
+  Line  135 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  135 | [MISSING RETURN TYPE]
+           Function 'test_get_car_position_semester_1' has no return type hint
+
+  Line  146 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  146 | [MISSING RETURN TYPE]
+           Function 'test_get_car_position_semester_7' has no return type hint
+
+  Line  154 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  154 | [MISSING RETURN TYPE]
+           Function 'test_get_car_position_intermediate' has no return type hint
+
+  Line  166 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  166 | [MISSING RETURN TYPE]
+           Function 'test_get_car_position_boundaries' has no return type hint
+
+  Line  178 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  178 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  178 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  178 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  178 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_complete' has no return type hint
+
+  Line  214 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  214 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_no_student' has no return type hint
+
+  Line  226 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  226 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  226 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_no_einschreibung' has no return type hint
+
+  Line  247 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  247 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  247 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  247 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_time_status_ahead' has no return type hint
+
+  Line  278 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  278 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  278 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  278 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_time_status_minus' has no return type hint
+
+  Line  295 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  308 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  308 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  308 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  308 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  308 | [MISSING RETURN TYPE]
+           Function 'test_get_dashboard_data_includes_next_exam' has no return type hint
+
+  Line  339 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  339 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  339 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  339 | [MISSING RETURN TYPE]
+           Function 'test_get_next_exam_found' has no return type hint
+
+  Line  365 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  365 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  365 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  365 | [MISSING RETURN TYPE]
+           Function 'test_get_next_exam_not_found' has no return type hint
+
+  Line  381 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  381 | [MISSING RETURN TYPE]
+           Function 'test_get_next_exam_no_student' has no return type hint
+
+  Line  390 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  390 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  390 | [MISSING RETURN TYPE]
+           Function 'test_get_next_exam_no_einschreibung' has no return type hint
+
+  Line  402 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  402 | [MISSING RETURN TYPE]
+           Function 'test_get_next_exam_exception_handling' has no return type hint
+
+  Line  415 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  415 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  415 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  415 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  415 | [MISSING RETURN TYPE]
+           Function 'test_dashboard_data_structure_complete' has no return type hint
+
+  Line  422 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  444 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  444 | [MISSING RETURN TYPE]
+           Function 'test_car_position_interpolation_accuracy' has no return type hint
+
+  Line  459 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  459 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  459 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  459 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  459 | [MISSING RETURN TYPE]
+           Function 'test_max_semester_calculation' has no return type hint
+
+  Line  481 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  481 | [MISSING RETURN TYPE]
+           Function 'test_fallback_data_on_exception' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_modulbuchung.py (16 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   23 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_create_valid' has no return type hint
+
+  Line   40 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_create_with_string_date' has no return type hint
+
+  Line   54 | [MISSING RETURN TYPE]
+           Function 'test_modulbuchung_without_date' has no return type hint
+
+  Line   71 | [MISSING RETURN TYPE]
+           Function 'test_is_open' has no return type hint
+
+  Line   78 | [MISSING RETURN TYPE]
+           Function 'test_is_not_open' has no return type hint
+
+  Line   85 | [MISSING RETURN TYPE]
+           Function 'test_is_passed' has no return type hint
+
+  Line   92 | [MISSING RETURN TYPE]
+           Function 'test_is_not_passed' has no return type hint
+
+  Line   99 | [MISSING RETURN TYPE]
+           Function 'test_is_recognized' has no return type hint
+
+  Line  106 | [MISSING RETURN TYPE]
+           Function 'test_is_not_recognized' has no return type hint
+
+  Line  117 | [MISSING RETURN TYPE]
+           Function 'test_to_dict' has no return type hint
+
+  Line  139 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_without_date' has no return type hint
+
+  Line  158 | [MISSING RETURN TYPE]
+           Function 'test_from_row_with_date' has no return type hint
+
+  Line  177 | [MISSING RETURN TYPE]
+           Function 'test_from_row_with_string_date' has no return type hint
+
+  Line  193 | [MISSING RETURN TYPE]
+           Function 'test_from_row_without_date' has no return type hint
+
+  Line  212 | [MISSING RETURN TYPE]
+           Function 'test_str_representation' has no return type hint
+
+  Line  223 | [MISSING RETURN TYPE]
+           Function 'test_repr_representation' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_modulbuchung_repository.py (63 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   16 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   16 | [MISSING RETURN TYPE]
+           Function 'mock_db_path' has no return type hint
+
+  Line   22 | [MISSING TYPE HINT]
+           Parameter 'mock_db_path' has no type hint
+
+  Line   22 | [MISSING RETURN TYPE]
+           Function 'controller' has no return type hint
+
+  Line   32 | [MISSING RETURN TYPE]
+           Function 'sample_student' has no return type hint
+
+  Line   44 | [MISSING RETURN TYPE]
+           Function 'sample_einschreibung' has no return type hint
+
+  Line   58 | [MISSING TYPE HINT]
+           Parameter 'mock_db_path' has no type hint
+
+  Line   58 | [MISSING RETURN TYPE]
+           Function 'test_controller_initialization' has no return type hint
+
+  Line   71 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line   71 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_no_student' has no return type hint
+
+  Line   82 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line   82 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line   82 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line   82 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_success' has no return type hint
+
+  Line  110 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  110 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  110 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  110 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_with_booked_module' has no return type hint
+
+  Line  146 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  146 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  146 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  146 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_with_exam_date' has no return type hint
+
+  Line  151 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  152 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  153 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  154 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  182 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  182 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  182 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_no_einschreibung_fallback' has no return type hint
+
+  Line  197 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  197 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  197 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  197 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_various_semesters' has no return type hint
+
+  Line  210 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  210 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_exception_handling' has no return type hint
+
+  Line  224 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  224 | [MISSING RETURN TYPE]
+           Function 'test_book_module_no_student' has no return type hint
+
+  Line  235 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  235 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  235 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  235 | [MISSING RETURN TYPE]
+           Function 'test_book_module_success' has no return type hint
+
+  Line  256 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  256 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  256 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  256 | [MISSING RETURN TYPE]
+           Function 'test_book_module_already_booked' has no return type hint
+
+  Line  277 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  277 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  277 | [MISSING RETURN TYPE]
+           Function 'test_book_module_no_einschreibung' has no return type hint
+
+  Line  290 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  290 | [MISSING RETURN TYPE]
+           Function 'test_book_module_exception_handling' has no return type hint
+
+  Line  302 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  302 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  302 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  302 | [MISSING RETURN TYPE]
+           Function 'test_book_module_foreign_key_constraint' has no return type hint
+
+  Line  322 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  322 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  322 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  322 | [MISSING RETURN TYPE]
+           Function 'test_book_and_get_modules_workflow' has no return type hint
+
+  Line  346 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  362 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  362 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  362 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  362 | [MISSING RETURN TYPE]
+           Function 'test_response_structure_completeness' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_progress.py (30 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   23 | [MISSING RETURN TYPE]
+           Function 'test_progress_create_valid' has no return type hint
+
+  Line   44 | [MISSING RETURN TYPE]
+           Function 'test_progress_create_without_grade' has no return type hint
+
+  Line   59 | [MISSING RETURN TYPE]
+           Function 'test_progress_create_with_float_values' has no return type hint
+
+  Line   77 | [MISSING RETURN TYPE]
+           Function 'test_progress_create_with_open_fees' has no return type hint
+
+  Line   96 | [MISSING RETURN TYPE]
+           Function 'test_calculate_overall_status_excellent' has no return type hint
+
+  Line  111 | [MISSING RETURN TYPE]
+           Function 'test_calculate_overall_status_good' has no return type hint
+
+  Line  126 | [MISSING RETURN TYPE]
+           Function 'test_calculate_overall_status_okay' has no return type hint
+
+  Line  140 | [MISSING RETURN TYPE]
+           Function 'test_calculate_overall_status_critical' has no return type hint
+
+  Line  155 | [MISSING RETURN TYPE]
+           Function 'test_calculate_overall_status_no_grade' has no return type hint
+
+  Line  157 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  175 | [MISSING RETURN TYPE]
+           Function 'test_get_completion_percentage_basic' has no return type hint
+
+  Line  192 | [MISSING RETURN TYPE]
+           Function 'test_get_completion_percentage_zero' has no return type hint
+
+  Line  207 | [MISSING RETURN TYPE]
+           Function 'test_get_completion_percentage_complete' has no return type hint
+
+  Line  222 | [MISSING RETURN TYPE]
+           Function 'test_get_completion_percentage_over_100_capped' has no return type hint
+
+  Line  238 | [MISSING RETURN TYPE]
+           Function 'test_get_completion_percentage_custom_total' has no return type hint
+
+  Line  254 | [MISSING RETURN TYPE]
+           Function 'test_get_completion_percentage_invalid_total' has no return type hint
+
+  Line  275 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_with_grade' has no return type hint
+
+  Line  300 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_without_grade' has no return type hint
+
+  Line  302 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  319 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_with_open_fees' has no return type hint
+
+  Line  338 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_ahead_of_schedule' has no return type hint
+
+  Line  357 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_behind_schedule' has no return type hint
+
+  Line  376 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_on_schedule' has no return type hint
+
+  Line  378 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  394 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_completion_percentage' has no return type hint
+
+  Line  416 | [MISSING RETURN TYPE]
+           Function 'test_str_representation_with_grade' has no return type hint
+
+  Line  418 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  436 | [MISSING RETURN TYPE]
+           Function 'test_str_representation_without_grade' has no return type hint
+
+  Line  438 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  455 | [MISSING RETURN TYPE]
+           Function 'test_repr_representation' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_progress_repository.py (5 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line    2 | [UNUSED IMPORT]
+           Unused import: 'annotations'
+
+  Line  151 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  152 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  153 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  230 | [TRAILING WHITESPACE]
+           Trailing whitespace
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_progress_text_service.py (60 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   11 | [UNUSED IMPORT]
+           Unused import: 'date'
+
+  Line   17 | [MISSING RETURN TYPE]
+           Function 'sample_progress' has no return type hint
+
+  Line   31 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   31 | [MISSING RETURN TYPE]
+           Function 'temp_progress_json' has no return type hint
+
+  Line   85 | [MISSING RETURN TYPE]
+           Function 'test_init_with_default_path' has no return type hint
+
+  Line   92 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line   92 | [MISSING RETURN TYPE]
+           Function 'test_init_with_custom_path' has no return type hint
+
+  Line  101 | [MISSING RETURN TYPE]
+           Function 'test_init_with_missing_json' has no return type hint
+
+  Line  113 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  113 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  113 | [MISSING RETURN TYPE]
+           Function 'test_get_grade_text_fast' has no return type hint
+
+  Line  124 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  124 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  124 | [MISSING RETURN TYPE]
+           Function 'test_get_grade_text_medium' has no return type hint
+
+  Line  135 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  135 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  135 | [MISSING RETURN TYPE]
+           Function 'test_get_grade_text_slow' has no return type hint
+
+  Line  146 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  146 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  146 | [MISSING RETURN TYPE]
+           Function 'test_get_grade_text_unknown' has no return type hint
+
+  Line  156 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  156 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  156 | [MISSING RETURN TYPE]
+           Function 'test_get_grade_text_english' has no return type hint
+
+  Line  169 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  169 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  169 | [MISSING RETURN TYPE]
+           Function 'test_get_time_text_ahead' has no return type hint
+
+  Line  179 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  179 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  179 | [MISSING RETURN TYPE]
+           Function 'test_get_time_text_behind' has no return type hint
+
+  Line  190 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  190 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  190 | [MISSING RETURN TYPE]
+           Function 'test_get_time_text_english' has no return type hint
+
+  Line  201 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  201 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  201 | [MISSING RETURN TYPE]
+           Function 'test_get_fee_text_zero' has no return type hint
+
+  Line  211 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  211 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  211 | [MISSING RETURN TYPE]
+           Function 'test_get_fee_text_open' has no return type hint
+
+  Line  222 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  222 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  222 | [MISSING RETURN TYPE]
+           Function 'test_get_fee_text_english' has no return type hint
+
+  Line  234 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  234 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  234 | [MISSING RETURN TYPE]
+           Function 'test_get_all_texts_complete' has no return type hint
+
+  Line  247 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  247 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  247 | [MISSING RETURN TYPE]
+           Function 'test_get_all_texts_category_correct' has no return type hint
+
+  Line  257 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  257 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  257 | [MISSING RETURN TYPE]
+           Function 'test_get_all_texts_time_status' has no return type hint
+
+  Line  268 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  268 | [MISSING RETURN TYPE]
+           Function 'test_full_workflow_excellent_student' has no return type hint
+
+  Line  295 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  295 | [MISSING RETURN TYPE]
+           Function 'test_full_workflow_struggling_student' has no return type hint
+
+  Line  324 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  324 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  324 | [MISSING RETURN TYPE]
+           Function 'test_placeholder_replacement_correct' has no return type hint
+
+  Line  335 | [MISSING TYPE HINT]
+           Parameter 'temp_progress_json' has no type hint
+
+  Line  335 | [MISSING TYPE HINT]
+           Parameter 'sample_progress' has no type hint
+
+  Line  335 | [MISSING RETURN TYPE]
+           Function 'test_handles_none_gracefully' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_pruefungsleistung.py (24 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   25 | [MISSING RETURN TYPE]
+           Function 'test_pruefungsleistung_create_valid' has no return type hint
+
+  Line   53 | [MISSING RETURN TYPE]
+           Function 'test_pruefungsleistung_with_float_note' has no return type hint
+
+  Line   70 | [MISSING RETURN TYPE]
+           Function 'test_pruefungsleistung_without_note' has no return type hint
+
+  Line   87 | [MISSING RETURN TYPE]
+           Function 'test_pruefungsleistung_with_thema' has no return type hint
+
+  Line  110 | [MISSING RETURN TYPE]
+           Function 'test_has_grade_true' has no return type hint
+
+  Line  121 | [MISSING RETURN TYPE]
+           Function 'test_has_grade_false' has no return type hint
+
+  Line  132 | [MISSING RETURN TYPE]
+           Function 'test_is_passed_with_good_note' has no return type hint
+
+  Line  143 | [MISSING RETURN TYPE]
+           Function 'test_is_passed_with_failing_note' has no return type hint
+
+  Line  154 | [MISSING RETURN TYPE]
+           Function 'test_is_passed_without_note' has no return type hint
+
+  Line  165 | [MISSING RETURN TYPE]
+           Function 'test_get_grade_category_sehr_gut' has no return type hint
+
+  Line  176 | [MISSING RETURN TYPE]
+           Function 'test_get_grade_category_gut' has no return type hint
+
+  Line  187 | [MISSING RETURN TYPE]
+           Function 'test_get_grade_category_bestanden' has no return type hint
+
+  Line  198 | [MISSING RETURN TYPE]
+           Function 'test_get_grade_category_nicht_bestanden' has no return type hint
+
+  Line  209 | [MISSING RETURN TYPE]
+           Function 'test_get_grade_category_keine_note' has no return type hint
+
+  Line  224 | [MISSING RETURN TYPE]
+           Function 'test_can_retry_first_attempt' has no return type hint
+
+  Line  236 | [MISSING RETURN TYPE]
+           Function 'test_can_retry_second_attempt' has no return type hint
+
+  Line  248 | [MISSING RETURN TYPE]
+           Function 'test_cannot_retry_last_attempt' has no return type hint
+
+  Line  264 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_extends_base' has no return type hint
+
+  Line  294 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_without_note' has no return type hint
+
+  Line  313 | [MISSING RETURN TYPE]
+           Function 'test_from_row' has no return type hint
+
+  Line  340 | [MISSING RETURN TYPE]
+           Function 'test_str_representation_with_note' has no return type hint
+
+  Line  355 | [MISSING RETURN TYPE]
+           Function 'test_str_representation_without_note' has no return type hint
+
+  Line  368 | [MISSING RETURN TYPE]
+           Function 'test_str_representation_second_attempt' has no return type hint
+
+  Line  382 | [MISSING RETURN TYPE]
+           Function 'test_repr_representation' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_semester_controller.py (63 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   16 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   16 | [MISSING RETURN TYPE]
+           Function 'mock_db_path' has no return type hint
+
+  Line   22 | [MISSING TYPE HINT]
+           Parameter 'mock_db_path' has no type hint
+
+  Line   22 | [MISSING RETURN TYPE]
+           Function 'controller' has no return type hint
+
+  Line   32 | [MISSING RETURN TYPE]
+           Function 'sample_student' has no return type hint
+
+  Line   44 | [MISSING RETURN TYPE]
+           Function 'sample_einschreibung' has no return type hint
+
+  Line   58 | [MISSING TYPE HINT]
+           Parameter 'mock_db_path' has no type hint
+
+  Line   58 | [MISSING RETURN TYPE]
+           Function 'test_controller_initialization' has no return type hint
+
+  Line   71 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line   71 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_no_student' has no return type hint
+
+  Line   82 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line   82 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line   82 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line   82 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_success' has no return type hint
+
+  Line  110 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  110 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  110 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  110 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_with_booked_module' has no return type hint
+
+  Line  146 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  146 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  146 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  146 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_with_exam_date' has no return type hint
+
+  Line  151 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  152 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  153 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  154 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  182 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  182 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  182 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_no_einschreibung_fallback' has no return type hint
+
+  Line  197 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  197 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  197 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  197 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_various_semesters' has no return type hint
+
+  Line  210 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  210 | [MISSING RETURN TYPE]
+           Function 'test_get_modules_for_semester_exception_handling' has no return type hint
+
+  Line  224 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  224 | [MISSING RETURN TYPE]
+           Function 'test_book_module_no_student' has no return type hint
+
+  Line  235 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  235 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  235 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  235 | [MISSING RETURN TYPE]
+           Function 'test_book_module_success' has no return type hint
+
+  Line  256 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  256 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  256 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  256 | [MISSING RETURN TYPE]
+           Function 'test_book_module_already_booked' has no return type hint
+
+  Line  277 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  277 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  277 | [MISSING RETURN TYPE]
+           Function 'test_book_module_no_einschreibung' has no return type hint
+
+  Line  290 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  290 | [MISSING RETURN TYPE]
+           Function 'test_book_module_exception_handling' has no return type hint
+
+  Line  302 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  302 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  302 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  302 | [MISSING RETURN TYPE]
+           Function 'test_book_module_foreign_key_constraint' has no return type hint
+
+  Line  322 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  322 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  322 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  322 | [MISSING RETURN TYPE]
+           Function 'test_book_and_get_modules_workflow' has no return type hint
+
+  Line  346 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  362 | [MISSING TYPE HINT]
+           Parameter 'controller' has no type hint
+
+  Line  362 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  362 | [MISSING TYPE HINT]
+           Parameter 'sample_einschreibung' has no type hint
+
+  Line  362 | [MISSING RETURN TYPE]
+           Function 'test_response_structure_completeness' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_student.py (12 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   21 | [MISSING RETURN TYPE]
+           Function 'test_student_create_valid' has no return type hint
+
+  Line   38 | [MISSING RETURN TYPE]
+           Function 'test_student_without_login_id' has no return type hint
+
+  Line   54 | [MISSING RETURN TYPE]
+           Function 'test_validate_valid_student' has no return type hint
+
+  Line   69 | [MISSING RETURN TYPE]
+           Function 'test_validate_matrikel_nr_too_short' has no return type hint
+
+  Line   84 | [MISSING RETURN TYPE]
+           Function 'test_validate_missing_vorname' has no return type hint
+
+  Line  103 | [MISSING RETURN TYPE]
+           Function 'test_get_full_name' has no return type hint
+
+  Line  119 | [MISSING RETURN TYPE]
+           Function 'test_to_dict' has no return type hint
+
+  Line  139 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_without_login_id' has no return type hint
+
+  Line  157 | [MISSING RETURN TYPE]
+           Function 'test_from_db_row_with_dict' has no return type hint
+
+  Line  176 | [MISSING RETURN TYPE]
+           Function 'test_from_db_row_without_login_id' has no return type hint
+
+  Line  195 | [MISSING RETURN TYPE]
+           Function 'test_str_representation' has no return type hint
+
+  Line  210 | [MISSING RETURN TYPE]
+           Function 'test_repr_representation' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_student_repository.py (96 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   15 | [MISSING TYPE HINT]
+           Parameter 'tmp_path' has no type hint
+
+  Line   15 | [MISSING RETURN TYPE]
+           Function 'db_path' has no return type hint
+
+  Line   22 | [MISSING TYPE HINT]
+           Parameter 'db_path' has no type hint
+
+  Line   22 | [MISSING RETURN TYPE]
+           Function 'setup_db' has no return type hint
+
+  Line   55 | [MISSING TYPE HINT]
+           Parameter 'setup_db' has no type hint
+
+  Line   55 | [MISSING RETURN TYPE]
+           Function 'repo' has no return type hint
+
+  Line   61 | [MISSING RETURN TYPE]
+           Function 'sample_student' has no return type hint
+
+  Line   74 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line   74 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line   74 | [MISSING RETURN TYPE]
+           Function 'test_insert_student_success' has no return type hint
+
+  Line   82 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line   82 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line   82 | [MISSING RETURN TYPE]
+           Function 'test_insert_student_returns_new_id' has no return type hint
+
+  Line   91 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line   91 | [MISSING RETURN TYPE]
+           Function 'test_insert_student_with_invalid_data_raises' has no return type hint
+
+  Line  105 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  105 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  105 | [MISSING RETURN TYPE]
+           Function 'test_insert_duplicate_matrikel_nr_raises' has no return type hint
+
+  Line  121 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  121 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  121 | [MISSING RETURN TYPE]
+           Function 'test_insert_duplicate_login_id_raises' has no return type hint
+
+  Line  137 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  137 | [MISSING RETURN TYPE]
+           Function 'test_insert_student_without_login_id' has no return type hint
+
+  Line  153 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  153 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  153 | [MISSING RETURN TYPE]
+           Function 'test_get_by_id_existing_student' has no return type hint
+
+  Line  166 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  166 | [MISSING RETURN TYPE]
+           Function 'test_get_by_id_nonexistent_student' has no return type hint
+
+  Line  173 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  173 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  173 | [MISSING RETURN TYPE]
+           Function 'test_get_by_id_returns_student_object' has no return type hint
+
+  Line  184 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  184 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  184 | [MISSING RETURN TYPE]
+           Function 'test_get_by_login_id_existing_student' has no return type hint
+
+  Line  195 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  195 | [MISSING RETURN TYPE]
+           Function 'test_get_by_login_id_nonexistent_login' has no return type hint
+
+  Line  202 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  202 | [MISSING RETURN TYPE]
+           Function 'test_get_by_login_id_without_login_id' has no return type hint
+
+  Line  220 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  220 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  220 | [MISSING RETURN TYPE]
+           Function 'test_get_by_matrikel_nr_existing_student' has no return type hint
+
+  Line  231 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  231 | [MISSING RETURN TYPE]
+           Function 'test_get_by_matrikel_nr_nonexistent_matrikel' has no return type hint
+
+  Line  238 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  238 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  238 | [MISSING RETURN TYPE]
+           Function 'test_get_by_matrikel_nr_case_sensitive' has no return type hint
+
+  Line  251 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  251 | [MISSING RETURN TYPE]
+           Function 'test_get_all_empty_database' has no return type hint
+
+  Line  259 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  259 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  259 | [MISSING RETURN TYPE]
+           Function 'test_get_all_single_student' has no return type hint
+
+  Line  269 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  269 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  269 | [MISSING RETURN TYPE]
+           Function 'test_get_all_multiple_students' has no return type hint
+
+  Line  290 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  290 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  290 | [MISSING RETURN TYPE]
+           Function 'test_get_all_returns_student_objects' has no return type hint
+
+  Line  301 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  301 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  301 | [MISSING RETURN TYPE]
+           Function 'test_update_student_success' has no return type hint
+
+  Line  316 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  316 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  316 | [MISSING RETURN TYPE]
+           Function 'test_update_student_all_fields' has no return type hint
+
+  Line  337 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  337 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  337 | [MISSING RETURN TYPE]
+           Function 'test_update_student_with_invalid_data_raises' has no return type hint
+
+  Line  348 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  348 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  348 | [MISSING RETURN TYPE]
+           Function 'test_update_student_duplicate_matrikel_raises' has no return type hint
+
+  Line  368 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  368 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  368 | [MISSING RETURN TYPE]
+           Function 'test_update_student_duplicate_login_id_raises' has no return type hint
+
+  Line  370 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  371 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  372 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  390 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  390 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  390 | [MISSING RETURN TYPE]
+           Function 'test_delete_student_success' has no return type hint
+
+  Line  402 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  402 | [MISSING RETURN TYPE]
+           Function 'test_delete_nonexistent_student' has no return type hint
+
+  Line  409 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  409 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  409 | [MISSING RETURN TYPE]
+           Function 'test_delete_student_removes_from_all_queries' has no return type hint
+
+  Line  422 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  422 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  422 | [MISSING RETURN TYPE]
+           Function 'test_exists_with_existing_matrikel' has no return type hint
+
+  Line  431 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  431 | [MISSING RETURN TYPE]
+           Function 'test_exists_with_nonexistent_matrikel' has no return type hint
+
+  Line  438 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  438 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  438 | [MISSING RETURN TYPE]
+           Function 'test_exists_after_delete' has no return type hint
+
+  Line  451 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  451 | [MISSING TYPE HINT]
+           Parameter 'sample_student' has no type hint
+
+  Line  451 | [MISSING RETURN TYPE]
+           Function 'test_full_crud_cycle' has no return type hint
+
+  Line  478 | [MISSING TYPE HINT]
+           Parameter 'repo' has no type hint
+
+  Line  478 | [MISSING RETURN TYPE]
+           Function 'test_multiple_students_workflow' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_studiengang.py (22 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   22 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_create_valid_bachelor' has no return type hint
+
+  Line   38 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_create_valid_master' has no return type hint
+
+  Line   55 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_all_valid_grades' has no return type hint
+
+  Line   69 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_invalid_grad_raises' has no return type hint
+
+  Line   80 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_empty_name_raises' has no return type hint
+
+  Line   91 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_whitespace_name_raises' has no return type hint
+
+  Line  102 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_regel_semester_too_low_raises' has no return type hint
+
+  Line  113 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_regel_semester_too_high_raises' has no return type hint
+
+  Line  128 | [MISSING RETURN TYPE]
+           Function 'test_get_full_name' has no return type hint
+
+  Line  140 | [MISSING RETURN TYPE]
+           Function 'test_is_bachelor_true' has no return type hint
+
+  Line  155 | [MISSING RETURN TYPE]
+           Function 'test_is_master_true' has no return type hint
+
+  Line  170 | [MISSING RETURN TYPE]
+           Function 'test_get_total_ects_target_bachelor' has no return type hint
+
+  Line  183 | [MISSING RETURN TYPE]
+           Function 'test_get_total_ects_target_bachelor_7_semester' has no return type hint
+
+  Line  196 | [MISSING RETURN TYPE]
+           Function 'test_get_total_ects_target_master' has no return type hint
+
+  Line  213 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_basic' has no return type hint
+
+  Line  236 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_without_description' has no return type hint
+
+  Line  250 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_master' has no return type hint
+
+  Line  270 | [MISSING RETURN TYPE]
+           Function 'test_from_row_basic' has no return type hint
+
+  Line  289 | [MISSING RETURN TYPE]
+           Function 'test_from_row_without_description' has no return type hint
+
+  Line  303 | [MISSING RETURN TYPE]
+           Function 'test_from_row_master' has no return type hint
+
+  Line  326 | [MISSING RETURN TYPE]
+           Function 'test_str_representation' has no return type hint
+
+  Line  342 | [MISSING RETURN TYPE]
+           Function 'test_repr_representation' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: tests/unit/test_studiengang_modul.py (26 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   22 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_create_valid_pflicht' has no return type hint
+
+  Line   37 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_create_valid_wahlpflicht' has no return type hint
+
+  Line   49 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_create_valid_wahl' has no return type hint
+
+  Line   61 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_all_valid_pflichtgrade' has no return type hint
+
+  Line   75 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_invalid_studiengang_id_raises' has no return type hint
+
+  Line   86 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_invalid_modul_id_raises' has no return type hint
+
+  Line   97 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_invalid_semester_too_low_raises' has no return type hint
+
+  Line  108 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_invalid_semester_too_high_raises' has no return type hint
+
+  Line  119 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_invalid_pflichtgrad_raises' has no return type hint
+
+  Line  134 | [MISSING RETURN TYPE]
+           Function 'test_is_pflicht_true' has no return type hint
+
+  Line  148 | [MISSING RETURN TYPE]
+           Function 'test_is_wahlpflicht_true' has no return type hint
+
+  Line  162 | [MISSING RETURN TYPE]
+           Function 'test_is_wahl_true' has no return type hint
+
+  Line  176 | [MISSING RETURN TYPE]
+           Function 'test_is_mandatory_pflicht' has no return type hint
+
+  Line  188 | [MISSING RETURN TYPE]
+           Function 'test_is_mandatory_wahlpflicht' has no return type hint
+
+  Line  200 | [MISSING RETURN TYPE]
+           Function 'test_is_mandatory_wahl_false' has no return type hint
+
+  Line  216 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_pflicht' has no return type hint
+
+  Line  237 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_wahlpflicht' has no return type hint
+
+  Line  255 | [MISSING RETURN TYPE]
+           Function 'test_to_dict_wahl' has no return type hint
+
+  Line  277 | [MISSING RETURN TYPE]
+           Function 'test_from_row_basic' has no return type hint
+
+  Line  294 | [MISSING RETURN TYPE]
+           Function 'test_from_row_wahlpflicht' has no return type hint
+
+  Line  309 | [MISSING RETURN TYPE]
+           Function 'test_from_row_wahl' has no return type hint
+
+  Line  328 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_first_semester' has no return type hint
+
+  Line  340 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_last_semester' has no return type hint
+
+  Line  352 | [MISSING RETURN TYPE]
+           Function 'test_studiengang_modul_typical_bachelor_semesters' has no return type hint
+
+  Line  368 | [MISSING RETURN TYPE]
+           Function 'test_str_representation' has no return type hint
+
+  Line  386 | [MISSING RETURN TYPE]
+           Function 'test_repr_representation' has no return type hint
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: utils/__init__.py (1 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   17 | [UNUSED IMPORT]
+           Unused import: '*'
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+FILE: utils/login.py (9 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Line   89 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  101 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  102 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  103 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  104 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  105 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  106 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  107 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+  Line  108 | [DUPLICATED CODE]
+           Duplicated code fragment (10+ lines)
+
+
+
+🏷️  WARNINGS NACH KATEGORIE
+====================================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[DUPLICATED CODE] (64 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  controllers/semester_controller.py:147
+    → Duplicated code fragment (10+ lines)
+
+  controllers/semester_controller.py:148
+    → Duplicated code fragment (10+ lines)
+
+  repositories/progress_repository.py:151
+    → Duplicated code fragment (10+ lines)
+
+  repositories/progress_repository.py:152
+    → Duplicated code fragment (10+ lines)
+
+  repositories/progress_repository.py:153
+    → Duplicated code fragment (10+ lines)
+
+  repositories/student_repository.py:102
+    → Duplicated code fragment (10+ lines)
+
+  repositories/student_repository.py:127
+    → Duplicated code fragment (10+ lines)
+
+  tests/conftest.py:369
+    → Duplicated code fragment (10+ lines)
+
+  tests/conftest.py:370
+    → Duplicated code fragment (10+ lines)
+
+  tests/conftest.py:371
+    → Duplicated code fragment (10+ lines)
+
+  tests/conftest.py:372
+    → Duplicated code fragment (10+ lines)
+
+  tests/conftest.py:373
+    → Duplicated code fragment (10+ lines)
+
+  tests/conftest.py:374
+    → Duplicated code fragment (10+ lines)
+
+  tests/conftest.py:375
+    → Duplicated code fragment (10+ lines)
+
+  tests/conftest.py:376
+    → Duplicated code fragment (10+ lines)
+
+  tests/integration/test_routes.py:174
+    → Duplicated code fragment (10+ lines)
+
+  tests/integration/test_routes.py:175
+    → Duplicated code fragment (10+ lines)
+
+  tests/integration/test_routes.py:176
+    → Duplicated code fragment (10+ lines)
+
+  tests/integration/test_routes.py:225
+    → Duplicated code fragment (10+ lines)
+
+  tests/integration/test_routes.py:226
+    → Duplicated code fragment (10+ lines)
+
+  tests/integration/test_routes.py:227
+    → Duplicated code fragment (10+ lines)
+
+  tests/integration/test_routes.py:228
+    → Duplicated code fragment (10+ lines)
+
+  tests/integration/test_routes.py:229
+    → Duplicated code fragment (10+ lines)
+
+  tests/integration/test_routes.py:230
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_auth_controller.py:189
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_auth_controller.py:190
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_auth_controller.py:219
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_auth_controller.py:220
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_dashboard_controller.py:295
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_dashboard_controller.py:422
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_gebuehr.py:185
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_modul.py:275
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_modul_repository.py:295
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_modul_repository.py:422
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_modulbuchung_repository.py:151
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_modulbuchung_repository.py:152
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_modulbuchung_repository.py:153
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_modulbuchung_repository.py:154
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_modulbuchung_repository.py:346
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_progress.py:157
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_progress.py:302
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_progress.py:378
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_progress.py:418
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_progress.py:438
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_progress_repository.py:151
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_progress_repository.py:152
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_progress_repository.py:153
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_semester_controller.py:151
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_semester_controller.py:152
+    → Duplicated code fragment (10+ lines)
+
+  tests/unit/test_semester_controller.py:153
+    → Duplicated code fragment (10+ lines)
+
+  ... und 14 weitere
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[LINE TOO LONG] (9 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  controllers/semester_controller.py:6
+    → Line too long (132 > 120 characters)
+
+  controllers/semester_controller.py:99
+    → Line too long (127 > 120 characters)
+
+  models/studiengang_modul.py:125
+    → Line too long (133 > 120 characters)
+
+  repositories/einschreibung_repository.py:40
+    → Line too long (134 > 120 characters)
+
+  repositories/einschreibung_repository.py:48
+    → Line too long (123 > 120 characters)
+
+  repositories/gebuehr_repository.py:201
+    → Line too long (122 > 120 characters)
+
+  tests/conftest.py:168
+    → Line too long (135 > 120 characters)
+
+  tests/conftest.py:211
+    → Line too long (145 > 120 characters)
+
+  tests/integration/test_routes.py:56
+    → Line too long (125 > 120 characters)
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[MISSING RETURN TYPE] (656 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  app.py:50
+    → Function 'load_user' has no return type hint
+
+  app.py:60
+    → Function 'login' has no return type hint
+
+  app.py:93
+    → Function 'logout' has no return type hint
+
+  app.py:107
+    → Function 'dashboard' has no return type hint
+
+  app.py:130
+    → Function 'get_semester_modules' has no return type hint
+
+  app.py:161
+    → Function 'book_module' has no return type hint
+
+  app.py:197
+    → Function 'api_book_module' has no return type hint
+
+  app.py:256
+    → Function 'register_exam' has no return type hint
+
+  app.py:374
+    → Function 'not_found' has no return type hint
+
+  app.py:380
+    → Function 'internal_error' has no return type hint
+
+  config.py:122
+    → Function 'setup_logging' has no return type hint
+
+  controllers/auth_controller.py:37
+    → Function '_con' has no return type hint
+
+  models/modulbuchung.py:23
+    → Function '__post_init__' has no return type hint
+
+  models/progress.py:23
+    → Function '__post_init__' has no return type hint
+
+  models/pruefungsleistung.py:25
+    → Function '__post_init__' has no return type hint
+
+  models/studiengang.py:43
+    → Function '__post_init__' has no return type hint
+
+  models/studiengang_modul.py:52
+    → Function '__post_init__' has no return type hint
+
+  processing/path_detector.py:13
+    → Function 'process_and_save' has no return type hint
+
+  processing/path_detector.py:34
+    → Function 'get_position_for_semester' has no return type hint
+
+  processing/path_detector.py:50
+    → Function 'get_dark_mask' has no return type hint
+
+  processing/path_detector.py:66
+    → Function 'get_sign_mask' has no return type hint
+
+  processing/path_detector.py:98
+    → Function 'is_near_masked' has no return type hint
+
+  reset_password.py:73
+    → Function 'list_users' has no return type hint
+
+  reset_password.py:98
+    → Function 'interactive_mode' has no return type hint
+
+  tests/conftest.py:37
+    → Function 'temp_db' has no return type hint
+
+  tests/conftest.py:59
+    → Function '_init_real_schema' has no return type hint
+
+  tests/conftest.py:238
+    → Function 'db_with_data' has no return type hint
+
+  tests/conftest.py:319
+    → Function 'app' has no return type hint
+
+  tests/conftest.py:342
+    → Function 'client' has no return type hint
+
+  tests/conftest.py:348
+    → Function 'authenticated_client' has no return type hint
+
+  tests/conftest.py:362
+    → Function 'app_client' has no return type hint
+
+  tests/conftest.py:409
+    → Function 'db_connection' has no return type hint
+
+  tests/conftest.py:425
+    → Function 'sample_student' has no return type hint
+
+  tests/conftest.py:439
+    → Function 'sample_modul' has no return type hint
+
+  tests/conftest.py:450
+    → Function 'sample_modulbuchung' has no return type hint
+
+  tests/conftest.py:462
+    → Function 'sample_pruefungsleistung' has no return type hint
+
+  tests/conftest.py:480
+    → Function 'sample_gebuehr' has no return type hint
+
+  tests/conftest.py:493
+    → Function 'sample_einschreibung' has no return type hint
+
+  tests/conftest.py:506
+    → Function 'sample_studiengang' has no return type hint
+
+  tests/conftest.py:518
+    → Function 'sample_progress' has no return type hint
+
+  tests/conftest.py:532
+    → Function 'sample_dates' has no return type hint
+
+  tests/conftest.py:543
+    → Function 'sample_notes' has no return type hint
+
+  tests/conftest.py:558
+    → Function 'pytest_configure' has no return type hint
+
+  tests/integration/test_db_gateway.py:22
+    → Function '_reload_gateway_with_env' has no return type hint
+
+  tests/integration/test_db_gateway.py:61
+    → Function 'test_data_source_points_to_same_file' has no return type hint
+
+  tests/integration/test_db_gateway.py:74
+    → Function 'test_db_path_is_absolute' has no return type hint
+
+  tests/integration/test_db_gateway.py:89
+    → Function 'test_foreign_keys_enforced' has no return type hint
+
+  tests/integration/test_db_gateway.py:104
+    → Function 'test_connection_has_row_factory' has no return type hint
+
+  tests/integration/test_db_gateway.py:118
+    → Function 'test_multiple_connections' has no return type hint
+
+  tests/integration/test_db_gateway.py:137
+    → Function 'test_backward_compatible_connect' has no return type hint
+
+  ... und 606 weitere
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[MISSING TYPE HINT] (544 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  app.py:50
+    → Parameter 'user_id' has no type hint
+
+  app.py:130
+    → Parameter 'semester_nr' has no type hint
+
+  app.py:161
+    → Parameter 'semester_nr' has no type hint
+
+  app.py:161
+    → Parameter 'modul_id' has no type hint
+
+  app.py:374
+    → Parameter 'e' has no type hint
+
+  app.py:380
+    → Parameter 'e' has no type hint
+
+  config.py:122
+    → Parameter 'level' has no type hint
+
+  models/einschreibung.py:166
+    → Parameter 'cls' has no type hint
+
+  models/einschreibung.py:166
+    → Parameter 'row' has no type hint
+
+  models/gebuehr.py:195
+    → Parameter 'cls' has no type hint
+
+  models/gebuehr.py:195
+    → Parameter 'row' has no type hint
+
+  models/login.py:177
+    → Parameter 'cls' has no type hint
+
+  models/login.py:177
+    → Parameter 'row' has no type hint
+
+  models/modul.py:30
+    → Parameter 'cls' has no type hint
+
+  models/modul.py:30
+    → Parameter 'row' has no type hint
+
+  models/modulbuchung.py:56
+    → Parameter 'cls' has no type hint
+
+  models/modulbuchung.py:56
+    → Parameter 'row' has no type hint
+
+  models/pruefungsleistung.py:92
+    → Parameter 'cls' has no type hint
+
+  models/pruefungsleistung.py:92
+    → Parameter 'row' has no type hint
+
+  models/student.py:113
+    → Parameter 'cls' has no type hint
+
+  models/student.py:113
+    → Parameter 'row' has no type hint
+
+  models/studiengang.py:107
+    → Parameter 'cls' has no type hint
+
+  models/studiengang.py:107
+    → Parameter 'row' has no type hint
+
+  models/studiengang_modul.py:113
+    → Parameter 'cls' has no type hint
+
+  models/studiengang_modul.py:113
+    → Parameter 'row' has no type hint
+
+  processing/path_detector.py:6
+    → Parameter 'image_path' has no type hint
+
+  processing/path_detector.py:34
+    → Parameter 'semester_count' has no type hint
+
+  processing/path_detector.py:50
+    → Parameter 'hsv_img' has no type hint
+
+  processing/path_detector.py:66
+    → Parameter 'hsv_img' has no type hint
+
+  processing/path_detector.py:98
+    → Parameter 'px' has no type hint
+
+  processing/path_detector.py:98
+    → Parameter 'py' has no type hint
+
+  processing/path_detector.py:98
+    → Parameter 'masks' has no type hint
+
+  processing/path_detector.py:98
+    → Parameter 'radius' has no type hint
+
+  repositories/modul_repository.py:113
+    → Parameter 'row' has no type hint
+
+  tests/conftest.py:238
+    → Parameter 'temp_db' has no type hint
+
+  tests/conftest.py:319
+    → Parameter 'temp_db' has no type hint
+
+  tests/conftest.py:342
+    → Parameter 'app' has no type hint
+
+  tests/conftest.py:348
+    → Parameter 'client' has no type hint
+
+  tests/conftest.py:348
+    → Parameter 'db_with_data' has no type hint
+
+  tests/conftest.py:362
+    → Parameter 'temp_db' has no type hint
+
+  tests/conftest.py:409
+    → Parameter 'temp_db' has no type hint
+
+  tests/conftest.py:558
+    → Parameter 'config' has no type hint
+
+  tests/integration/test_db_gateway.py:61
+    → Parameter 'tmp_path' has no type hint
+
+  tests/integration/test_db_gateway.py:61
+    → Parameter 'monkeypatch' has no type hint
+
+  tests/integration/test_db_gateway.py:74
+    → Parameter 'tmp_path' has no type hint
+
+  tests/integration/test_db_gateway.py:74
+    → Parameter 'monkeypatch' has no type hint
+
+  tests/integration/test_db_gateway.py:89
+    → Parameter 'tmp_path' has no type hint
+
+  tests/integration/test_db_gateway.py:89
+    → Parameter 'monkeypatch' has no type hint
+
+  tests/integration/test_db_gateway.py:104
+    → Parameter 'tmp_path' has no type hint
+
+  tests/integration/test_db_gateway.py:104
+    → Parameter 'monkeypatch' has no type hint
+
+  ... und 494 weitere
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[MISSING WHITESPACE] (2 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  tests/conftest.py:197
+    → Missing whitespace after ','
+
+  tests/unit/test_einschreibung_repository.py:55
+    → Missing whitespace after ','
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[TRAILING WHITESPACE] (6 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  tests/conftest.py:265
+    → Trailing whitespace
+
+  tests/conftest.py:278
+    → Trailing whitespace
+
+  tests/conftest.py:287
+    → Trailing whitespace
+
+  tests/unit/test_login_utils.py:46
+    → Trailing whitespace
+
+  tests/unit/test_modul.py:145
+    → Trailing whitespace
+
+  tests/unit/test_progress_repository.py:230
+    → Trailing whitespace
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[UNUSED IMPORT] (33 warnings)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  controllers/dashboard_controller.py:2
+    → Unused import: 'annotations'
+
+  controllers/semester_controller.py:2
+    → Unused import: 'annotations'
+
+  controllers/semester_controller.py:3
+    → Unused import: 'Optional'
+
+  models/einschreibung.py:12
+    → Unused import: 'annotations'
+
+  models/gebuehr.py:10
+    → Unused import: 'annotations'
+
+  models/login.py:14
+    → Unused import: 'annotations'
+
+  models/modul.py:2
+    → Unused import: 'annotations'
+
+  models/modulbuchung.py:2
+    → Unused import: 'annotations'
+
+  models/progress.py:2
+    → Unused import: 'annotations'
+
+  models/pruefungsleistung.py:2
+    → Unused import: 'annotations'
+
+  models/student.py:14
+    → Unused import: 'annotations'
+
+  models/studiengang.py:12
+    → Unused import: 'annotations'
+
+  models/studiengang_modul.py:16
+    → Unused import: 'annotations'
+
+  processing/path_detector.py:3
+    → Unused import: 'np'
+
+  repositories/db_gateway.py:2
+    → Unused import: 'annotations'
+
+  repositories/db_gateway.py:8
+    → Unused import: 'date'
+
+  repositories/einschreibung_repository.py:2
+    → Unused import: 'annotations'
+
+  repositories/einschreibung_repository.py:5
+    → Unused import: 'Optional'
+
+  repositories/einschreibung_repository.py:6
+    → Unused import: 'EinschreibungError'
+
+  repositories/gebuehr_repository.py:2
+    → Unused import: 'annotations'
+
+  repositories/modul_repository.py:2
+    → Unused import: 'annotations'
+
+  repositories/modulbuchung_repository.py:2
+    → Unused import: 'annotations'
+
+  repositories/progress_repository.py:2
+    → Unused import: 'annotations'
+
+  services/progress_text_service.py:2
+    → Unused import: 'annotations'
+
+  tests/conftest.py:22
+    → Unused import: 'ModulBuchung'
+
+  tests/conftest.py:29
+    → Unused import: 'StudiengangModul'
+
+  tests/integration/test_db_gateway.py:6
+    → Unused import: 'annotations'
+
+  tests/unit/test_gebuehr.py:8
+    → Unused import: 'timedelta'
+
+  tests/unit/test_login.py:12
+    → Unused import: 'VerifyMismatchError'
+
+  tests/unit/test_login_utils.py:10
+    → Unused import: 'Path'
+
+  tests/unit/test_progress_repository.py:2
+    → Unused import: 'annotations'
+
+  tests/unit/test_progress_text_service.py:11
+    → Unused import: 'date'
+
+  utils/__init__.py:17
+    → Unused import: '*'
+
+
+====================================================================================================
+ENDE DES REPORTS
+====================================================================================================

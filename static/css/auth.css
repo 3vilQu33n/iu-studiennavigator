@@ -1,0 +1,88 @@
+/* =================================================================
+   AUTH.CSS - Auto-generated from style.css
+   ================================================================= */
+
+/* === AUTH PAGES === */
+.auth {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg) 0%, var(--screen-bg) 100%);
+}
+
+.auth-card {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--fg);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--muted);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.form-group input.error {
+    border-color: var(--accent-bad);
+}
+
+.flash-messages {
+    margin-bottom: 1rem;
+}
+
+.flash-message {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.flash-success {
+    background: var(--accent-good);
+    color: white;
+}
+
+.flash-error {
+    background: var(--accent-bad);
+    color: white;
+}
+
+.flash-warning {
+    background: #ffd60a;
+    color: #000000 !important;
+    border-left: 4px solid #ff9800;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+button[type="submit"]:hover {
+    opacity: 0.9;
+}

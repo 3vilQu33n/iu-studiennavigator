@@ -1,0 +1,36 @@
+/* =================================================================
+   NOTIFICATIONS.CSS - Auto-generated from style.css
+   ================================================================= */
+
+/* === NOTIFICATIONS === */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    z-index: 3000;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification.success {
+    background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+}
+
+.notification.error {
+    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+}
+
+.notification.info {
+    background: linear-gradient(135deg, #00ccff 0%, #0088cc 100%);
+}

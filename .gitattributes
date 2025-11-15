@@ -1,0 +1,109 @@
+# ============================================================================
+# GIT ATTRIBUTES
+# ============================================================================
+# Definiert wie Git mit verschiedenen Dateitypen umgeht
+# - Line Endings (LF für Unix/Mac, CRLF für Windows)
+# - Text vs Binary
+# - Encoding
+
+# ============================================================================
+# DEFAULT: Auto-Erkennung mit LF Line-Endings
+# ============================================================================
+* text=auto eol=lf
+
+# ============================================================================
+# SOURCE CODE - UTF-8 Encoding, LF Line-Endings
+# ============================================================================
+
+# Python
+*.py text eol=lf encoding=utf-8
+
+# JavaScript
+*.js text eol=lf encoding=utf-8
+
+# HTML/Templates
+*.html text eol=lf encoding=utf-8
+
+# CSS
+*.css text eol=lf encoding=utf-8
+
+# JSON
+*.json text eol=lf
+
+# YAML
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# ============================================================================
+# DOCUMENTATION
+# ============================================================================
+
+# Markdown
+*.md text eol=lf
+
+# LaTeX
+*.tex text eol=lf encoding=utf-8
+
+# PlantUML
+*.puml text eol=lf
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+# Shell Scripts (Unix LF)
+*.sh text eol=lf
+
+# Docker
+Dockerfile text eol=lf
+.dockerignore text eol=lf
+
+# Git
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# Environment
+.env text eol=lf
+.env.* text eol=lf
+
+# ============================================================================
+# BINARY FILES - Never modify line endings or encoding
+# ============================================================================
+
+# Databases
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+
+# SVG als Text behandeln (für bessere Diffs)
+*.svg text eol=lf
+
+# Documents
+*.pdf binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.tgz binary
+
+# ============================================================================
+# DIFF STRATEGIES
+# ============================================================================
+
+# Python: Zeige Funktionsnamen in Diffs
+*.py diff=python
+
+# JSON: Prettier Diffs
+*.json diff
+
+# Markdown: Zeige Überschriften in Diffs
+*.md diff=markdown
