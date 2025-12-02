@@ -1,7 +1,7 @@
 # app.py
 from flask import Flask, render_template, jsonify, request, redirect, url_for, flash, session
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
-from flask_mail import Mail, Message
+from flask_mailman import Mail, EmailMessage
 from dotenv import load_dotenv
 import logging
 import sqlite3
@@ -198,23 +198,23 @@ def forgot_password():
             logger.info(f"Reset-Code fuer {email}: {reset_code}")
 
             try:
-                msg = Message(
+                msg = EmailMessage(
                     subject='Dein Passwort-Reset-Code',
-                    recipients=[email],
                     body=f'''Hallo,
 
-du hast einen Passwort-Reset angefordert.
+            du hast einen Passwort-Reset angefordert.
 
-Dein Reset-Code: {reset_code}
+            Dein Reset-Code: {reset_code}
 
-Dieser Code ist 15 Minuten gueltig.
+            Dieser Code ist 15 Minuten gueltig.
 
-Falls du diese Anfrage nicht gestellt hast, ignoriere diese E-Mail.
+            Falls du diese Anfrage nicht gestellt hast, ignoriere diese E-Mail.
 
-Viele Gruesse
-Dein Studiennavigator-Team'''
+            Viele Gruesse
+            Dein Studiennavigator-Team''',
+                    to=[email]
                 )
-                mail.send(msg)
+                msg.send()
                 flash('Ein Reset-Code wurde an deine E-Mail-Adresse gesendet.', 'success')
             except Exception as e:
                 logger.warning(f"E-Mail konnte nicht versendet werden: {e}")

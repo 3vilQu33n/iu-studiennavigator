@@ -91,8 +91,8 @@ A comprehensive web application for managing and visualizing academic progress a
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR-USERNAME/IU-Studiennavigator.git
-   cd IU-Studiennavigator
+   git clone https://github.com/3vilQu33n/iu-studiennavigator
+   cd iu-studiennavigator
    ```
 
 2. **Create virtual environment** (optional but recommended)
@@ -128,8 +128,8 @@ A comprehensive web application for managing and visualizing academic progress a
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR-USERNAME/IU-Studiennavigator.git
-   cd IU-Studiennavigator
+    git clone https://github.com/3vilQu33n/iu-studiennavigator
+    cd iu-studiennavigator  
    ```
 
 2. **Configure environment**
