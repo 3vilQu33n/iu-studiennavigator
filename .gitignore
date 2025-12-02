@@ -1,41 +1,80 @@
-# Database files
-*.db
+# ==============================================================================
+# .gitignore für IU Studiennavigator (Public Repository / Portfolio)
+# ==============================================================================
+
+# ===== Datenbank =====
+# *.db Auskommentiert, weil Demo-DB ins Repo soll
 *.sqlite
 *.db-journal
 *.db-wal
 *.db-shm
-dashboard.db
+# dashboard.db Auskommentiert für Demo-DB
 
-# Python
+# ===== Python =====
 __pycache__/
 *.py[cod]
 *.pyo
+*.pyd
 .pytest_cache/
+*.egg-info/
+dist/
+build/
 
-# Virtual Environments
+# ===== Virtual Environments =====
 venv/
 .venv/
 env/
+ENV/
 
-# IDE
+# ===== IDE =====
 .idea/
 .vscode/
 *.swp
+*.swo
 *~
 
-# Environment & Secrets
+# ===== Environment & Secrets =====
 .env
 .env.local
 .env.*.local
 # ABER: .env.example soll NICHT ignoriert werden!
 !.env.example
 
-# Logs
+# ===== Logs =====
 *.log
+logs/
 
-# Backups
-*.bak
-*_backup_*
-
-# macOS
+# ===== macOS =====
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# ===== Backups =====
+*.bak
+*.tmp
+*.temp
+*_backup_*
+~*
+
+# ===== Testing & Coverage =====
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# ===== Docker =====
+# Docker persistent data (wird beim Container-Start erstellt)
+data/
+.docker/
+
+# ===== Dokumentation =====
+# LaTeX-Ordner (akademische Dokumente, nicht fürs Portfolio)
+docs/
+out/
+
+# PDFs (nicht ins Portfolio-Repo)
+*.pdf
+
+# ===== Projekt-spezifisch =====
+# Flask Session
+flask_session/

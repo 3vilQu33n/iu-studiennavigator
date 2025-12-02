@@ -1,0 +1,63 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Database (wird via Volume gemountet)
+*.db
+*.sqlite
+data/
+
+# Logs
+*.log
+logs/
+
+# Documentation (nicht für Runtime nötig)
+*.md
+docs/
+*.pdf
+
+# Tests (optional - könnte man auch einbinden)
+# tests/
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# Backups
+*_backup_*
+*.bak
+*.tmp
+
+# Docker itself
+Dockerfile
+docker-compose*.yaml
+.dockerignore

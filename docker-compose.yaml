@@ -1,0 +1,59 @@
+# ==============================================================================
+# IU Studiennavigator - Docker Compose Configuration
+# ==============================================================================
+#
+# Quick Start:
+#   1. Copy .env.example to .env and configure
+#   2. Run: docker-compose up -d --build
+#   3. Access: http://localhost:5050
+#
+# ==============================================================================
+
+services:
+  studiennavigator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: studiennavigator
+    restart: unless-stopped
+
+    # Port mapping (external:internal)
+    ports:
+      - "5050:5000"
+
+    # Environment variables from .env file
+    env_file:
+      - .env
+
+    # Persistent data volumes
+    volumes:
+      # SQLite database persistence
+      - ./data:/app/data
+
+    # Environment overrides
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+      - DATABASE_PATH=/app/data/dashboard.db
+
+    # Health check for container monitoring
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ==============================================================================
+# Optional: Custom network configuration
+# ==============================================================================
+# networks:
+#   studiennavigator-net:
+#     driver: bridge
