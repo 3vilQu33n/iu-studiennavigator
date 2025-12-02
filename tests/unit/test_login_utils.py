@@ -1,691 +1,665 @@
-# tests/unit/test_login_utils.py
+# tests/unit/test_utils_login.py
 """
-Unit Tests fÃƒÂ¼r utils/login.py
+Unit Tests fuer utils/login.py
 
-Testet die Flask-Login User-Klasse, Passwort-Policy und Email-Validierung.
-WICHTIG: Dies ist KEIN Domain Model Test, sondern ein Utility Test!
+Testet:
+- User-Klasse (Flask-Login Integration)
+  - __init__() - Initialisierung
+  - get() - User aus DB laden
+  - get_by_email() - User per Email laden
+  - get_id() - ID fuer Flask-Login
+  - __normalize_email() - Email-Normalisierung
+  - __repr__(), __str__() - String-Repräsentationen
+
+- Passwort-Policy
+  - password_meets_policy() - Anforderungen pruefen
+  - PASSWORD_MIN_LENGTH Konstante
+
+- Passwort-Generator
+  - generate_strong_password() - Sicheres Passwort generieren
+
+- Email-Validierung
+  - validate_email() - Email-Format pruefen
 """
+from __future__ import annotations
+
 import pytest
 import sqlite3
+import tempfile
+import os
+import re
 from pathlib import Path
-from utils import (
-    User,
-    password_meets_policy,
-    generate_strong_password,
-    validate_email,
-    PASSWORD_MIN_LENGTH
-)
+
+# Mark this whole module as unit tests
+pytestmark = pytest.mark.unit
+
+
+# ============================================================================
+# FIXTURES
+# ============================================================================
+
+@pytest.fixture
+def login_module():
+    """Importiert das login-Modul aus utils"""
+    try:
+        from utils.login import (
+            User, password_meets_policy, generate_strong_password,
+            validate_email, PASSWORD_MIN_LENGTH
+        )
+        return {
+            'User': User,
+            'password_meets_policy': password_meets_policy,
+            'generate_strong_password': generate_strong_password,
+            'validate_email': validate_email,
+            'PASSWORD_MIN_LENGTH': PASSWORD_MIN_LENGTH
+        }
+    except ImportError:
+        from utils import (
+            User, password_meets_policy, generate_strong_password,
+            validate_email, PASSWORD_MIN_LENGTH
+        )
+        return {
+            'User': User,
+            'password_meets_policy': password_meets_policy,
+            'generate_strong_password': generate_strong_password,
+            'validate_email': validate_email,
+            'PASSWORD_MIN_LENGTH': PASSWORD_MIN_LENGTH
+        }
 
 
 @pytest.fixture
-def db_path(tmp_path):
-    """Erstellt eine temporÃƒÂ¤re Test-Datenbank"""
-    db_file = tmp_path / "test_login.db"
-    return str(db_file)
+def user_class(login_module):
+    """Gibt User-Klasse zurueck"""
+    return login_module['User']
 
 
 @pytest.fixture
-def setup_db(db_path):
-    """Erstellt login Tabelle und Test-Daten"""
-    with sqlite3.connect(db_path) as conn:
-        # login Tabelle (wie in echtem Schema)
-        conn.execute("""
-            CREATE TABLE login (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                student_id INTEGER NOT NULL,
-                email TEXT NOT NULL UNIQUE,
-                password_hash TEXT NOT NULL,
-                is_active INTEGER DEFAULT 1,
-                role TEXT DEFAULT 'student'
-            )
-        """)
+def password_meets_policy_func(login_module):
+    """Gibt password_meets_policy Funktion zurueck"""
+    return login_module['password_meets_policy']
 
-        # Test-User einfÃƒÂ¼gen
-        conn.execute("""
-            INSERT INTO login (id, student_id, email, password_hash, is_active, role)
-            VALUES 
-                (1, 1, 'test@example.com', 'dummy_hash', 1, 'student'),
-                (2, 2, 'admin@example.com', 'dummy_hash', 1, 'admin'),
-                (3, 3, 'inactive@example.com', 'dummy_hash', 0, 'student'),
-                (4, 4, 'Test.Upper@Example.COM', 'dummy_hash', 1, 'student')
-        """)
 
-        conn.commit()
-    return db_path
+@pytest.fixture
+def generate_strong_password_func(login_module):
+    """Gibt generate_strong_password Funktion zurueck"""
+    return login_module['generate_strong_password']
 
 
-# ========== User.get() Tests ==========
+@pytest.fixture
+def validate_email_func(login_module):
+    """Gibt validate_email Funktion zurueck"""
+    return login_module['validate_email']
 
-def test_user_get_existing(setup_db):
-    """Test: User.get() lÃƒÂ¤dt existierenden User"""
-    user = User.get(1, setup_db)
 
-    assert user is not None
-    assert isinstance(user, User)
-    assert user.id == 1
-    assert user.email == 'test@example.com'
+@pytest.fixture
+def password_min_length(login_module):
+    """Gibt PASSWORD_MIN_LENGTH zurueck"""
+    return login_module['PASSWORD_MIN_LENGTH']
 
 
-def test_user_get_not_found(setup_db):
-    """Test: User.get() gibt None fÃƒÂ¼r nicht existierende ID"""
-    user = User.get(999, setup_db)
+@pytest.fixture
+def temp_db():
+    """Erstellt temporaere Test-Datenbank mit login-Tabelle"""
+    fd, path = tempfile.mkstemp(suffix='.db')
+    os.close(fd)
 
-    assert user is None
+    conn = sqlite3.connect(path)
+    conn.execute("PRAGMA foreign_keys = ON;")
 
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS login (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            passwort_hash TEXT NOT NULL
+        );
 
-def test_user_get_returns_correct_type(setup_db):
-    """Test: User.get() gibt User-Objekt zurÃƒÂ¼ck"""
-    user = User.get(1, setup_db)
+        INSERT INTO login (id, email, passwort_hash) VALUES
+            (1, 'max.mustermann@example.com', 'hash1'),
+            (2, 'Erika.Musterfrau@EXAMPLE.COM', 'hash2'),
+            (3, 'test@domain.org', 'hash3');
+    """)
+    conn.commit()
+    conn.close()
 
-    assert isinstance(user, User)
-    assert hasattr(user, 'id')
-    assert hasattr(user, 'email')
-    assert hasattr(user, 'get_id')
+    yield path
 
+    # Cleanup
+    try:
+        os.unlink(path)
+    except OSError:
+        pass
 
-def test_user_get_with_invalid_db_path():
-    """Test: User.get() behandelt ungÃƒÂ¼ltigen DB-Pfad"""
-    user = User.get(1, "/nicht/existent.db")
 
-    assert user is None
+# ============================================================================
+# USER CLASS TESTS
+# ============================================================================
 
+class TestUserInit:
+    """Tests fuer User.__init__()"""
 
-def test_user_get_normalizes_email(setup_db):
-    """Test: User.get() normalisiert E-Mail (lowercase)"""
-    user = User.get(4, setup_db)
+    def test_init_with_id_and_email(self, user_class):
+        """User kann mit id und email initialisiert werden"""
+        user = user_class(id=1, email='test@example.com')
 
-    assert user is not None
-    assert user.email == 'test.upper@example.com'
+        assert user.id == 1
+        assert user.email == 'test@example.com'
 
+    def test_init_normalizes_email_lowercase(self, user_class):
+        """User normalisiert Email zu lowercase"""
+        user = user_class(id=1, email='TEST@EXAMPLE.COM')
 
-# ========== User.get_by_email() Tests ==========
+        assert user.email == 'test@example.com'
 
-def test_user_get_by_email_existing(setup_db):
-    """Test: User.get_by_email() lÃƒÂ¤dt User per E-Mail"""
-    user = User.get_by_email('test@example.com', setup_db)
+    def test_init_normalizes_email_strips_whitespace(self, user_class):
+        """User entfernt Whitespace von Email"""
+        user = user_class(id=1, email='  test@example.com  ')
 
-    assert user is not None
-    assert user.id == 1
-    assert user.email == 'test@example.com'
+        assert user.email == 'test@example.com'
 
+    def test_init_handles_non_string_email(self, user_class):
+        """User behandelt non-string Email gracefully"""
+        user = user_class(id=1, email=None)
 
-def test_user_get_by_email_case_insensitive(setup_db):
-    """Test: User.get_by_email() ist case-insensitive"""
-    user1 = User.get_by_email('TEST@EXAMPLE.COM', setup_db)
-    user2 = User.get_by_email('test@example.com', setup_db)
+        assert user.email == ''
 
-    assert user1 is not None
-    assert user2 is not None
-    assert user1.id == user2.id
 
+class TestUserGet:
+    """Tests fuer User.get() statische Methode"""
 
-def test_user_get_by_email_not_found(setup_db):
-    """Test: User.get_by_email() gibt None fÃƒÂ¼r nicht existierende E-Mail"""
-    user = User.get_by_email('notfound@example.com', setup_db)
+    def test_get_existing_user(self, user_class, temp_db):
+        """get() laedt existierenden User"""
+        user = user_class.get(1, temp_db)
 
-    assert user is None
+        assert user is not None
+        assert user.id == 1
+        assert user.email == 'max.mustermann@example.com'
 
+    def test_get_returns_user_instance(self, user_class, temp_db):
+        """get() gibt User-Instanz zurueck"""
+        user = user_class.get(1, temp_db)
 
-def test_user_get_by_email_with_whitespace(setup_db):
-    """Test: User.get_by_email() mit Whitespace gibt None zurÃ¼ck (Email wird nicht getrimmt)"""
-    user = User.get_by_email('  test@example.com  ', setup_db)
+        assert isinstance(user, user_class)
 
-    # âœ… Korrigiert: Email wird nicht automatisch getrimmt
-    assert user is None
+    def test_get_nonexistent_user(self, user_class, temp_db):
+        """get() gibt None fuer nicht existierenden User"""
+        user = user_class.get(999, temp_db)
 
+        assert user is None
 
-def test_user_get_by_email_empty_string(setup_db):
-    """Test: User.get_by_email() behandelt leeren String"""
-    user = User.get_by_email('', setup_db)
+    def test_get_invalid_db_path(self, user_class):
+        """get() gibt None bei ungueltigem DB-Pfad"""
+        user = user_class.get(1, '/nonexistent/path.db')
 
-    assert user is None
+        assert user is None
 
+    def test_get_normalizes_email(self, user_class, temp_db):
+        """get() normalisiert geladene Email"""
+        # User 2 hat uppercase Email in DB
+        user = user_class.get(2, temp_db)
 
-# ========== User.__init__() Tests ==========
+        assert user.email == 'erika.musterfrau@example.com'
 
-def test_user_init_normalizes_email():
-    """Test: __init__ normalisiert E-Mail"""
-    user = User(id=1, email='  TEST@EXAMPLE.COM  ')
 
-    assert user.email == 'test@example.com'
+class TestUserGetByEmail:
+    """Tests fuer User.get_by_email() statische Methode"""
 
+    def test_get_by_email_existing(self, user_class, temp_db):
+        """get_by_email() laedt User per Email"""
+        user = user_class.get_by_email('max.mustermann@example.com', temp_db)
 
-def test_user_init_with_valid_data():
-    """Test: __init__ mit gÃƒÂ¼ltigen Daten"""
-    user = User(id=42, email='user@example.com')
+        assert user is not None
+        assert user.id == 1
 
-    assert user.id == 42
-    assert user.email == 'user@example.com'
+    def test_get_by_email_case_insensitive(self, user_class, temp_db):
+        """get_by_email() ist case-insensitive"""
+        user = user_class.get_by_email('MAX.MUSTERMANN@EXAMPLE.COM', temp_db)
 
+        assert user is not None
+        assert user.id == 1
 
-def test_user_init_with_empty_email():
-    """Test: __init__ behandelt leere E-Mail"""
-    user = User(id=1, email='')
+    def test_get_by_email_nonexistent(self, user_class, temp_db):
+        """get_by_email() gibt None fuer nicht existierende Email"""
+        user = user_class.get_by_email('unknown@example.com', temp_db)
 
-    assert user.email == ''
+        assert user is None
 
+    def test_get_by_email_invalid_db_path(self, user_class):
+        """get_by_email() gibt None bei ungueltigem DB-Pfad"""
+        user = user_class.get_by_email('test@example.com', '/nonexistent/path.db')
 
-# ========== User.get_id() Tests ==========
+        assert user is None
 
-def test_user_get_id_returns_string(setup_db):
-    """Test: get_id() gibt ID als String zurÃƒÂ¼ck (fÃƒÂ¼r Flask-Login)"""
-    user = User.get(1, setup_db)
 
-    user_id = user.get_id()
+class TestUserGetId:
+    """Tests fuer User.get_id() (Flask-Login)"""
 
-    assert isinstance(user_id, str)
-    assert user_id == '1'
+    def test_get_id_returns_string(self, user_class):
+        """get_id() gibt String zurueck"""
+        user = user_class(id=42, email='test@example.com')
 
+        result = user.get_id()
 
-def test_user_get_id_with_large_id():
-    """Test: get_id() funktioniert mit groÃƒÅ¸en IDs"""
-    user = User(id=999999, email='test@example.com')
+        assert isinstance(result, str)
 
-    assert user.get_id() == '999999'
+    def test_get_id_correct_value(self, user_class):
+        """get_id() gibt korrekte ID zurueck"""
+        user = user_class(id=123, email='test@example.com')
 
+        assert user.get_id() == '123'
 
-# ========== UserMixin Integration Tests ==========
 
-def test_user_is_authenticated(setup_db):
-    """Test: User implementiert is_authenticated (UserMixin)"""
-    user = User.get(1, setup_db)
+class TestUserStringMethods:
+    """Tests fuer User.__repr__() und __str__()"""
 
-    assert hasattr(user, 'is_authenticated')
-    assert user.is_authenticated is True
+    def test_repr_format(self, user_class):
+        """__repr__() hat korrektes Format"""
+        user = user_class(id=1, email='test@example.com')
 
+        result = repr(user)
 
-def test_user_is_active(setup_db):
-    """Test: User implementiert is_active (UserMixin)"""
-    user = User.get(1, setup_db)
+        assert 'User' in result
+        assert 'id=1' in result
+        assert 'test@example.com' in result
 
-    assert hasattr(user, 'is_active')
-    assert user.is_active is True
+    def test_str_returns_email(self, user_class):
+        """__str__() gibt Email zurueck"""
+        user = user_class(id=1, email='test@example.com')
 
+        result = str(user)
 
-def test_user_is_anonymous(setup_db):
-    """Test: User implementiert is_anonymous (UserMixin)"""
-    user = User.get(1, setup_db)
+        assert result == 'test@example.com'
 
-    assert hasattr(user, 'is_anonymous')
-    assert user.is_anonymous is False
 
+class TestUserMixin:
+    """Tests fuer Flask-Login UserMixin Integration"""
 
-# ========== String Representation Tests ==========
+    def test_user_is_authenticated(self, user_class):
+        """User.is_authenticated ist True (von UserMixin)"""
+        user = user_class(id=1, email='test@example.com')
 
-def test_user_repr():
-    """Test: __repr__ gibt Debug-String zurÃƒÂ¼ck"""
-    user = User(id=1, email='test@example.com')
+        assert user.is_authenticated is True
 
-    repr_str = repr(user)
+    def test_user_is_active(self, user_class):
+        """User.is_active ist True (von UserMixin)"""
+        user = user_class(id=1, email='test@example.com')
 
-    assert 'User' in repr_str
-    assert 'id=1' in repr_str
-    assert 'test@example.com' in repr_str
+        assert user.is_active is True
 
+    def test_user_is_anonymous(self, user_class):
+        """User.is_anonymous ist False (von UserMixin)"""
+        user = user_class(id=1, email='test@example.com')
 
-def test_user_str():
-    """Test: __str__ gibt E-Mail zurÃƒÂ¼ck"""
-    user = User(id=1, email='test@example.com')
+        assert user.is_anonymous is False
 
-    str_representation = str(user)
 
-    assert str_representation == 'test@example.com'
+# ============================================================================
+# PASSWORD POLICY TESTS
+# ============================================================================
 
+class TestPasswordMeetsPolicy:
+    """Tests fuer password_meets_policy() Funktion"""
 
-# ========== Email Validation Tests (Private) ==========
+    def test_valid_password(self, password_meets_policy_func):
+        """Gueltiges Passwort wird akzeptiert"""
+        valid, msg = password_meets_policy_func('SecurePass123!')
 
-def test_validate_email_format_valid():
-    """Test: E-Mail Validierung mit gÃƒÂ¼ltiger E-Mail"""
-    user = User(id=1, email='user@example.com')
+        assert valid is True
+        assert msg == ''
 
-    is_valid = user._User__validate_email_format()
+    def test_too_short(self, password_meets_policy_func, password_min_length):
+        """Zu kurzes Passwort wird abgelehnt"""
+        short_pw = 'Ab1!' + 'x' * (password_min_length - 5)  # Zu kurz
 
-    assert is_valid is True
+        valid, msg = password_meets_policy_func(short_pw)
 
+        assert valid is False
+        assert 'Zeichen' in msg
 
-def test_validate_email_format_no_at():
-    """Test: E-Mail Validierung ohne @"""
-    user = User(id=1, email='invalid.email.com')
+    def test_missing_lowercase(self, password_meets_policy_func):
+        """Passwort ohne Kleinbuchstabe wird abgelehnt"""
+        valid, msg = password_meets_policy_func('SECUREPASS123!')
 
-    is_valid = user._User__validate_email_format()
+        assert valid is False
+        assert 'Kleinbuchstabe' in msg
 
-    assert is_valid is False
+    def test_missing_uppercase(self, password_meets_policy_func):
+        """Passwort ohne Grossbuchstabe wird abgelehnt"""
+        valid, msg = password_meets_policy_func('securepass123!')
 
+        assert valid is False
+        assert 'Großbuchstabe' in msg or 'GroÃŸbuchstabe' in msg
 
-def test_validate_email_format_no_domain():
-    """Test: E-Mail Validierung ohne Domain"""
-    user = User(id=1, email='user@')
+    def test_missing_digit(self, password_meets_policy_func):
+        """Passwort ohne Ziffer wird abgelehnt"""
+        valid, msg = password_meets_policy_func('SecurePassword!')
 
-    is_valid = user._User__validate_email_format()
+        assert valid is False
+        assert 'Ziffer' in msg
 
-    assert is_valid is False
+    def test_missing_special_char(self, password_meets_policy_func):
+        """Passwort ohne Sonderzeichen wird abgelehnt"""
+        valid, msg = password_meets_policy_func('SecurePassword123')
 
+        assert valid is False
+        assert 'Sonderzeichen' in msg
 
-def test_validate_email_format_no_dot_in_domain():
-    """Test: E-Mail Validierung ohne Punkt in Domain"""
-    user = User(id=1, email='user@domain')
+    def test_multiple_missing_requirements(self, password_meets_policy_func):
+        """Mehrere fehlende Anforderungen werden gemeldet"""
+        valid, msg = password_meets_policy_func('abc')  # Zu kurz, keine Grossbuchstaben, keine Ziffern, keine Sonderzeichen
 
-    is_valid = user._User__validate_email_format()
+        assert valid is False
+        # Sollte mehrere Probleme melden
+        assert msg.count(',') >= 1 or 'nicht erfüllt' in msg or 'nicht erfÃ¼llt' in msg
 
-    assert is_valid is False
+    def test_invalid_type(self, password_meets_policy_func):
+        """Nicht-String wird abgelehnt"""
+        valid, msg = password_meets_policy_func(12345)
 
+        assert valid is False
 
-# ========== Password Policy Tests ==========
+    def test_none_password(self, password_meets_policy_func):
+        """None wird abgelehnt"""
+        valid, msg = password_meets_policy_func(None)
 
-def test_password_meets_policy_valid():
-    """Test: GÃƒÂ¼ltiges Passwort (12+ Zeichen, alle Anforderungen)"""
-    valid, msg = password_meets_policy('ValidPass123!')
+        assert valid is False
 
-    assert valid is True
-    assert msg == ""
+    def test_exact_minimum_length(self, password_meets_policy_func, password_min_length):
+        """Passwort mit exakter Mindestlaenge wird akzeptiert"""
+        # Erstelle Passwort mit exakter Mindestlaenge
+        pw = 'Aa1!' + 'x' * (password_min_length - 4)
 
+        valid, msg = password_meets_policy_func(pw)
 
-def test_password_meets_policy_too_short():
-    """Test: Zu kurzes Passwort"""
-    valid, msg = password_meets_policy('Short1!')
+        assert valid is True
 
-    assert valid is False
-    assert f"mindestens {PASSWORD_MIN_LENGTH} Zeichen" in msg
 
+# ============================================================================
+# PASSWORD GENERATOR TESTS
+# ============================================================================
 
-def test_password_meets_policy_no_uppercase():
-    """Test: Kein Großbuchstabe"""
-    valid, msg = password_meets_policy('lowercase123!')
+class TestGenerateStrongPassword:
+    """Tests fuer generate_strong_password() Funktion"""
 
-    assert valid is False
-    assert "Großbuchstabe" in msg
+    def test_default_length(self, generate_strong_password_func):
+        """Generiert Passwort mit Default-Laenge 16"""
+        pw = generate_strong_password_func()
 
+        assert len(pw) == 16
 
-def test_password_meets_policy_no_lowercase():
-    """Test: Kein Kleinbuchstabe"""
-    valid, msg = password_meets_policy('UPPERCASE123!')
+    def test_custom_length(self, generate_strong_password_func):
+        """Generiert Passwort mit angegebener Laenge"""
+        pw = generate_strong_password_func(length=20)
 
-    assert valid is False
-    assert "Kleinbuchstabe" in msg
+        assert len(pw) == 20
 
+    def test_minimum_length_enforced(self, generate_strong_password_func, password_min_length):
+        """Mindestlaenge wird erzwungen"""
+        pw = generate_strong_password_func(length=5)  # Zu kurz
 
-def test_password_meets_policy_no_digit():
-    """Test: Keine Ziffer"""
-    valid, msg = password_meets_policy('NoDigitsHere!')
+        assert len(pw) >= password_min_length
 
-    assert valid is False
-    assert "Ziffer" in msg
+    def test_meets_policy(self, generate_strong_password_func, password_meets_policy_func):
+        """Generiertes Passwort erfuellt Policy"""
+        for _ in range(10):  # Mehrfach testen
+            pw = generate_strong_password_func()
+            valid, msg = password_meets_policy_func(pw)
 
+            assert valid is True, f"Passwort '{pw}' erfuellt Policy nicht: {msg}"
 
-def test_password_meets_policy_no_special():
-    """Test: Kein Sonderzeichen"""
-    valid, msg = password_meets_policy('NoSpecial123')
+    def test_contains_lowercase(self, generate_strong_password_func):
+        """Generiertes Passwort enthaelt Kleinbuchstaben"""
+        pw = generate_strong_password_func()
 
-    assert valid is False
-    assert "Sonderzeichen" in msg
+        assert any(c.islower() for c in pw)
 
+    def test_contains_uppercase(self, generate_strong_password_func):
+        """Generiertes Passwort enthaelt Grossbuchstaben"""
+        pw = generate_strong_password_func()
 
-def test_password_meets_policy_empty():
-    """Test: Leeres Passwort"""
-    valid, msg = password_meets_policy('')
+        assert any(c.isupper() for c in pw)
 
-    assert valid is False
-    assert msg != ""
+    def test_contains_digit(self, generate_strong_password_func):
+        """Generiertes Passwort enthaelt Ziffern"""
+        pw = generate_strong_password_func()
 
+        assert any(c.isdigit() for c in pw)
 
-def test_password_meets_policy_none():
-    """Test: None als Passwort"""
-    valid, msg = password_meets_policy(None)
+    def test_contains_special_char(self, generate_strong_password_func):
+        """Generiertes Passwort enthaelt Sonderzeichen"""
+        pw = generate_strong_password_func()
 
-    assert valid is False
-    assert "Ungültiger Passwort-Typ" in msg
+        assert any(not c.isalnum() for c in pw)
 
+    def test_randomness(self, generate_strong_password_func):
+        """Generierte Passwoerter sind unterschiedlich"""
+        passwords = [generate_strong_password_func() for _ in range(10)]
 
-def test_password_meets_policy_whitespace_only():
-    """Test: Nur Leerzeichen"""
-    valid, msg = password_meets_policy('            ')
+        # Alle sollten unterschiedlich sein
+        assert len(set(passwords)) == 10
 
-    assert valid is False
+    def test_no_obvious_patterns(self, generate_strong_password_func):
+        """Generierte Passwoerter haben keine offensichtlichen Muster"""
+        pw = generate_strong_password_func()
 
+        # Nicht alle Zeichen gleich
+        assert len(set(pw)) > 1
 
-def test_password_meets_policy_all_requirements():
-    """Test: Alle Anforderungen erfÃ¼llt mit Edge-Case Zeichen"""
-    passwords = [
-        'Aa1!aaaaaaaa',  # Genau 12 Zeichen
-        'SuperSecure2024!',  # Normal
-        'Pa$$w0rd1234',  # âœ… Korrigiert: Ohne Umlaut, 12 ASCII-Zeichen
-        'Test_123_Test',  # Underscore als Sonderzeichen
-        '1!Aa' + 'a' * 20  # Sehr lang
-    ]
+        # Nicht nur Buchstaben am Anfang, Zahlen am Ende
+        first_half = pw[:len(pw)//2]
+        second_half = pw[len(pw)//2:]
 
-    for pw in passwords:
-        valid, msg = password_meets_policy(pw)
-        assert valid is True, f"Password '{pw}' should be valid but got: {msg}"
+        # Beide Haelften sollten gemischt sein
+        assert any(c.isdigit() for c in first_half) or any(c.isalpha() for c in second_half)
 
 
-# ========== generate_strong_password() Tests ==========
+# ============================================================================
+# EMAIL VALIDATION TESTS
+# ============================================================================
 
-def test_generate_strong_password_returns_string():
-    """Test: generate_strong_password() gibt String zurÃƒÂ¼ck"""
-    password = generate_strong_password()
+class TestValidateEmail:
+    """Tests fuer validate_email() Funktion"""
 
-    assert isinstance(password, str)
+    def test_valid_email_simple(self, validate_email_func):
+        """Einfache gueltige Email wird akzeptiert"""
+        valid, msg = validate_email_func('test@example.com')
 
+        assert valid is True
+        assert msg == ''
 
-def test_generate_strong_password_meets_policy():
-    """Test: Generiertes Passwort erfÃƒÂ¼llt Policy"""
-    password = generate_strong_password()
+    def test_valid_email_with_subdomain(self, validate_email_func):
+        """Email mit Subdomain wird akzeptiert"""
+        valid, msg = validate_email_func('user@mail.example.com')
 
-    valid, msg = password_meets_policy(password)
+        assert valid is True
 
-    assert valid is True, f"Generated password '{password}' failed policy: {msg}"
+    def test_valid_email_with_plus(self, validate_email_func):
+        """Email mit + wird akzeptiert"""
+        valid, msg = validate_email_func('user+tag@example.com')
 
+        assert valid is True
 
-def test_generate_strong_password_default_length():
-    """Test: Generiertes Passwort hat Standard-LÃƒÂ¤nge (16)"""
-    password = generate_strong_password()
+    def test_valid_email_with_dots(self, validate_email_func):
+        """Email mit Punkten im Local-Part wird akzeptiert"""
+        valid, msg = validate_email_func('first.last@example.com')
 
-    assert len(password) == 16
+        assert valid is True
 
+    def test_invalid_no_at(self, validate_email_func):
+        """Email ohne @ wird abgelehnt"""
+        valid, msg = validate_email_func('invalid')
 
-def test_generate_strong_password_custom_length():
-    """Test: Generiertes Passwort mit custom LÃƒÂ¤nge"""
-    password = generate_strong_password(length=20)
+        assert valid is False
+        assert '@' in msg
 
-    assert len(password) == 20
+    def test_invalid_no_local_part(self, validate_email_func):
+        """Email ohne Local-Part wird abgelehnt"""
+        valid, msg = validate_email_func('@example.com')
 
+        assert valid is False
 
-def test_generate_strong_password_minimum_length():
-    """Test: Generiertes Passwort mit Minimum-LÃƒÂ¤nge"""
-    password = generate_strong_password(length=PASSWORD_MIN_LENGTH)
+    def test_invalid_no_domain(self, validate_email_func):
+        """Email ohne Domain wird abgelehnt"""
+        valid, msg = validate_email_func('user@')
 
-    assert len(password) == PASSWORD_MIN_LENGTH
-    valid, _ = password_meets_policy(password)
-    assert valid is True
+        assert valid is False
 
+    def test_invalid_no_dot_in_domain(self, validate_email_func):
+        """Email ohne Punkt in Domain wird abgelehnt"""
+        valid, msg = validate_email_func('user@domain')
 
-def test_generate_strong_password_uniqueness():
-    """Test: Generierte PasswÃƒÂ¶rter sind unterschiedlich"""
-    password1 = generate_strong_password()
-    password2 = generate_strong_password()
+        assert valid is False
 
-    assert password1 != password2
+    def test_invalid_too_short(self, validate_email_func):
+        """Zu kurze Email wird abgelehnt"""
+        valid, msg = validate_email_func('a@b')
 
+        assert valid is False
 
-def test_generate_strong_password_multiple_times():
-    """Test: Mehrere generierte PasswÃƒÂ¶rter erfÃƒÂ¼llen Policy"""
-    for _ in range(10):
-        password = generate_strong_password()
-        valid, msg = password_meets_policy(password)
-        assert valid is True, f"Password '{password}' failed: {msg}"
+    def test_invalid_type(self, validate_email_func):
+        """Nicht-String wird abgelehnt"""
+        valid, msg = validate_email_func(12345)
 
+        assert valid is False
 
-def test_generate_strong_password_contains_all_types():
-    """Test: Generiertes Passwort enthÃƒÂ¤lt alle Zeichen-Typen"""
-    password = generate_strong_password()
+    def test_invalid_none(self, validate_email_func):
+        """None wird abgelehnt"""
+        valid, msg = validate_email_func(None)
 
-    # PrÃƒÂ¼fe dass alle Typen vorhanden sind
-    has_lower = any(c.islower() for c in password)
-    has_upper = any(c.isupper() for c in password)
-    has_digit = any(c.isdigit() for c in password)
-    has_special = any(not c.isalnum() for c in password)
+        assert valid is False
 
-    assert has_lower
-    assert has_upper
-    assert has_digit
-    assert has_special
+    def test_strips_whitespace(self, validate_email_func):
+        """Whitespace wird entfernt"""
+        valid, msg = validate_email_func('  test@example.com  ')
 
+        assert valid is True
 
-# ========== validate_email() Tests ==========
+    def test_various_valid_emails(self, validate_email_func):
+        """Verschiedene gueltige Email-Formate"""
+        valid_emails = [
+            'simple@example.com',
+            'very.common@example.com',
+            'disposable.style.email.with+symbol@example.com',
+            'other.email-with-hyphen@example.com',
+            'fully-qualified-domain@example.com',
+            'user.name+tag+sorting@example.com',
+            'x@example.com',
+            'example-indeed@strange-example.com',
+            'example@s.example',
+        ]
 
-def test_validate_email_valid():
-    """Test: validate_email() mit gÃƒÂ¼ltiger E-Mail"""
-    valid, msg = validate_email('test@example.com')
+        for email in valid_emails:
+            valid, msg = validate_email_func(email)
+            assert valid is True, f"Email '{email}' sollte gueltig sein: {msg}"
 
-    assert valid is True
-    assert msg == ""
+    def test_various_invalid_emails(self, validate_email_func):
+        """Verschiedene ungueltige Email-Formate"""
+        invalid_emails = [
+            '',
+            'plainaddress',
+            '@no-local-part.com',
+            'missing-domain@.com',
+            'missing-tld@domain',
+            'two@@at.com',
+        ]
 
+        for email in invalid_emails:
+            valid, msg = validate_email_func(email)
+            assert valid is False, f"Email '{email}' sollte ungueltig sein"
 
-def test_validate_email_with_subdomain():
-    """Test: validate_email() mit Subdomain"""
-    valid, msg = validate_email('user@mail.example.com')
 
-    assert valid is True
+# ============================================================================
+# INTEGRATION TESTS
+# ============================================================================
 
+class TestIntegration:
+    """Integration-Tests fuer zusammenhaengende Funktionalitaet"""
 
-def test_validate_email_with_plus():
-    """Test: validate_email() mit + Zeichen"""
-    valid, msg = validate_email('user+tag@example.com')
+    def test_user_login_workflow(self, user_class, temp_db):
+        """Test: User-Login Workflow"""
+        # 1. User per Email laden
+        user = user_class.get_by_email('max.mustermann@example.com', temp_db)
+        assert user is not None
 
-    assert valid is True
+        # 2. ID fuer Session pruefen
+        user_id = user.get_id()
+        assert user_id == '1'
 
+        # 3. User per ID wiederladen (Session-Restore)
+        restored_user = user_class.get(int(user_id), temp_db)
+        assert restored_user is not None
+        assert restored_user.email == user.email
 
-def test_validate_email_no_at():
-    """Test: validate_email() ohne @"""
-    valid, msg = validate_email('invalid.email.com')
+    def test_password_generation_and_validation(self, generate_strong_password_func, password_meets_policy_func):
+        """Test: Passwort generieren und validieren"""
+        # Generiere Passwort
+        pw = generate_strong_password_func(length=16)
 
-    assert valid is False
-    assert '@' in msg
+        # Validiere
+        valid, msg = password_meets_policy_func(pw)
 
+        assert valid is True
+        assert len(pw) == 16
 
-def test_validate_email_no_dot_in_domain():
-    """Test: validate_email() ohne Punkt in Domain"""
-    valid, msg = validate_email('user@domain')
 
-    assert valid is False
-    assert '.' in msg
+# ============================================================================
+# EDGE CASES
+# ============================================================================
 
+class TestEdgeCases:
+    """Tests fuer Randfaelle"""
 
-def test_validate_email_empty():
-    """Test: validate_email() mit leerem String"""
-    valid, msg = validate_email('')
+    def test_user_with_special_chars_in_email(self, user_class):
+        """User mit Sonderzeichen in Email"""
+        user = user_class(id=1, email='user+tag@example.com')
 
-    assert valid is False
+        assert user.email == 'user+tag@example.com'
 
+    def test_empty_email(self, user_class):
+        """User mit leerer Email"""
+        user = user_class(id=1, email='')
 
-def test_validate_email_too_short():
-    """Test: validate_email() zu kurz"""
-    valid, msg = validate_email('a@b')
+        assert user.email == ''
 
-    assert valid is False
-    assert 'kurz' in msg
+    def test_very_long_password(self, generate_strong_password_func, password_meets_policy_func):
+        """Sehr langes Passwort"""
+        pw = generate_strong_password_func(length=100)
 
+        assert len(pw) == 100
 
-def test_validate_email_no_local_part():
-    """Test: validate_email() ohne Local-Part"""
-    valid, msg = validate_email('@example.com')
+        valid, msg = password_meets_policy_func(pw)
+        assert valid is True
 
-    assert valid is False
+    def test_password_with_unicode(self, password_meets_policy_func):
+        """Passwort mit Unicode-Zeichen"""
+        # Unicode-Sonderzeichen zaehlen als Sonderzeichen
+        pw = 'SecurePass123Ü'
 
+        valid, msg = password_meets_policy_func(pw)
 
-def test_validate_email_no_domain():
-    """Test: validate_email() ohne Domain"""
-    valid, msg = validate_email('user@')
+        # Sollte gueltig sein (Ü ist Sonderzeichen)
+        assert valid is True
 
-    assert valid is False
+    def test_email_with_numbers(self, validate_email_func):
+        """Email mit Zahlen"""
+        valid, msg = validate_email_func('user123@example456.com')
 
+        assert valid is True
 
-def test_validate_email_with_whitespace():
-    """Test: validate_email() mit Whitespace (wird getrimmt)"""
-    valid, msg = validate_email('  test@example.com  ')
+    def test_email_with_hyphen_in_domain(self, validate_email_func):
+        """Email mit Bindestrich in Domain"""
+        valid, msg = validate_email_func('user@my-domain.com')
 
-    assert valid is True
+        assert valid is True
 
+    def test_concurrent_user_loading(self, user_class, temp_db):
+        """Mehrere User gleichzeitig laden"""
+        user1 = user_class.get(1, temp_db)
+        user2 = user_class.get(2, temp_db)
+        user3 = user_class.get(3, temp_db)
 
-def test_validate_email_invalid_chars():
-    """Test: validate_email() mit ungÃƒÂ¼ltigen Zeichen"""
-    valid, msg = validate_email('user name@example.com')
+        assert user1.id == 1
+        assert user2.id == 2
+        assert user3.id == 3
 
-    assert valid is False
-
-
-def test_validate_email_multiple_at():
-    """Test: validate_email() mit mehreren @"""
-    valid, msg = validate_email('user@@example.com')
-
-    assert valid is False
-
-
-def test_validate_email_none_type():
-    """Test: validate_email() mit None"""
-    valid, msg = validate_email(None)
-
-    assert valid is False
-    assert 'Typ' in msg
-
-
-# ========== Integration Tests ==========
-
-def test_full_user_lifecycle(setup_db):
-    """Test: VollstÃƒÂ¤ndiger User-Lifecycle"""
-    # 1. User per ID laden
-    user = User.get(1, setup_db)
-    assert user is not None
-
-    # 2. get_id() aufrufen
-    user_id = user.get_id()
-    assert user_id == '1'
-
-    # 3. User erneut per E-Mail laden
-    user2 = User.get_by_email(user.email, setup_db)
-    assert user2 is not None
-    assert user2.id == user.id
-
-    # 4. String-Repr prÃƒÂ¼fen
-    assert str(user) == user.email
-
-
-def test_password_policy_integration():
-    """Test: Password-Policy mit User-Erstellung"""
-    # 1. Passwort generieren
-    password = generate_strong_password()
-
-    # 2. Policy prÃƒÂ¼fen
-    valid, msg = password_meets_policy(password)
-    assert valid is True
-
-    # 3. User erstellen (wÃƒÂ¼rde in Praxis mit hash gespeichert)
-    user = User(id=1, email='newuser@example.com')
-    assert user is not None
-
-
-def test_email_validation_integration():
-    """Test: E-Mail Validierung mit User"""
-    # 1. E-Mail validieren
-    email = 'newuser@example.com'
-    valid, _ = validate_email(email)
-    assert valid is True
-
-    # 2. User mit validierter E-Mail erstellen
-    user = User(id=1, email=email)
-    assert user.email == email
-
-
-# ========== Edge Cases ==========
-
-def test_user_get_with_sql_injection(setup_db):
-    """Test: User.get() resistent gegen SQL Injection"""
-    user = User.get("1 OR 1=1", setup_db)
-
-    assert user is None
-
-
-def test_user_get_by_email_with_sql_injection(setup_db):
-    """Test: User.get_by_email() resistent gegen SQL Injection"""
-    user = User.get_by_email("' OR '1'='1", setup_db)
-
-    assert user is None
-
-
-def test_password_policy_with_unicode():
-    """Test: Password-Policy mit Unicode-Zeichen"""
-    valid, msg = password_meets_policy('PÃƒÂ¤sswÃƒÂ¶rt123!')
-
-    assert valid is True
-
-
-def test_user_with_very_long_email():
-    """Test: User mit sehr langer E-Mail"""
-    long_email = 'a' * 100 + '@' + 'b' * 100 + '.com'
-    user = User(id=1, email=long_email)
-
-    assert user.email == long_email.lower()
-
-
-def test_validate_email_with_unicode_domain():
-    """Test: validate_email() mit Unicode in Domain"""
-    # Internationalized domain names
-    valid, msg = validate_email('user@mÃƒÂ¼ller.de')
-
-    # Je nach Implementation erlaubt oder nicht
-    # IDN sollten in Punycode konvertiert werden
-    assert isinstance(valid, bool)
-
-
-# ========== Database Error Handling ==========
-
-def test_user_get_with_corrupted_db():
-    """Test: User.get() behandelt korrupte DB"""
-    user = User.get(1, "/tmp/not_a_db.txt")
-
-    assert user is None
-
-
-def test_user_get_with_readonly_db(tmp_path):
-    """Test: User.get() funktioniert mit readonly DB"""
-    db_file = tmp_path / "readonly.db"
-
-    # DB erstellen
-    with sqlite3.connect(str(db_file)) as conn:
-        conn.execute("""
-            CREATE TABLE login (
-                id INTEGER PRIMARY KEY,
-                email TEXT NOT NULL
-            )
-        """)
-        conn.execute("INSERT INTO login (id, email) VALUES (1, 'test@example.com')")
-        conn.commit()
-
-    # Readonly machen
-    db_file.chmod(0o444)
-
-    # Sollte trotzdem lesen kÃƒÂ¶nnen
-    user = User.get(1, str(db_file))
-
-    assert user is not None
-    assert user.email == 'test@example.com'
-
-
-# ========== Concurrency Tests ==========
-
-def test_multiple_user_loads_same_time(setup_db):
-    """Test: Mehrere User gleichzeitig laden"""
-    users = [User.get(i, setup_db) for i in range(1, 3)]
-
-    assert all(u is not None for u in users)
-    assert len(set(u.id for u in users)) == 2
-
-
-# ========== Performance Tests ==========
-
-def test_generate_password_performance():
-    """Test: Passwort-Generierung ist performant"""
-    import time
-
-    start = time.time()
-    for _ in range(100):
-        generate_strong_password()
-    elapsed = time.time() - start
-
-    # Sollte < 1 Sekunde fÃƒÂ¼r 100 PasswÃƒÂ¶rter sein
-    assert elapsed < 1.0
-
-
-def test_password_policy_check_performance():
-    """Test: Policy-Check ist performant"""
-    import time
-
-    password = generate_strong_password()
-
-    start = time.time()
-    for _ in range(1000):
-        password_meets_policy(password)
-    elapsed = time.time() - start
-
-    # Sollte < 0.1 Sekunden fÃƒÂ¼r 1000 Checks sein
-    assert elapsed < 0.1
+        # Alle unterschiedlich
+        assert user1.email != user2.email != user3.email

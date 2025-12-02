@@ -1,18 +1,41 @@
 # Database files
 *.db
 *.sqlite
+*.db-journal
+*.db-wal
+*.db-shm
 dashboard.db
 
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
 .pytest_cache/
+
+# Virtual Environments
+venv/
+.venv/
+env/
 
 # IDE
 .idea/
+.vscode/
+*.swp
+*~
 
-# Environment
+# Environment & Secrets
 .env
+.env.local
+.env.*.local
+# ABER: .env.example soll NICHT ignoriert werden!
+!.env.example
+
+# Logs
+*.log
+
+# Backups
+*.bak
+*_backup_*
 
 # macOS
 .DS_Store

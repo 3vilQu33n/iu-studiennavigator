@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class ModulbuchungRepository:
-    """Repository für Modulbuchung-Datenbankzugriff
+    """Repository fÃ¼r Modulbuchung-Datenbankzugriff
 
-    Verantwortlich für:
+    Verantwortlich fÃ¼r:
     - CRUD-Operationen auf modulbuchung-Tabelle
     - Polymorphe Behandlung von Modulbuchung und Pruefungsleistung
     """
@@ -57,16 +57,16 @@ class ModulbuchungRepository:
             raise
 
     def get_by_id(self, buchung_id: int) -> Optional[Modulbuchung]:
-        """PUBLIC: Lädt eine Modulbuchung anhand der ID
+        """PUBLIC: LÃ¤dt eine Modulbuchung anhand der ID
 
         Returns:
-            Modulbuchung oder Pruefungsleistung (polymorphe Rückgabe)
+            Modulbuchung oder Pruefungsleistung (polymorphe RÃ¼ckgabe)
         """
         try:
             with self.__get_connection() as con:
                 con.row_factory = sqlite3.Row
 
-                # Prüfe zuerst ob eine Pruefungsleistung existiert
+                # PrÃ¼fe zuerst ob eine Pruefungsleistung existiert
                 pl_row = con.execute(
                     """SELECT pl.*,
                               mb.einschreibung_id,
@@ -100,7 +100,7 @@ class ModulbuchungRepository:
             raise
 
     def get_by_student(self, student_id: int) -> List[Modulbuchung]:
-        """PUBLIC: Lädt alle Modulbuchungen eines Studenten
+        """PUBLIC: LÃ¤dt alle Modulbuchungen eines Studenten
 
         Returns:
             Liste mit Modulbuchung und/oder Pruefungsleistung-Objekten
@@ -136,7 +136,7 @@ class ModulbuchungRepository:
                 return result
 
         except sqlite3.Error as e:
-            logger.exception(f"Fehler beim Laden der Buchungen für Student {student_id}: {e}")
+            logger.exception(f"Fehler beim Laden der Buchungen fÃ¼r Student {student_id}: {e}")
             raise
 
     def update_status(self, buchung_id: int, new_status: str) -> bool:
@@ -165,9 +165,9 @@ class ModulbuchungRepository:
             raise
 
     def delete(self, buchung_id: int) -> bool:
-        """PUBLIC: Löscht eine Modulbuchung
+        """PUBLIC: LÃ¶scht eine Modulbuchung
 
-        KOMPOSITION: Löscht automatisch auch zugehörige Pruefungsleistung
+        KOMPOSITION: LÃ¶scht automatisch auch zugehÃ¶rige Pruefungsleistung
         (durch CASCADE in der DB)
         """
         try:
@@ -177,7 +177,7 @@ class ModulbuchungRepository:
                 return True
 
         except sqlite3.Error as e:
-            logger.exception(f"Fehler beim Löschen der Buchung {buchung_id}: {e}")
+            logger.exception(f"Fehler beim LÃ¶schen der Buchung {buchung_id}: {e}")
             raise
 
     def check_if_booked(self, einschreibung_id: int, modul_id: int) -> bool:
@@ -200,6 +200,130 @@ class ModulbuchungRepository:
 
         except sqlite3.Error as e:
             logger.exception("Fehler beim Prüfen der Buchung")
+            raise
+
+    def validate_wahlmodul_booking(
+            self,
+            einschreibung_id: int,
+            modul_id: int,
+            studiengang_id: int
+    ) -> tuple[bool, str]:
+        """PUBLIC: Validiert ob ein Wahlmodul gebucht werden darf
+
+        Regeln:
+        - Jedes Modul darf nur einmal gebucht werden (egal welcher Wahlbereich)
+        - Pro Wahlbereich darf nur 1 Modul gebucht werden
+        - Semester 5, Wahlbereich A: max 1 Modul
+        - Semester 6, Wahlbereich B: max 1 Modul
+        - Semester 6, Wahlbereich C: max 1 Modul
+
+        Args:
+            einschreibung_id: ID der Einschreibung
+            modul_id: ID des zu buchenden Moduls
+            studiengang_id: ID des Studiengangs
+
+        Returns:
+            Tuple (ist_erlaubt, fehlermeldung)
+            - (True, "") wenn Buchung erlaubt
+            - (False, "Fehlermeldung") wenn nicht erlaubt
+        """
+        try:
+            with self.__get_connection() as con:
+                con.row_factory = sqlite3.Row
+
+                # 1. Prüfe ob Modul bereits gebucht
+                if self.check_if_booked(einschreibung_id, modul_id):
+                    return (False, "Dieses Modul wurde bereits gebucht.")
+
+                # 2. Hole Wahlbereich des zu buchenden Moduls
+                modul_info = con.execute(
+                    """SELECT sm.semester, sm.wahlbereich, m.name
+                       FROM studiengang_modul sm
+                       JOIN modul m ON m.id = sm.modul_id
+                       WHERE sm.modul_id = ?
+                         AND sm.studiengang_id = ?
+                         AND sm.wahlbereich IS NOT NULL""",
+                    (modul_id, studiengang_id)
+                ).fetchone()
+
+                # Kein Wahlmodul -> keine Einschränkung
+                if not modul_info:
+                    return (True, "")
+
+                wahlbereich = modul_info['wahlbereich']
+                semester = modul_info['semester']
+                modul_name = modul_info['name']
+
+                # 3. Prüfe ob im gleichen Wahlbereich bereits ein Modul gebucht ist
+                bereits_gebucht = con.execute(
+                    """SELECT m.name
+                       FROM modulbuchung mb
+                       JOIN studiengang_modul sm ON sm.modul_id = mb.modul_id
+                                                AND sm.studiengang_id = ?
+                       JOIN modul m ON m.id = mb.modul_id
+                       WHERE mb.einschreibung_id = ?
+                         AND sm.wahlbereich = ?
+                         AND sm.semester = ?""",
+                    (studiengang_id, einschreibung_id, wahlbereich, semester)
+                ).fetchone()
+
+                if bereits_gebucht:
+                    return (False,
+                            f"Im Wahlbereich {wahlbereich} (Semester {semester}) "
+                            f"wurde bereits '{bereits_gebucht['name']}' gebucht. "
+                            f"Pro Wahlbereich ist nur 1 Modul erlaubt.")
+
+                return (True, "")
+
+        except sqlite3.Error as e:
+            logger.exception("Fehler bei Wahlmodul-Validierung")
+            raise
+
+    def get_wahlmodul_status(self, einschreibung_id: int, studiengang_id: int) -> dict:
+        """PUBLIC: Gibt Übersicht über gebuchte Wahlmodule zurück
+
+        Returns:
+            Dict mit Struktur:
+            {
+                'A': {'semester': 5, 'modul': 'Modulname' oder None, 'gebucht': True/False},
+                'B': {'semester': 6, 'modul': 'Modulname' oder None, 'gebucht': True/False},
+                'C': {'semester': 6, 'modul': 'Modulname' oder None, 'gebucht': True/False}
+            }
+        """
+        try:
+            with self.__get_connection() as con:
+                con.row_factory = sqlite3.Row
+
+                # Hole alle gebuchten Wahlmodule
+                rows = con.execute(
+                    """SELECT sm.wahlbereich, sm.semester, m.name
+                       FROM modulbuchung mb
+                       JOIN studiengang_modul sm ON sm.modul_id = mb.modul_id
+                                                AND sm.studiengang_id = ?
+                       JOIN modul m ON m.id = mb.modul_id
+                       WHERE mb.einschreibung_id = ?
+                         AND sm.wahlbereich IS NOT NULL
+                       ORDER BY sm.semester, sm.wahlbereich""",
+                    (studiengang_id, einschreibung_id)
+                ).fetchall()
+
+                # Initialisiere Status
+                status = {
+                    'A': {'semester': 5, 'modul': None, 'gebucht': False},
+                    'B': {'semester': 6, 'modul': None, 'gebucht': False},
+                    'C': {'semester': 6, 'modul': None, 'gebucht': False}
+                }
+
+                for row in rows:
+                    bereich = row['wahlbereich']
+                    if bereich in status:
+                        status[bereich]['modul'] = row['name']
+                        status[bereich]['gebucht'] = True
+
+                return status
+
+        except sqlite3.Error as e:
+            logger.exception("Fehler beim Laden des Wahlmodul-Status")
             raise
 
     # ========== PRIVATE Helper Methods ==========

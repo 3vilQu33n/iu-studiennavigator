@@ -46,7 +46,7 @@
     }
 }
 
-/* âœ… STICKY HEADER beim Scrollen */
+/* Ã¢Å“â€¦ STICKY HEADER beim Scrollen */
 .modal-header {
     background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
     padding: 20px 30px;
@@ -106,7 +106,7 @@
     gap: 20px;
 }
 
-/* âœ… MODUL CARDS: Kompakter + Buttons auf gleicher HÃ¶he */
+/* Ã¢Å“â€¦ MODUL CARDS: Kompakter + Buttons auf gleicher HÃƒÂ¶he */
 .modul-card {
     background: #2a2a2a;
     border: 2px solid #444;
@@ -168,7 +168,7 @@
     min-height: 48px;
 }
 
-/* âœ… MODULNAME ZENTRIERT */
+/* Ã¢Å“â€¦ MODULNAME ZENTRIERT */
 .modul-header h3 {
     margin: 0;
     color: white;
@@ -207,7 +207,7 @@
     font-size: 14px;
 }
 
-/* âœ… Status nimmt flexiblen Raum ein */
+/* Ã¢Å“â€¦ Status nimmt flexiblen Raum ein */
 .modul-status {
     margin-bottom: 12px;
     flex-grow: 1;
@@ -241,7 +241,7 @@
     color: #ff4444;
 }
 
-/* âœ… BUTTON immer am unteren Ende */
+/* Ã¢Å“â€¦ BUTTON immer am unteren Ende */
 .book-btn {
     width: 100%;
     padding: 12px;
@@ -279,7 +279,7 @@
     font-size: 16px;
 }
 
-/* === PRÃœFUNGSANMELDUNGS-MODAL === */
+/* === PRÃƒÅ“FUNGSANMELDUNGS-MODAL === */
 .exam-modal {
     position: fixed;
     top: 0;
@@ -359,4 +359,119 @@
 
 .exam-btn:active {
     transform: scale(0.98);
+}
+
+/* ============================================================================
+   WAHLMODUL-KARTEN MIT DROPDOWN
+   ============================================================================ */
+
+/* === WAHLMODUL-KARTE === */
+.wahlmodul-card {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a2e 100%);
+    border-color: #00ccff;
+}
+
+.wahlmodul-card:hover {
+    border-color: #00eeff;
+    box-shadow: 0 8px 25px rgba(0, 204, 255, 0.25);
+}
+
+.wahlmodul-card .wahlbereich-label {
+    color: #00ccff;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+/* === DROPDOWN FUER WAHLMODUL-AUSWAHL === */
+.wahlmodul-select-wrapper {
+    margin: 12px 0;
+}
+
+.wahlmodul-select {
+    width: 100%;
+    padding: 10px 14px;
+    background: #1a1a2e;
+    border: 2px solid #444;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300ccff' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+.wahlmodul-select:hover {
+    border-color: #00ccff;
+    background-color: #222240;
+}
+
+.wahlmodul-select:focus {
+    outline: none;
+    border-color: #00ccff;
+    box-shadow: 0 0 0 3px rgba(0, 204, 255, 0.2);
+}
+
+.wahlmodul-select option {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 10px;
+}
+
+/* === GEWAEHLTES MODUL ANZEIGE === */
+.gewaehlt-info {
+    background: rgba(0, 204, 255, 0.1);
+    border: 1px solid rgba(0, 204, 255, 0.3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 12px 0;
+}
+
+.gewaehlt-label {
+    color: #00ccff;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.gewaehlt-name {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* === WAHLMODUL-KARTE STATUS-SPEZIFISCH === */
+.wahlmodul-card.bestanden {
+    border-color: #00ff88;
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.08) 0%, #1a1a2e 100%);
+}
+
+.wahlmodul-card.bestanden .wahlbereich-label {
+    color: #00ff88;
+}
+
+.wahlmodul-card.gebucht {
+    border-color: #ffaa00;
+    background: linear-gradient(135deg, rgba(255, 170, 0, 0.08) 0%, #1a1a2e 100%);
+}
+
+.wahlmodul-card.gebucht .wahlbereich-label {
+    color: #ffaa00;
+}
+
+/* === RESPONSIVE ANPASSUNGEN === */
+@media (max-width: 768px) {
+    .wahlmodul-select {
+        font-size: 16px;
+        padding: 12px 14px;
+    }
+
+    .gewaehlt-info {
+        padding: 8px 12px;
+    }
 }

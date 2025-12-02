@@ -1,508 +1,821 @@
 # tests/unit/test_student_repository.py
 """
-Unit Tests für StudentRepository
+Unit Tests fuer StudentRepository (repositories/student_repository.py)
 
-Testet alle CRUD-Operationen und Suchfunktionen mit einer In-Memory SQLite DB.
-FINALE VERSION: Entspricht der tatsächlichen DB-Struktur mit FK zu login
+Testet das StudentRepository:
+- get_by_id() - Student nach ID laden
+- get_by_login_id() - Student nach login_id laden (KOMPOSITION)
+- get_by_matrikel_nr() - Student nach Matrikelnummer laden
+- get_all() - Alle Studenten laden
+- insert() - Neuen Studenten anlegen
+- update() - Studenten aktualisieren
+- delete() - Studenten loeschen
+- exists() - Existenz pruefen
+
+Besondere Aspekte:
+- UNIQUE Constraints auf matrikel_nr und login_id
+- FOREIGN KEY auf login_id (KOMPOSITION zu Login)
+- Validierung vor Insert/Update mit student.validate() -> (bool, str)
+- Bei DB-Fehlern: get-Methoden geben None/[] zurueck, insert/update werfen Exceptions
 """
+from __future__ import annotations
+
 import pytest
 import sqlite3
-from repositories.student_repository import StudentRepository
-from models.student import Student
+import tempfile
+import os
+
+# Mark this whole module as unit tests
+pytestmark = pytest.mark.unit
+
+
+# ============================================================================
+# FIXTURES
+# ============================================================================
+
+@pytest.fixture
+def student_repository_class():
+    """Importiert StudentRepository-Klasse"""
+    try:
+        from repositories import StudentRepository
+        return StudentRepository
+    except ImportError:
+        from repositories.student_repository import StudentRepository
+        return StudentRepository
 
 
 @pytest.fixture
-def db_path(tmp_path):
-    """Erstellt eine temporäre Test-Datenbank"""
-    db_file = tmp_path / "test_students.db"
-    return str(db_file)
+def student_class():
+    """Importiert Student-Klasse"""
+    try:
+        from models import Student
+        return Student
+    except ImportError:
+        from models.student import Student
+        return Student
 
 
 @pytest.fixture
-def setup_db(db_path):
-    """Erstellt die student Tabelle mit korrekter Struktur"""
-    with sqlite3.connect(db_path) as conn:
-        conn.execute("PRAGMA foreign_keys = ON")
+def temp_db():
+    """Erstellt temporaere Test-Datenbank mit vollstaendigem Schema"""
+    fd, path = tempfile.mkstemp(suffix='.db')
+    os.close(fd)
 
-        # Login-Tabelle muss zuerst existieren wegen FK
-        conn.execute("""
-                     CREATE TABLE IF NOT EXISTS login
-                     (
-                         id INTEGER PRIMARY KEY AUTOINCREMENT
-                     )
-                     """)
+    conn = sqlite3.connect(path)
+    conn.execute("PRAGMA foreign_keys = ON;")
 
-        # Erstelle Test-Logins für die Tests
-        for i in range(1, 11):
-            conn.execute("INSERT INTO login (id) VALUES (?)", (i,))
+    # Erstelle Schema mit Login-Tabelle (wegen FK)
+    conn.executescript("""
+        -- Login-Tabelle zuerst (wegen FK)
+        CREATE TABLE IF NOT EXISTS login (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            benutzername TEXT UNIQUE NOT NULL,
+            passwort_hash TEXT NOT NULL
+        );
 
-        conn.execute("""
-                     CREATE TABLE IF NOT EXISTS student
-                     (
-                         id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                         vorname     TEXT        NOT NULL,
-                         nachname    TEXT        NOT NULL,
-                         matrikel_nr TEXT UNIQUE NOT NULL,
-                         login_id    INTEGER UNIQUE,
-                         FOREIGN KEY (login_id) REFERENCES login (id)
-                     )
-                     """)
-        conn.commit()
-    return db_path
+        -- Student-Tabelle mit UNIQUE Constraints
+        CREATE TABLE IF NOT EXISTS student (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            vorname TEXT NOT NULL,
+            nachname TEXT NOT NULL,
+            matrikel_nr TEXT UNIQUE NOT NULL,
+            login_id INTEGER UNIQUE,
+            FOREIGN KEY (login_id) REFERENCES login(id)
+        );
+
+        -- Test-Logins einfuegen
+        INSERT INTO login (id, benutzername, passwort_hash) VALUES
+            (1, 'max.mustermann', 'hash1'),
+            (2, 'erika.musterfrau', 'hash2'),
+            (3, 'peter.pan', 'hash3'),
+            (4, 'unused.login', 'hash4');
+    """)
+    conn.commit()
+    conn.close()
+
+    yield path
+
+    # Cleanup
+    try:
+        os.unlink(path)
+    except OSError:
+        pass
 
 
 @pytest.fixture
-def repo(setup_db):
-    """Erstellt eine Repository-Instanz mit Test-DB"""
-    return StudentRepository(setup_db)
+def temp_db_with_students(temp_db):
+    """Test-DB mit vorhandenen Studenten"""
+    conn = sqlite3.connect(temp_db)
+    conn.execute("PRAGMA foreign_keys = ON;")
+
+    conn.executescript("""
+        INSERT INTO student (id, vorname, nachname, matrikel_nr, login_id) VALUES
+            (1, 'Max', 'Mustermann', 'IU12345678', 1),
+            (2, 'Erika', 'Musterfrau', 'IU87654321', 2),
+            (3, 'Peter', 'Pan', 'IU11111111', NULL);
+    """)
+    conn.commit()
+    conn.close()
+
+    return temp_db
 
 
 @pytest.fixture
-def sample_student():
-    """Erstellt einen Test-Studenten"""
-    return Student(
+def repository(student_repository_class, temp_db):
+    """Erstellt Repository-Instanz mit Test-DB"""
+    return student_repository_class(temp_db)
+
+
+@pytest.fixture
+def repository_with_students(student_repository_class, temp_db_with_students):
+    """Erstellt Repository-Instanz mit Test-DB inkl. Studenten"""
+    return student_repository_class(temp_db_with_students)
+
+
+@pytest.fixture
+def sample_student(student_class):
+    """Erstellt Sample-Student fuer Tests"""
+    return student_class(
         id=0,
-        matrikel_nr="IU12345678",
-        vorname="Max",
-        nachname="Mustermann",
-        login_id=1
-    )
-
-
-# ========== INSERT Tests ==========
-
-def test_insert_student_success(repo, sample_student):
-    """Test: Student erfolgreich einfügen"""
-    student_id = repo.insert(sample_student)
-
-    assert student_id > 0
-    assert isinstance(student_id, int)
-
-
-def test_insert_student_returns_new_id(repo, sample_student):
-    """Test: insert() gibt die neue ID zurück"""
-    student_id = repo.insert(sample_student)
-
-    loaded = repo.get_by_id(student_id)
-    assert loaded is not None
-    assert loaded.matrikel_nr == sample_student.matrikel_nr
-
-
-def test_insert_student_with_invalid_data_raises(repo):
-    """Test: Ungültiger Student wirft ValueError"""
-    invalid_student = Student(
-        id=0,
-        matrikel_nr="IU12",  # zu kurz (4 Zeichen)
-        vorname="Max",
-        nachname="Mustermann",
-        login_id=1
-    )
-
-    with pytest.raises(ValueError):
-        repo.insert(invalid_student)
-
-
-def test_insert_duplicate_matrikel_nr_raises(repo, sample_student):
-    """Test: Duplikat Matrikelnummer wirft ValueError"""
-    repo.insert(sample_student)
-
-    duplicate = Student(
-        id=0,
-        matrikel_nr=sample_student.matrikel_nr,  # Duplikat
-        vorname="Anna",
-        nachname="Beispiel",
-        login_id=2
-    )
-
-    with pytest.raises(ValueError):
-        repo.insert(duplicate)
-
-
-def test_insert_duplicate_login_id_raises(repo, sample_student):
-    """Test: Duplikat login_id wirft ValueError (UNIQUE Constraint)"""
-    repo.insert(sample_student)
-
-    duplicate = Student(
-        id=0,
-        matrikel_nr="IU87654321",
-        vorname="Anna",
-        nachname="Beispiel",
-        login_id=sample_student.login_id  # Duplikat login_id!
-    )
-
-    with pytest.raises(ValueError):
-        repo.insert(duplicate)
-
-
-def test_insert_student_without_login_id(repo):
-    """Test: Student ohne login_id einfügen (NULL erlaubt)"""
-    student = Student(
-        id=0,
-        matrikel_nr="IU11111111",
+        matrikel_nr="IU99999999",
         vorname="Test",
-        nachname="User",
-        login_id=None
+        nachname="Student",
+        login_id=3  # Existiert in temp_db
     )
 
-    student_id = repo.insert(student)
-    assert student_id > 0
 
+# ============================================================================
+# INITIALIZATION TESTS
+# ============================================================================
 
-# ========== GET BY ID Tests ==========
+class TestStudentRepositoryInit:
+    """Tests fuer Repository-Initialisierung"""
 
-def test_get_by_id_existing_student(repo, sample_student):
-    """Test: Student anhand ID laden"""
-    student_id = repo.insert(sample_student)
+    def test_init_with_db_path(self, student_repository_class, temp_db):
+        """Repository kann mit DB-Pfad initialisiert werden"""
+        repo = student_repository_class(temp_db)
 
-    loaded = repo.get_by_id(student_id)
+        # db_path ist private, aber Repository funktioniert
+        assert repo is not None
 
-    assert loaded is not None
-    assert loaded.id == student_id
-    assert loaded.matrikel_nr == sample_student.matrikel_nr
-    assert loaded.vorname == sample_student.vorname
-    assert loaded.nachname == sample_student.nachname
+    def test_init_stores_db_path(self, student_repository_class):
+        """Repository speichert db_path (privat)"""
+        repo = student_repository_class("/path/to/db.sqlite")
 
+        # Zugriff auf privates Attribut
+        assert repo._StudentRepository__db_path == "/path/to/db.sqlite"
 
-def test_get_by_id_nonexistent_student(repo):
-    """Test: Nicht existierender Student gibt None zurück"""
-    loaded = repo.get_by_id(99999)
 
-    assert loaded is None
+# ============================================================================
+# GET_BY_ID TESTS
+# ============================================================================
 
+class TestGetById:
+    """Tests fuer get_by_id() Methode"""
 
-def test_get_by_id_returns_student_object(repo, sample_student):
-    """Test: get_by_id gibt Student-Objekt zurück"""
-    student_id = repo.insert(sample_student)
+    def test_get_by_id_existing(self, repository_with_students, student_class):
+        """get_by_id() laedt existierenden Studenten"""
+        result = repository_with_students.get_by_id(1)
 
-    loaded = repo.get_by_id(student_id)
+        assert result is not None
+        assert isinstance(result, student_class)
+        assert result.id == 1
 
-    assert isinstance(loaded, Student)
+    def test_get_by_id_correct_data(self, repository_with_students):
+        """get_by_id() laedt korrekte Daten"""
+        result = repository_with_students.get_by_id(1)
 
+        assert result.vorname == 'Max'
+        assert result.nachname == 'Mustermann'
+        assert result.matrikel_nr == 'IU12345678'
+        assert result.login_id == 1
 
-# ========== GET BY LOGIN_ID Tests ==========
+    def test_get_by_id_not_found(self, repository):
+        """get_by_id() gibt None zurueck wenn nicht gefunden"""
+        result = repository.get_by_id(999)
 
-def test_get_by_login_id_existing_student(repo, sample_student):
-    """Test: Student anhand login_id laden"""
-    repo.insert(sample_student)
+        assert result is None
 
-    loaded = repo.get_by_login_id(1)
+    def test_get_by_id_student_without_login(self, repository_with_students):
+        """get_by_id() laedt Student ohne login_id"""
+        result = repository_with_students.get_by_id(3)
 
-    assert loaded is not None
-    assert loaded.login_id == 1
-    assert loaded.matrikel_nr == sample_student.matrikel_nr
+        assert result is not None
+        assert result.vorname == 'Peter'
+        assert result.login_id is None
 
 
-def test_get_by_login_id_nonexistent_login(repo):
-    """Test: Nicht existierende login_id gibt None zurück"""
-    loaded = repo.get_by_login_id(99999)
+# ============================================================================
+# GET_BY_LOGIN_ID TESTS
+# ============================================================================
 
-    assert loaded is None
+class TestGetByLoginId:
+    """Tests fuer get_by_login_id() Methode (KOMPOSITION)"""
 
+    def test_get_by_login_id_existing(self, repository_with_students, student_class):
+        """get_by_login_id() laedt Student mit login_id"""
+        result = repository_with_students.get_by_login_id(1)
 
-def test_get_by_login_id_without_login_id(repo):
-    """Test: Student ohne login_id kann nicht per login_id gefunden werden"""
-    student = Student(
-        id=0,
-        matrikel_nr="IU12345678",
-        vorname="Max",
-        nachname="Mustermann",
-        login_id=None
-    )
-    repo.insert(student)
+        assert result is not None
+        assert isinstance(result, student_class)
+        assert result.login_id == 1
 
-    loaded = repo.get_by_login_id(None)
+    def test_get_by_login_id_correct_student(self, repository_with_students):
+        """get_by_login_id() laedt korrekten Studenten"""
+        result = repository_with_students.get_by_login_id(2)
 
-    assert loaded is None
+        assert result.vorname == 'Erika'
+        assert result.nachname == 'Musterfrau'
+        assert result.matrikel_nr == 'IU87654321'
 
+    def test_get_by_login_id_not_found(self, repository_with_students):
+        """get_by_login_id() gibt None wenn kein Student mit login_id"""
+        # login_id 4 existiert, aber kein Student hat sie
+        result = repository_with_students.get_by_login_id(4)
 
-# ========== GET BY MATRIKEL_NR Tests ==========
+        assert result is None
 
-def test_get_by_matrikel_nr_existing_student(repo, sample_student):
-    """Test: Student anhand Matrikelnummer laden"""
-    repo.insert(sample_student)
+    def test_get_by_login_id_nonexistent(self, repository):
+        """get_by_login_id() gibt None fuer nicht existierende login_id"""
+        result = repository.get_by_login_id(999)
 
-    loaded = repo.get_by_matrikel_nr("IU12345678")
+        assert result is None
 
-    assert loaded is not None
-    assert loaded.matrikel_nr == "IU12345678"
-    assert loaded.vorname == sample_student.vorname
 
+# ============================================================================
+# GET_BY_MATRIKEL_NR TESTS
+# ============================================================================
 
-def test_get_by_matrikel_nr_nonexistent_matrikel(repo):
-    """Test: Nicht existierende Matrikelnummer gibt None zurück"""
-    loaded = repo.get_by_matrikel_nr("IU99999999")
+class TestGetByMatrikelNr:
+    """Tests fuer get_by_matrikel_nr() Methode"""
 
-    assert loaded is None
+    def test_get_by_matrikel_nr_existing(self, repository_with_students, student_class):
+        """get_by_matrikel_nr() laedt Student mit Matrikelnummer"""
+        result = repository_with_students.get_by_matrikel_nr('IU12345678')
 
+        assert result is not None
+        assert isinstance(result, student_class)
+        assert result.matrikel_nr == 'IU12345678'
 
-def test_get_by_matrikel_nr_case_sensitive(repo, sample_student):
-    """Test: Matrikelnummer ist case-sensitive"""
-    repo.insert(sample_student)
+    def test_get_by_matrikel_nr_correct_student(self, repository_with_students):
+        """get_by_matrikel_nr() laedt korrekten Studenten"""
+        result = repository_with_students.get_by_matrikel_nr('IU87654321')
 
-    # Lowercase sollte nicht funktionieren
-    loaded = repo.get_by_matrikel_nr("iu12345678")
+        assert result.vorname == 'Erika'
+        assert result.nachname == 'Musterfrau'
+        assert result.id == 2
 
-    # Für SQLite ist es case-sensitive
-    assert loaded is None or loaded.matrikel_nr == "IU12345678"
+    def test_get_by_matrikel_nr_not_found(self, repository):
+        """get_by_matrikel_nr() gibt None wenn nicht gefunden"""
+        result = repository.get_by_matrikel_nr('INVALID123')
+
+        assert result is None
 
+    def test_get_by_matrikel_nr_case_sensitive(self, repository_with_students):
+        """get_by_matrikel_nr() ist case-sensitive"""
+        # Kleinbuchstaben sollten nicht gefunden werden
+        result = repository_with_students.get_by_matrikel_nr('iu12345678')
 
-# ========== GET ALL Tests ==========
+        assert result is None
+
+
+# ============================================================================
+# GET_ALL TESTS
+# ============================================================================
+
+class TestGetAll:
+    """Tests fuer get_all() Methode"""
+
+    def test_get_all_returns_list(self, repository_with_students):
+        """get_all() gibt Liste zurueck"""
+        result = repository_with_students.get_all()
+
+        assert isinstance(result, list)
+
+    def test_get_all_correct_count(self, repository_with_students):
+        """get_all() gibt alle Studenten zurueck"""
+        result = repository_with_students.get_all()
+
+        assert len(result) == 3
+
+    def test_get_all_contains_students(self, repository_with_students, student_class):
+        """get_all() enthaelt Student-Objekte"""
+        result = repository_with_students.get_all()
+
+        for student in result:
+            assert isinstance(student, student_class)
+
+    def test_get_all_empty(self, repository):
+        """get_all() gibt leere Liste wenn keine Studenten"""
+        result = repository.get_all()
+
+        assert result == []
+
+
+# ============================================================================
+# INSERT TESTS
+# ============================================================================
+
+class TestInsert:
+    """Tests fuer insert() Methode"""
+
+    def test_insert_returns_id(self, repository, sample_student):
+        """insert() gibt neue ID zurueck"""
+        new_id = repository.insert(sample_student)
+
+        assert isinstance(new_id, int)
+        assert new_id > 0
+
+    def test_insert_stores_data(self, repository, sample_student):
+        """insert() speichert Daten korrekt"""
+        new_id = repository.insert(sample_student)
+
+        loaded = repository.get_by_id(new_id)
+        assert loaded is not None
+        assert loaded.vorname == sample_student.vorname
+        assert loaded.nachname == sample_student.nachname
+        assert loaded.matrikel_nr == sample_student.matrikel_nr
+
+    def test_insert_increments_id(self, repository, student_class):
+        """insert() inkrementiert IDs"""
+        s1 = student_class(
+            id=0,
+            matrikel_nr="IU00000001",
+            vorname="Test1",
+            nachname="Student1",
+            login_id=None
+        )
+        s2 = student_class(
+            id=0,
+            matrikel_nr="IU00000002",
+            vorname="Test2",
+            nachname="Student2",
+            login_id=None
+        )
+
+        id1 = repository.insert(s1)
+        id2 = repository.insert(s2)
+
+        assert id2 > id1
+
+    def test_insert_validates_student(self, repository, student_class):
+        """insert() validiert Student vor Insert via student.validate()"""
+        # Student mit leerem Vornamen (wird von validate() abgelehnt)
+        invalid_student = student_class(
+            id=0,
+            matrikel_nr="IU99999999",
+            vorname="",  # Leer - ungueltig
+            nachname="Student",
+            login_id=None
+        )
+
+        with pytest.raises(ValueError):
+            repository.insert(invalid_student)
+
+    def test_insert_duplicate_matrikel_nr_raises(self, repository_with_students, student_class):
+        """insert() wirft ValueError bei doppelter Matrikelnummer"""
+        duplicate = student_class(
+            id=0,
+            matrikel_nr="IU12345678",  # Existiert bereits
+            vorname="Neu",
+            nachname="Student",
+            login_id=None
+        )
+
+        with pytest.raises(ValueError) as exc_info:
+            repository_with_students.insert(duplicate)
+
+        assert "Matrikelnummer" in str(exc_info.value)
+        assert "existiert bereits" in str(exc_info.value)
+
+    def test_insert_duplicate_login_id_raises(self, repository_with_students, student_class):
+        """insert() wirft ValueError bei doppelter login_id"""
+        duplicate = student_class(
+            id=0,
+            matrikel_nr="IU99999999",
+            vorname="Neu",
+            nachname="Student",
+            login_id=1  # Bereits von Max verwendet
+        )
+
+        with pytest.raises(ValueError) as exc_info:
+            repository_with_students.insert(duplicate)
+
+        assert "Login-ID" in str(exc_info.value)
+        assert "bereits vergeben" in str(exc_info.value)
 
-def test_get_all_empty_database(repo):
-    """Test: Leere Datenbank gibt leere Liste zurück"""
-    students = repo.get_all()
+    def test_insert_nonexistent_login_id_raises(self, repository, student_class):
+        """insert() wirft ValueError bei nicht existierender login_id (FK)"""
+        student = student_class(
+            id=0,
+            matrikel_nr="IU99999999",
+            vorname="Test",
+            nachname="Student",
+            login_id=999  # Existiert nicht
+        )
 
-    assert students == []
-    assert isinstance(students, list)
+        with pytest.raises(ValueError) as exc_info:
+            repository.insert(student)
 
+        assert "Login-ID" in str(exc_info.value)
+        assert "existiert nicht" in str(exc_info.value)
 
-def test_get_all_single_student(repo, sample_student):
-    """Test: Ein Student in der DB"""
-    repo.insert(sample_student)
+    def test_insert_with_null_login_id(self, repository, student_class):
+        """insert() erlaubt NULL fuer login_id"""
+        student = student_class(
+            id=0,
+            matrikel_nr="IU99999999",
+            vorname="Ohne",
+            nachname="Login",
+            login_id=None
+        )
 
-    students = repo.get_all()
+        new_id = repository.insert(student)
+        loaded = repository.get_by_id(new_id)
 
-    assert len(students) == 1
-    assert students[0].matrikel_nr == sample_student.matrikel_nr
+        assert loaded.login_id is None
 
 
-def test_get_all_multiple_students(repo, sample_student):
-    """Test: Mehrere Studenten laden"""
-    repo.insert(sample_student)
+# ============================================================================
+# UPDATE TESTS
+# ============================================================================
 
-    student2 = Student(
-        id=0,
-        matrikel_nr="IU87654321",
-        vorname="Anna",
-        nachname="Beispiel",
-        login_id=2
-    )
-    repo.insert(student2)
+class TestUpdate:
+    """Tests fuer update() Methode"""
 
-    students = repo.get_all()
+    def test_update_success(self, repository_with_students):
+        """update() aktualisiert Student erfolgreich"""
+        student = repository_with_students.get_by_id(1)
+        student.vorname = 'Maximilian'
 
-    assert len(students) == 2
-    matrikel_nrs = [s.matrikel_nr for s in students]
-    assert "IU12345678" in matrikel_nrs
-    assert "IU87654321" in matrikel_nrs
+        result = repository_with_students.update(student)
 
+        assert result is True
 
-def test_get_all_returns_student_objects(repo, sample_student):
-    """Test: get_all gibt Student-Objekte zurück"""
-    repo.insert(sample_student)
+        loaded = repository_with_students.get_by_id(1)
+        assert loaded.vorname == 'Maximilian'
 
-    students = repo.get_all()
+    def test_update_nachname(self, repository_with_students):
+        """update() kann Nachnamen aendern"""
+        student = repository_with_students.get_by_id(1)
+        student.nachname = 'Muster'
 
-    assert all(isinstance(s, Student) for s in students)
+        repository_with_students.update(student)
 
+        loaded = repository_with_students.get_by_id(1)
+        assert loaded.nachname == 'Muster'
 
-# ========== UPDATE Tests ==========
+    def test_update_validates_student(self, repository_with_students):
+        """update() validiert Student vor Update via student.validate()"""
+        student = repository_with_students.get_by_id(1)
+        student.vorname = ''  # Leer - ungueltig
 
-def test_update_student_success(repo, sample_student):
-    """Test: Student erfolgreich aktualisieren"""
-    student_id = repo.insert(sample_student)
+        with pytest.raises(ValueError):
+            repository_with_students.update(student)
 
-    loaded = repo.get_by_id(student_id)
-    loaded.vorname = "Maximilian"
+    def test_update_duplicate_matrikel_nr_raises(self, repository_with_students):
+        """update() wirft ValueError bei doppelter Matrikelnummer"""
+        student = repository_with_students.get_by_id(1)
+        student.matrikel_nr = 'IU87654321'  # Gehoert zu Erika
 
-    success = repo.update(loaded)
+        with pytest.raises(ValueError) as exc_info:
+            repository_with_students.update(student)
 
-    assert success is True
+        assert "Matrikelnummer" in str(exc_info.value)
+        assert "existiert bereits" in str(exc_info.value)
 
-    updated = repo.get_by_id(student_id)
-    assert updated.vorname == "Maximilian"
+    def test_update_duplicate_login_id_raises(self, repository_with_students):
+        """update() wirft ValueError bei doppelter login_id"""
+        student = repository_with_students.get_by_id(1)
+        student.login_id = 2  # Gehoert zu Erika
 
+        with pytest.raises(ValueError) as exc_info:
+            repository_with_students.update(student)
 
-def test_update_student_all_fields(repo, sample_student):
-    """Test: Alle Felder eines Students aktualisieren"""
-    student_id = repo.insert(sample_student)
+        assert "Login-ID" in str(exc_info.value)
+        assert "bereits vergeben" in str(exc_info.value)
 
-    loaded = repo.get_by_id(student_id)
-    loaded.matrikel_nr = "IU99999999"
-    loaded.vorname = "Anna"
-    loaded.nachname = "Beispiel"
-    loaded.login_id = 2
+    def test_update_nonexistent_login_id_raises(self, repository_with_students):
+        """update() wirft ValueError bei nicht existierender login_id (FK)"""
+        student = repository_with_students.get_by_id(1)
+        student.login_id = 999  # Existiert nicht
 
-    success = repo.update(loaded)
+        with pytest.raises(ValueError) as exc_info:
+            repository_with_students.update(student)
 
-    assert success is True
+        assert "Login-ID" in str(exc_info.value)
+        assert "existiert nicht" in str(exc_info.value)
 
-    updated = repo.get_by_id(student_id)
-    assert updated.matrikel_nr == "IU99999999"
-    assert updated.vorname == "Anna"
-    assert updated.nachname == "Beispiel"
-    assert updated.login_id == 2
+    def test_update_returns_true(self, repository_with_students):
+        """update() gibt True zurueck"""
+        student = repository_with_students.get_by_id(1)
+        student.vorname = 'Max'  # Gleich, aber Update sollte funktionieren
 
+        result = repository_with_students.update(student)
 
-def test_update_student_with_invalid_data_raises(repo, sample_student):
-    """Test: Update mit ungültigen Daten wirft ValueError"""
-    student_id = repo.insert(sample_student)
+        assert result is True
 
-    loaded = repo.get_by_id(student_id)
-    loaded.matrikel_nr = "IU12"  # zu kurz (4 Zeichen)
 
-    with pytest.raises(ValueError):
-        repo.update(loaded)
+# ============================================================================
+# DELETE TESTS
+# ============================================================================
 
+class TestDelete:
+    """Tests fuer delete() Methode"""
 
-def test_update_student_duplicate_matrikel_raises(repo, sample_student):
-    """Test: Update mit Duplikat Matrikelnummer wirft ValueError"""
-    student_id1 = repo.insert(sample_student)
+    def test_delete_success(self, repository_with_students):
+        """delete() loescht Student erfolgreich"""
+        # Student existiert
+        before = repository_with_students.get_by_id(1)
+        assert before is not None
 
-    student2 = Student(
-        id=0,
-        matrikel_nr="IU87654321",
-        vorname="Anna",
-        nachname="Beispiel",
-        login_id=2
-    )
-    student_id2 = repo.insert(student2)
+        # Loeschen
+        result = repository_with_students.delete(1)
+        assert result is True
 
-    loaded = repo.get_by_id(student_id2)
-    loaded.matrikel_nr = sample_student.matrikel_nr  # Duplikat
+        # Student existiert nicht mehr
+        after = repository_with_students.get_by_id(1)
+        assert after is None
 
-    with pytest.raises(ValueError):
-        repo.update(loaded)
+    def test_delete_returns_true(self, repository_with_students):
+        """delete() gibt True zurueck"""
+        result = repository_with_students.delete(1)
 
+        assert result is True
 
-def test_update_student_duplicate_login_id_raises(repo, sample_student):
-    """Test: Update mit Duplikat login_id wirft ValueError"""
-    student_id1 = repo.insert(sample_student)
+    def test_delete_reduces_count(self, repository_with_students):
+        """delete() reduziert Anzahl der Studenten"""
+        before = len(repository_with_students.get_all())
 
-    student2 = Student(
-        id=0,
-        matrikel_nr="IU87654321",
-        vorname="Anna",
-        nachname="Beispiel",
-        login_id=2
-    )
-    student_id2 = repo.insert(student2)
+        repository_with_students.delete(1)
 
-    loaded = repo.get_by_id(student_id2)
-    loaded.login_id = sample_student.login_id  # Duplikat login_id
+        after = len(repository_with_students.get_all())
+        assert after == before - 1
 
-    with pytest.raises(ValueError):
-        repo.update(loaded)
+    def test_delete_nonexistent_returns_true(self, repository):
+        """delete() gibt True zurueck auch wenn Student nicht existiert"""
+        # SQLite loescht 0 Zeilen, aber kein Fehler
+        result = repository.delete(999)
 
+        assert result is True
 
-# ========== DELETE Tests ==========
 
-def test_delete_student_success(repo, sample_student):
-    """Test: Student erfolgreich löschen"""
-    student_id = repo.insert(sample_student)
+# ============================================================================
+# EXISTS TESTS
+# ============================================================================
 
-    success = repo.delete(student_id)
+class TestExists:
+    """Tests fuer exists() Methode"""
 
-    assert success is True
+    def test_exists_true(self, repository_with_students):
+        """exists() gibt True wenn Student existiert"""
+        result = repository_with_students.exists('IU12345678')
 
-    loaded = repo.get_by_id(student_id)
-    assert loaded is None
+        assert result is True
 
+    def test_exists_false(self, repository):
+        """exists() gibt False wenn Student nicht existiert"""
+        result = repository.exists('INVALID123')
 
-def test_delete_nonexistent_student(repo):
-    """Test: Nicht existierenden Student löschen gibt True zurück"""
-    success = repo.delete(99999)
+        assert result is False
 
-    assert success is True
+    def test_exists_case_sensitive(self, repository_with_students):
+        """exists() ist case-sensitive"""
+        result = repository_with_students.exists('iu12345678')
 
+        assert result is False
 
-def test_delete_student_removes_from_all_queries(repo, sample_student):
-    """Test: Gelöschter Student ist in keiner Query mehr auffindbar"""
-    student_id = repo.insert(sample_student)
 
-    repo.delete(student_id)
+# ============================================================================
+# PRIVATE METHOD TESTS
+# ============================================================================
 
-    assert repo.get_by_id(student_id) is None
-    assert repo.get_by_matrikel_nr(sample_student.matrikel_nr) is None
-    assert len(repo.get_all()) == 0
+class TestPrivateMethods:
+    """Tests fuer private Hilfsmethoden"""
 
+    def test_get_connection_returns_connection(self, repository):
+        """__get_connection() gibt Connection zurueck"""
+        conn = repository._StudentRepository__get_connection()
 
-# ========== EXISTS Tests ==========
+        assert isinstance(conn, sqlite3.Connection)
+        conn.close()
 
-def test_exists_with_existing_matrikel(repo, sample_student):
-    """Test: exists() gibt True für existierende Matrikelnummer"""
-    repo.insert(sample_student)
+    def test_get_connection_enables_foreign_keys(self, repository):
+        """__get_connection() aktiviert Foreign Keys"""
+        conn = repository._StudentRepository__get_connection()
 
-    exists = repo.exists("IU12345678")
+        result = conn.execute("PRAGMA foreign_keys;").fetchone()
+        assert result[0] == 1
 
-    assert exists is True
+        conn.close()
 
+    def test_get_connection_sets_row_factory(self, repository):
+        """__get_connection() setzt Row Factory auf sqlite3.Row"""
+        conn = repository._StudentRepository__get_connection()
 
-def test_exists_with_nonexistent_matrikel(repo):
-    """Test: exists() gibt False für nicht existierende Matrikelnummer"""
-    exists = repo.exists("IU99999999")
+        assert conn.row_factory == sqlite3.Row
 
-    assert exists is False
+        conn.close()
 
+    def test_db_path_is_private(self, student_repository_class, temp_db):
+        """db_path ist privates Attribut (__db_path)"""
+        repo = student_repository_class(temp_db)
 
-def test_exists_after_delete(repo, sample_student):
-    """Test: exists() gibt False nach Löschen"""
-    student_id = repo.insert(sample_student)
+        # Direkter Zugriff auf db_path sollte fehlschlagen
+        assert not hasattr(repo, 'db_path')
 
-    assert repo.exists(sample_student.matrikel_nr) is True
+        # Zugriff ueber Name-Mangling funktioniert
+        assert repo._StudentRepository__db_path == temp_db
 
-    repo.delete(student_id)
 
-    assert repo.exists(sample_student.matrikel_nr) is False
+# ============================================================================
+# DB ERROR HANDLING TESTS
+# ============================================================================
 
+class TestDbErrorHandling:
+    """Tests fuer DB-Fehlerbehandlung"""
 
-# ========== INTEGRATION Tests ==========
+    def test_get_by_id_returns_none_on_error(self, student_repository_class):
+        """get_by_id() gibt None bei DB-Fehler zurueck"""
+        repo = student_repository_class("/nonexistent/path.db")
 
-def test_full_crud_cycle(repo, sample_student):
-    """Test: Kompletter CRUD Zyklus"""
-    # Create
-    student_id = repo.insert(sample_student)
-    assert student_id > 0
+        # Sollte None zurueckgeben, nicht Exception werfen
+        result = repo.get_by_id(1)
+        assert result is None
 
-    # Read
-    loaded = repo.get_by_id(student_id)
-    assert loaded is not None
-    assert loaded.vorname == "Max"
+    def test_get_by_login_id_returns_none_on_error(self, student_repository_class):
+        """get_by_login_id() gibt None bei DB-Fehler zurueck"""
+        repo = student_repository_class("/nonexistent/path.db")
 
-    # Update
-    loaded.vorname = "Maximilian"
-    success = repo.update(loaded)
-    assert success is True
+        result = repo.get_by_login_id(1)
+        assert result is None
 
-    updated = repo.get_by_id(student_id)
-    assert updated.vorname == "Maximilian"
+    def test_get_by_matrikel_nr_returns_none_on_error(self, student_repository_class):
+        """get_by_matrikel_nr() gibt None bei DB-Fehler zurueck"""
+        repo = student_repository_class("/nonexistent/path.db")
 
-    # Delete
-    success = repo.delete(student_id)
-    assert success is True
+        result = repo.get_by_matrikel_nr("IU12345678")
+        assert result is None
 
-    deleted = repo.get_by_id(student_id)
-    assert deleted is None
+    def test_get_all_returns_empty_list_on_error(self, student_repository_class):
+        """get_all() gibt leere Liste bei DB-Fehler zurueck"""
+        repo = student_repository_class("/nonexistent/path.db")
 
+        result = repo.get_all()
+        assert result == []
 
-def test_multiple_students_workflow(repo):
-    """Test: Workflow mit mehreren Studenten"""
-    # Füge 3 Studenten ein
-    students = [
-        Student(0, "IU11111111", "Max", "Mustermann", 3),
-        Student(0, "IU22222222", "Anna", "Beispiel", 4),
-        Student(0, "IU33333333", "Tom", "Test", 5),
-    ]
+    def test_exists_returns_false_on_error(self, student_repository_class):
+        """exists() gibt False bei DB-Fehler zurueck"""
+        repo = student_repository_class("/nonexistent/path.db")
 
-    ids = [repo.insert(s) for s in students]
+        result = repo.exists("IU12345678")
+        assert result is False
 
-    # Alle laden
-    all_students = repo.get_all()
-    assert len(all_students) == 3
+    def test_delete_returns_false_on_error(self, student_repository_class):
+        """delete() gibt False bei DB-Fehler zurueck"""
+        repo = student_repository_class("/nonexistent/path.db")
 
-    # Einen updaten
-    student2 = repo.get_by_id(ids[1])
-    student2.vorname = "Annika"
-    repo.update(student2)
+        result = repo.delete(1)
+        assert result is False
 
-    # Einen löschen
-    repo.delete(ids[0])
 
-    # Prüfen
-    all_students = repo.get_all()
-    assert len(all_students) == 2
+# ============================================================================
+# INTEGRATION-LIKE TESTS
+# ============================================================================
 
-    remaining_names = [s.vorname for s in all_students]
-    assert "Max" not in remaining_names
-    assert "Annika" in remaining_names
-    assert "Tom" in remaining_names
+class TestIntegrationScenarios:
+    """Tests fuer typische Nutzungsszenarien"""
+
+    def test_full_student_lifecycle(self, repository, student_class):
+        """Test: Vollstaendiger Student-Lebenszyklus"""
+        # 1. Student erstellen
+        student = student_class(
+            id=0,
+            matrikel_nr="IU99999999",
+            vorname="Neu",
+            nachname="Student",
+            login_id=3
+        )
+        student_id = repository.insert(student)
+
+        # 2. Laden und pruefen
+        loaded = repository.get_by_id(student_id)
+        assert loaded.vorname == 'Neu'
+
+        # 3. Aktualisieren
+        loaded.vorname = 'Aktualisiert'
+        repository.update(loaded)
+
+        # 4. Pruefen
+        updated = repository.get_by_id(student_id)
+        assert updated.vorname == 'Aktualisiert'
+
+        # 5. Loeschen
+        repository.delete(student_id)
+        assert repository.get_by_id(student_id) is None
+
+    def test_login_composition_workflow(self, repository_with_students):
+        """Test: Login-KOMPOSITION Workflow"""
+        # 1. Student ueber login_id finden
+        student = repository_with_students.get_by_login_id(1)
+        assert student is not None
+        assert student.vorname == 'Max'
+
+        # 2. Gleicher Student ueber ID
+        same_student = repository_with_students.get_by_id(student.id)
+        assert same_student.login_id == 1
+
+    def test_matrikel_unique_constraint(self, repository, student_class):
+        """Test: Matrikelnummer UNIQUE Constraint"""
+        # Ersten Student anlegen
+        s1 = student_class(
+            id=0,
+            matrikel_nr="IU11111111",
+            vorname="Erster",
+            nachname="Student",
+            login_id=None
+        )
+        repository.insert(s1)
+
+        # Zweiten mit gleicher Matrikelnummer sollte fehlschlagen
+        s2 = student_class(
+            id=0,
+            matrikel_nr="IU11111111",  # Doppelt
+            vorname="Zweiter",
+            nachname="Student",
+            login_id=None
+        )
+
+        with pytest.raises(ValueError):
+            repository.insert(s2)
+
+
+# ============================================================================
+# EDGE CASES
+# ============================================================================
+
+class TestEdgeCases:
+    """Tests fuer Randfaelle"""
+
+    def test_get_by_id_zero(self, repository):
+        """get_by_id() mit ID 0 gibt None zurueck"""
+        result = repository.get_by_id(0)
+
+        assert result is None
+
+    def test_get_by_id_negative(self, repository):
+        """get_by_id() mit negativer ID gibt None zurueck"""
+        result = repository.get_by_id(-1)
+
+        assert result is None
+
+    def test_student_with_unicode_name(self, repository, student_class):
+        """Student mit Unicode-Namen (Umlaute)"""
+        student = student_class(
+            id=0,
+            matrikel_nr="IU99999999",
+            vorname="Müller",
+            nachname="Schröder",
+            login_id=None
+        )
+
+        new_id = repository.insert(student)
+        loaded = repository.get_by_id(new_id)
+
+        assert loaded.vorname == "Müller"
+        assert loaded.nachname == "Schröder"
+
+    def test_student_with_long_name(self, repository, student_class):
+        """Student mit langem Namen"""
+        long_name = "A" * 100
+        student = student_class(
+            id=0,
+            matrikel_nr="IU99999999",
+            vorname=long_name,
+            nachname=long_name,
+            login_id=None
+        )
+
+        new_id = repository.insert(student)
+        loaded = repository.get_by_id(new_id)
+
+        assert loaded.vorname == long_name
+        assert loaded.nachname == long_name
+
+    def test_multiple_students_null_login(self, repository, student_class):
+        """Mehrere Studenten mit NULL login_id"""
+        # NULL ist bei UNIQUE erlaubt (mehrfach)
+        for i in range(3):
+            student = student_class(
+                id=0,
+                matrikel_nr=f"IU0000000{i}",
+                vorname=f"Student{i}",
+                nachname="Ohne Login",
+                login_id=None
+            )
+            repository.insert(student)
+
+        all_students = repository.get_all()
+        null_login_count = sum(1 for s in all_students if s.login_id is None)
+
+        assert null_login_count == 3

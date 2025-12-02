@@ -203,3 +203,5 @@ CREATE TABLE modul_pruefungsart (
 );
 CREATE INDEX idx_modul_pruefungsart_modul ON modul_pruefungsart(modul_id);
 CREATE INDEX idx_modul_pruefungsart_art ON modul_pruefungsart(pruefungsart_id);
+CREATE UNIQUE INDEX idx_modulbuchung_unique
+ON modulbuchung(einschreibung_id, modul_id);

@@ -3,7 +3,7 @@ from __future__ import annotations
 import sqlite3
 import logging
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, date, time
 from models import Pruefungstermin
 
 logger = logging.getLogger(__name__)
@@ -132,18 +132,25 @@ class PruefungsterminRepository:
         """
         try:
             with self.__get_connection() as con:
+                # Konvertiere date/time/datetime Objekte zu Strings für SQLite
+                datum_str = termin.datum.isoformat() if isinstance(termin.datum, date) else termin.datum
+                beginn_str = termin.beginn.isoformat() if isinstance(termin.beginn, time) else termin.beginn
+                ende_str = termin.ende.isoformat() if isinstance(termin.ende, time) else termin.ende
+                anmeldeschluss_str = termin.anmeldeschluss.isoformat() if isinstance(termin.anmeldeschluss,
+                                                                                     datetime) else termin.anmeldeschluss
+
                 cursor = con.execute(
                     """INSERT INTO pruefungstermin
                        (modul_id, datum, beginn, ende, art, ort,
                         anmeldeschluss, kapazitaet, beschreibung)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (termin.modul_id,
-                     termin.datum,
-                     termin.beginn,
-                     termin.ende,
+                     datum_str,
+                     beginn_str,
+                     ende_str,
                      termin.art,
                      termin.ort,
-                     termin.anmeldeschluss,
+                     anmeldeschluss_str,
                      termin.kapazitaet,
                      termin.beschreibung)
                 )
@@ -165,6 +172,13 @@ class PruefungsterminRepository:
         """
         try:
             with self.__get_connection() as con:
+                # Konvertiere date/time/datetime Objekte zu Strings für SQLite
+                datum_str = termin.datum.isoformat() if isinstance(termin.datum, date) else termin.datum
+                beginn_str = termin.beginn.isoformat() if isinstance(termin.beginn, time) else termin.beginn
+                ende_str = termin.ende.isoformat() if isinstance(termin.ende, time) else termin.ende
+                anmeldeschluss_str = termin.anmeldeschluss.isoformat() if isinstance(termin.anmeldeschluss,
+                                                                                     datetime) else termin.anmeldeschluss
+
                 con.execute(
                     """UPDATE pruefungstermin
                        SET modul_id       = ?,
@@ -178,12 +192,12 @@ class PruefungsterminRepository:
                            beschreibung   = ?
                        WHERE id = ?""",
                     (termin.modul_id,
-                     termin.datum,
-                     termin.beginn,
-                     termin.ende,
+                     datum_str,
+                     beginn_str,
+                     ende_str,
                      termin.art,
                      termin.ort,
-                     termin.anmeldeschluss,
+                     anmeldeschluss_str,
                      termin.kapazitaet,
                      termin.beschreibung,
                      termin.id)

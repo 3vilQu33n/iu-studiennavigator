@@ -1,492 +1,846 @@
 # tests/unit/test_dashboard_controller.py
 """
-Unit Tests fÃ¼r DashboardController
+Unit Tests fuer DashboardController
 
-Testet die Dashboard-Logik mit gemockten Repositories.
+Testet Dashboard-Logik, Semester-Berechnung und Pruefungsdaten.
 """
 import pytest
-from unittest.mock import Mock, MagicMock, patch
-from datetime import date, datetime
-from decimal import Decimal
+import sqlite3
+from datetime import date, timedelta, datetime
+from argon2 import PasswordHasher
+
 from controllers.dashboard_controller import DashboardController
-from models.student import Student
-from models.einschreibung import Einschreibung
-from models.progress import Progress
+
+# Mark this whole module as unit test
+pytestmark = pytest.mark.unit
+
+ph = PasswordHasher()
+
+
+# ============================================================================
+# FIXTURES
+# ============================================================================
+
+@pytest.fixture
+def test_db(tmp_path):
+    """Erstellt eine Test-Datenbank mit vollstaendigem Schema"""
+    db_path = tmp_path / "test_dashboard.db"
+
+    with sqlite3.connect(str(db_path)) as conn:
+        conn.execute("PRAGMA foreign_keys = ON;")
+
+        # login Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE login (
+                id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id           INTEGER,
+                email                TEXT UNIQUE NOT NULL,
+                benutzername         TEXT UNIQUE,
+                password_hash        TEXT NOT NULL,
+                is_active            INTEGER DEFAULT 1,
+                role                 TEXT DEFAULT 'student',
+                created_at           TEXT,
+                must_change_password INTEGER DEFAULT 0,
+                last_login           TEXT
+            )
+        """)
+
+        # student Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE student (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                vorname     TEXT NOT NULL,
+                nachname    TEXT NOT NULL,
+                matrikel_nr TEXT UNIQUE NOT NULL,
+                login_id    INTEGER UNIQUE,
+                FOREIGN KEY (login_id) REFERENCES login(id)
+            )
+        """)
+
+        # studiengang Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE studiengang (
+                id             INTEGER PRIMARY KEY AUTOINCREMENT,
+                name           TEXT NOT NULL,
+                grad           TEXT NOT NULL,
+                regel_semester INTEGER NOT NULL
+            )
+        """)
+
+        # zeitmodell Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE zeitmodell (
+                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                name         TEXT NOT NULL UNIQUE,
+                dauer_monate INTEGER NOT NULL,
+                kosten_monat DECIMAL(10,2) NOT NULL
+            )
+        """)
+
+        # modul Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE modul (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                name        TEXT NOT NULL,
+                beschreibung TEXT,
+                ects        INTEGER NOT NULL
+            )
+        """)
+
+        # einschreibung Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE einschreibung (
+                id                     INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id             INTEGER NOT NULL,
+                studiengang_id         INTEGER NOT NULL,
+                zeitmodell_id          INTEGER NOT NULL,
+                start_datum            DATE NOT NULL,
+                exmatrikulations_datum DATE,
+                status                 TEXT NOT NULL DEFAULT 'aktiv'
+                    CHECK (status IN ('aktiv', 'pausiert', 'exmatrikuliert')),
+                FOREIGN KEY (student_id) REFERENCES student(id),
+                FOREIGN KEY (studiengang_id) REFERENCES studiengang(id),
+                FOREIGN KEY (zeitmodell_id) REFERENCES zeitmodell(id)
+            )
+        """)
+
+        # studiengang_modul Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE studiengang_modul (
+                id             INTEGER PRIMARY KEY AUTOINCREMENT,
+                studiengang_id INTEGER NOT NULL,
+                modul_id       INTEGER NOT NULL,
+                semester       INTEGER NOT NULL CHECK (semester BETWEEN 1 AND 7),
+                pflichtgrad    TEXT NOT NULL CHECK (pflichtgrad IN ('Pflicht', 'Wahl')),
+                wahlbereich    TEXT CHECK (wahlbereich IS NULL OR wahlbereich IN ('A', 'B', 'C')),
+                FOREIGN KEY (studiengang_id) REFERENCES studiengang(id),
+                FOREIGN KEY (modul_id) REFERENCES modul(id)
+            )
+        """)
+
+        # modulbuchung Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE modulbuchung (
+                id               INTEGER PRIMARY KEY AUTOINCREMENT,
+                einschreibung_id INTEGER NOT NULL,
+                modul_id         INTEGER NOT NULL,
+                buchungsdatum    DATE,
+                status           TEXT NOT NULL CHECK (status IN ('gebucht', 'bestanden', 'anerkannt')),
+                FOREIGN KEY (einschreibung_id) REFERENCES einschreibung(id),
+                FOREIGN KEY (modul_id) REFERENCES modul(id)
+            )
+        """)
+
+        # pruefungstermin Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE pruefungstermin (
+                id             INTEGER PRIMARY KEY AUTOINCREMENT,
+                modul_id       INTEGER NOT NULL,
+                datum          DATE NOT NULL,
+                beginn         TIME,
+                ende           TIME,
+                art            TEXT NOT NULL CHECK (art IN ('online', 'praesenz', 'projekt', 'workbook')),
+                ort            TEXT,
+                anmeldeschluss DATETIME,
+                kapazitaet     INTEGER,
+                beschreibung   TEXT,
+                FOREIGN KEY (modul_id) REFERENCES modul(id)
+            )
+        """)
+
+        # pruefungsanmeldung Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE pruefungsanmeldung (
+                id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+                modulbuchung_id     INTEGER NOT NULL,
+                pruefungstermin_id  INTEGER NOT NULL,
+                status              TEXT NOT NULL CHECK (status IN ('angemeldet', 'storniert', 'absolviert'))
+                                    DEFAULT 'angemeldet',
+                angemeldet_am       DATETIME NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (modulbuchung_id) REFERENCES modulbuchung(id),
+                FOREIGN KEY (pruefungstermin_id) REFERENCES pruefungstermin(id)
+            )
+        """)
+
+        # pruefungsleistung Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE pruefungsleistung (
+                id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+                modulbuchung_id       INTEGER NOT NULL,
+                pruefungsdatum        DATE,
+                note                  DECIMAL(3,1) CHECK(note >= 1.0 AND note <= 5.0),
+                versuch               INTEGER DEFAULT 1,
+                max_versuche          INTEGER DEFAULT 3,
+                anmeldemodus          TEXT,
+                thema                 TEXT,
+                pruefungsanmeldung_id INTEGER,
+                FOREIGN KEY (modulbuchung_id) REFERENCES modulbuchung(id)
+            )
+        """)
+
+        # gebuehr Tabelle
+        # noinspection SqlResolve
+        conn.execute("""
+            CREATE TABLE gebuehr (
+                id               INTEGER PRIMARY KEY AUTOINCREMENT,
+                einschreibung_id INTEGER NOT NULL,
+                art              TEXT NOT NULL,
+                betrag           DECIMAL(10,2) NOT NULL,
+                faellig_am       DATE NOT NULL,
+                bezahlt_am       DATE,
+                FOREIGN KEY (einschreibung_id) REFERENCES einschreibung(id)
+            )
+        """)
+
+        conn.commit()
+
+    return str(db_path)
 
 
 @pytest.fixture
-def mock_db_path(tmp_path):
-    """TemporÃ¤rer DB-Pfad"""
-    return str(tmp_path / "test.db")
+def test_db_with_data(test_db):
+    """Test-Datenbank mit Beispieldaten"""
+    with sqlite3.connect(test_db) as conn:
+        # Studiengang
+        # noinspection SqlResolve
+        conn.execute("""
+            INSERT INTO studiengang (id, name, grad, regel_semester)
+            VALUES (1, 'Angewandte KI', 'B.Sc.', 6)
+        """)
+
+        # Zeitmodell
+        # noinspection SqlResolve
+        conn.execute("""
+            INSERT INTO zeitmodell (id, name, dauer_monate, kosten_monat)
+            VALUES (1, 'Vollzeit', 36, 199.00)
+        """)
+
+        # Module fuer Semester 1
+        # noinspection SqlResolve
+        conn.execute("INSERT INTO modul (id, name, ects) VALUES (1, 'Programmieren mit Python', 5)")
+        # noinspection SqlResolve
+        conn.execute("INSERT INTO modul (id, name, ects) VALUES (2, 'Mathematik Grundlagen', 5)")
+        # noinspection SqlResolve
+        conn.execute("INSERT INTO modul (id, name, ects) VALUES (3, 'Einfuehrung KI', 5)")
+
+        # Module dem Studiengang zuordnen (Semester 1)
+        # noinspection SqlResolve
+        conn.execute("""
+            INSERT INTO studiengang_modul (studiengang_id, modul_id, semester, pflichtgrad)
+            VALUES (1, 1, 1, 'Pflicht'), (1, 2, 1, 'Pflicht'), (1, 3, 1, 'Pflicht')
+        """)
+
+        # Login erstellen
+        password_hash = ph.hash("TestPassword123!")
+        # noinspection SqlResolve
+        conn.execute("""
+            INSERT INTO login (id, student_id, email, benutzername, password_hash, is_active)
+            VALUES (1, 1, 'test@example.com', 'testuser', ?, 1)
+        """, (password_hash,))
+
+        # Student erstellen
+        # noinspection SqlResolve
+        conn.execute("""
+            INSERT INTO student (id, vorname, nachname, matrikel_nr, login_id)
+            VALUES (1, 'Max', 'Mustermann', 'IU12345678', 1)
+        """)
+
+        # Einschreibung erstellen (vor 6 Monaten)
+        start_datum = (date.today() - timedelta(days=180)).isoformat()
+        # noinspection SqlResolve
+        conn.execute("""
+            INSERT INTO einschreibung (id, student_id, studiengang_id, zeitmodell_id, start_datum, status)
+            VALUES (1, 1, 1, 1, ?, 'aktiv')
+        """, (start_datum,))
+
+        # Eine Modulbuchung
+        # noinspection SqlResolve
+        conn.execute("""
+            INSERT INTO modulbuchung (id, einschreibung_id, modul_id, status, buchungsdatum)
+            VALUES (1, 1, 1, 'bestanden', ?)
+        """, (date.today().isoformat(),))
+
+        # Pruefungsleistung
+        # noinspection SqlResolve
+        conn.execute("""
+            INSERT INTO pruefungsleistung (modulbuchung_id, note, pruefungsdatum)
+            VALUES (1, 1.7, ?)
+        """, (date.today().isoformat(),))
+
+        conn.commit()
+
+    return test_db
 
 
 @pytest.fixture
-def controller(mock_db_path):
-    """DashboardController Instanz mit gemockten Dependencies"""
-    with patch('controllers.dashboard_controller.StudentRepository'), \
-            patch('controllers.dashboard_controller.EinschreibungRepository'), \
-            patch('controllers.dashboard_controller.ProgressRepository'), \
-            patch('controllers.dashboard_controller.ProgressTextService'):
-        return DashboardController(mock_db_path)
+def test_db_with_exam(test_db_with_data):
+    """Test-Datenbank mit anstehender Pruefung"""
+    with sqlite3.connect(test_db_with_data) as conn:
+        # Weitere Modulbuchung fuer Pruefung
+        # noinspection SqlResolve
+        conn.execute("""
+            INSERT INTO modulbuchung (id, einschreibung_id, modul_id, status)
+            VALUES (2, 1, 2, 'gebucht')
+        """)
+
+        # Pruefungstermin in der Zukunft
+        pruefungsdatum = (date.today() + timedelta(days=14)).isoformat()
+        # noinspection SqlResolve
+        conn.execute("""
+            INSERT INTO pruefungstermin (id, modul_id, datum, beginn, ende, art, ort)
+            VALUES (1, 2, ?, '09:00:00', '11:00:00', 'online', 'Online-Klausur')
+        """, (pruefungsdatum,))
+
+        # Pruefungsanmeldung
+        # noinspection SqlResolve
+        conn.execute("""
+            INSERT INTO pruefungsanmeldung (modulbuchung_id, pruefungstermin_id, status)
+            VALUES (2, 1, 'angemeldet')
+        """)
+
+        conn.commit()
+
+    return test_db_with_data
 
 
 @pytest.fixture
-def sample_student():
-    """Test-Student"""
-    return Student(
-        id=1,
-        matrikel_nr="IU12345678",
-        vorname="Max",
-        nachname="Mustermann",
-        login_id=1
-    )
+def dashboard_controller(test_db):
+    """DashboardController mit leerer Test-DB"""
+    return DashboardController(test_db)
 
 
 @pytest.fixture
-def sample_einschreibung():
-    """Test-Einschreibung"""
-    return Einschreibung(
-        id=1,
-        student_id=1,
-        studiengang_id=1,
-        zeitmodell_id=1,
-        start_datum=date(2024, 3, 1),
-        status='aktiv'
-    )
+def dashboard_with_data(test_db_with_data):
+    """DashboardController mit Testdaten"""
+    return DashboardController(test_db_with_data)
 
 
 @pytest.fixture
-def sample_progress():
-    """Test-Progress"""
-    return Progress(
-        student_id=1,
-        durchschnittsnote=Decimal('2.0'),
-        anzahl_bestandene_module=10,
-        anzahl_gebuchte_module=12,
-        offene_gebuehren=Decimal('199.00'),
-        aktuelles_semester=2.5,
-        erwartetes_semester=2.3
-    )
+def dashboard_with_exam(test_db_with_exam):
+    """DashboardController mit Pruefungsdaten"""
+    return DashboardController(test_db_with_exam)
 
 
-# ========== Initialization Tests ==========
+# ============================================================================
+# INITIALIZATION TESTS
+# ============================================================================
 
-def test_controller_initialization(mock_db_path):
-    """Test: Controller wird korrekt initialisiert"""
-    with patch('controllers.dashboard_controller.StudentRepository'), \
-            patch('controllers.dashboard_controller.EinschreibungRepository'), \
-            patch('controllers.dashboard_controller.ProgressRepository'), \
-            patch('controllers.dashboard_controller.ProgressTextService'):
-        controller = DashboardController(mock_db_path)
+class TestDashboardControllerInit:
+    """Tests fuer DashboardController Initialisierung"""
 
-        assert controller.db_path == mock_db_path
-        assert hasattr(controller, 'SEMESTER_POSITIONS')
-        assert len(controller.SEMESTER_POSITIONS) == 7
+    def test_init_sets_db_path(self, test_db):
+        """Test: db_path wird korrekt gesetzt"""
+        controller = DashboardController(test_db)
+        assert controller.db_path == test_db
 
+    def test_init_creates_repositories(self, test_db):
+        """Test: Repositories werden erstellt"""
+        controller = DashboardController(test_db)
 
-def test_semester_positions_defined(controller):
-    """Test: Semester-Positionen sind definiert"""
-    assert 1 in controller.SEMESTER_POSITIONS
-    assert 7 in controller.SEMESTER_POSITIONS
+        # Private Attribute pruefen (mit name mangling)
+        assert hasattr(controller, '_DashboardController__student_repo')
+        assert hasattr(controller, '_DashboardController__einschreibung_repo')
+        assert hasattr(controller, '_DashboardController__progress_repo')
 
-    for pos in controller.SEMESTER_POSITIONS.values():
-        assert 'x_percent' in pos
-        assert 'y_percent' in pos
-        assert 'angle' in pos
-        assert 'flip' in pos
-
-
-# ========== get_student_by_auth_user Tests ==========
-
-def test_get_student_by_auth_user_success(controller, sample_student):
-    """Test: Student wird korrekt geladen"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=sample_student)
-
-    result = controller.get_student_by_auth_user(1)
-
-    assert result is not None
-    assert result['id'] == 1
-    assert result['vorname'] == 'Max'
-    assert result['nachname'] == 'Mustermann'
+    def test_init_creates_service(self, test_db):
+        """Test: ProgressTextService wird erstellt"""
+        controller = DashboardController(test_db)
+        assert hasattr(controller, '_DashboardController__progress_text_service')
 
 
-def test_get_student_by_auth_user_not_found(controller):
-    """Test: Nicht existierender Student gibt None zurÃ¼ck"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=None)
+# ============================================================================
+# GET_STUDENT_BY_AUTH_USER TESTS
+# ============================================================================
 
-    result = controller.get_student_by_auth_user(999)
+class TestGetStudentByAuthUser:
+    """Tests fuer get_student_by_auth_user() Methode"""
 
-    assert result is None
+    def test_get_student_success(self, dashboard_with_data):
+        """Test: Student wird korrekt geladen"""
+        result = dashboard_with_data.get_student_by_auth_user(1)
 
+        assert result is not None
+        assert result['vorname'] == 'Max'
+        assert result['nachname'] == 'Mustermann'
+        assert result['matrikel_nr'] == 'IU12345678'
 
-def test_get_student_by_auth_user_exception_handling(controller):
-    """Test: Exception wird abgefangen und None zurÃ¼ckgegeben"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(
-        side_effect=Exception("DB Error")
-    )
+    def test_get_student_nonexistent_login(self, dashboard_with_data):
+        """Test: Nicht existierender Login gibt None zurueck"""
+        result = dashboard_with_data.get_student_by_auth_user(999)
 
-    result = controller.get_student_by_auth_user(1)
+        assert result is None
 
-    assert result is None
+    def test_get_student_returns_dict(self, dashboard_with_data):
+        """Test: Ergebnis ist ein Dictionary"""
+        result = dashboard_with_data.get_student_by_auth_user(1)
 
+        assert isinstance(result, dict)
 
-# ========== get_car_position_for_semester Tests ==========
+    def test_get_student_contains_id(self, dashboard_with_data):
+        """Test: Ergebnis enthaelt Student-ID"""
+        result = dashboard_with_data.get_student_by_auth_user(1)
 
-def test_get_car_position_semester_1(controller):
-    """Test: Auto-Position fÃ¼r Semester 1"""
-    pos = controller.get_car_position_for_semester(1.0)
-
-    assert 'x_percent' in pos
-    assert 'y_percent' in pos
-    assert 'rotation' in pos
-    assert 'flip' in pos
-    assert pos['x_percent'] == controller.SEMESTER_POSITIONS[1]['x_percent']
-
-
-def test_get_car_position_semester_7(controller):
-    """Test: Auto-Position fÃ¼r Semester 7"""
-    pos = controller.get_car_position_for_semester(7.0)
-
-    assert pos['x_percent'] == controller.SEMESTER_POSITIONS[7]['x_percent']
-    assert pos['y_percent'] == controller.SEMESTER_POSITIONS[7]['y_percent']
+        assert 'id' in result
+        assert result['id'] == 1
 
 
-def test_get_car_position_intermediate(controller):
-    """Test: Auto-Position zwischen zwei Semestern wird interpoliert"""
-    pos = controller.get_car_position_for_semester(2.5)
+# ============================================================================
+# GET_DASHBOARD_DATA TESTS
+# ============================================================================
 
-    # Position sollte zwischen Semester 2 und 3 liegen
-    pos2 = controller.SEMESTER_POSITIONS[2]
-    pos3 = controller.SEMESTER_POSITIONS[3]
+class TestGetDashboardData:
+    """Tests fuer get_dashboard_data() Methode"""
 
-    # X sollte zwischen den beiden Werten liegen
-    assert min(pos2['x_percent'], pos3['x_percent']) <= pos['x_percent'] <= max(pos2['x_percent'], pos3['x_percent'])
+    def test_dashboard_data_success(self, dashboard_with_data):
+        """Test: Dashboard-Daten werden geladen"""
+        result = dashboard_with_data.get_dashboard_data(1)
 
+        assert result is not None
+        assert 'student' in result
+        assert 'student_name' in result
+        assert 'current_semester' in result
 
-def test_get_car_position_boundaries(controller):
-    """Test: Position bleibt in gÃ¼ltigen Grenzen"""
-    for semester in [0.5, 1.0, 3.5, 7.0, 7.5]:
-        pos = controller.get_car_position_for_semester(semester)
+    def test_dashboard_data_contains_student_info(self, dashboard_with_data):
+        """Test: Student-Informationen sind enthalten"""
+        result = dashboard_with_data.get_dashboard_data(1)
 
-        assert 0 <= pos['x_percent'] <= 1
-        assert 0 <= pos['y_percent'] <= 1
-        assert isinstance(pos['flip'], bool)
+        assert result['student'] is not None
+        assert result['student_id'] == 1
+        assert 'Max' in result['student_name']
 
+    def test_dashboard_data_contains_semester(self, dashboard_with_data):
+        """Test: Semester-Informationen sind enthalten"""
+        result = dashboard_with_data.get_dashboard_data(1)
 
-# ========== get_dashboard_data Tests ==========
+        assert 'current_semester' in result
+        assert 'max_semester' in result
+        assert result['current_semester'] >= 1
+        assert result['max_semester'] >= 6
 
-def test_get_dashboard_data_complete(controller, sample_student, sample_einschreibung, sample_progress):
-    """Test: VollstÃ¤ndige Dashboard-Daten"""
-    # Mock Repositories
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=sample_student)
-    controller._DashboardController__einschreibung_repo.get_aktive_by_student = Mock(return_value=sample_einschreibung)
-    controller._DashboardController__progress_repo.get_progress_for_student = Mock(return_value=sample_progress)
+    def test_dashboard_data_contains_progress(self, dashboard_with_data):
+        """Test: Progress-Texte sind enthalten"""
+        result = dashboard_with_data.get_dashboard_data(1)
 
-    # Mock ProgressTextService
-    mock_texts = {
-        'grade': 'Note: 2.0',
-        'time': 'Im Zeitplan',
-        'fee': '199.00 â‚¬ offen',
-        'category': 'fast'
-    }
-    controller._DashboardController__progress_text_service.get_all_texts = Mock(return_value=mock_texts)
+        assert 'progress_grade' in result
+        assert 'progress_time' in result
+        assert 'progress_fee' in result
+        assert 'grade_category' in result
+        assert 'time_status' in result
 
-    # Mock SQLite fÃ¼r zeitmodell
-    with patch('sqlite3.connect') as mock_connect:
-        mock_conn = MagicMock()
-        mock_conn.__enter__.return_value = mock_conn
-        mock_conn.execute.return_value.fetchone.return_value = (36,)  # 36 Monate = 6 Semester
-        mock_connect.return_value = mock_conn
+    def test_dashboard_data_contains_svg(self, dashboard_with_data):
+        """Test: SVG-Pfade sind enthalten"""
+        result = dashboard_with_data.get_dashboard_data(1)
 
+        assert 'image_svg' in result
+        assert result['image_svg'] == 'Infotainment.svg'
+
+    def test_dashboard_data_contains_debug_info(self, dashboard_with_data):
+        """Test: Debug-Informationen sind enthalten"""
+        result = dashboard_with_data.get_dashboard_data(1)
+
+        assert 'debug_info' in result
+        assert 'actual_semester' in result['debug_info']
+        assert 'expected_semester' in result['debug_info']
+
+    def test_dashboard_data_nonexistent_login(self, dashboard_with_data):
+        """Test: Nicht existierender Login gibt Fallback-Daten"""
+        result = dashboard_with_data.get_dashboard_data(999)
+
+        # Sollte Fallback-Daten zurueckgeben, nicht None
+        assert result is not None
+        assert result['student'] is None
+        assert result['student_name'] == 'Unbekannt'
+
+    def test_dashboard_data_fallback_has_all_keys(self, dashboard_with_data):
+        """Test: Fallback-Daten haben alle notwendigen Keys"""
+        result = dashboard_with_data.get_dashboard_data(999)
+
+        required_keys = [
+            'student', 'student_id', 'student_name',
+            'current_semester', 'max_semester',
+            'progress_grade', 'progress_time', 'progress_fee',
+            'grade_category', 'time_status',
+            'next_exam', 'image_svg', 'original_image', 'debug_info'
+        ]
+
+        for key in required_keys:
+            assert key in result, f"Key '{key}' fehlt in Fallback-Daten"
+
+    def test_dashboard_data_max_semester_vollzeit(self, test_db_with_data):
+        """Test: max_semester ist 7 fuer Vollzeit"""
+        controller = DashboardController(test_db_with_data)
         result = controller.get_dashboard_data(1)
 
-    # Assertions
-    assert result['student_name'] == 'Max Mustermann'
-    assert result['student_id'] == 1
-    assert result['current_semester'] > 0
-    assert 'car_x_percent' in result
-    assert 'car_y_percent' in result
-    assert 'progress_grade' in result
-    assert 'progress_time' in result
-    assert 'progress_fee' in result
+        assert result['max_semester'] == 7
 
+    def test_dashboard_data_max_semester_teilzeit_i(self, test_db_with_data):
+        """Test: max_semester ist 8 fuer Teilzeit I"""
+        # Aendere Zeitmodell zu Teilzeit I
+        with sqlite3.connect(test_db_with_data) as conn:
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO zeitmodell (id, name, dauer_monate, kosten_monat)
+                VALUES (2, 'Teilzeit I', 48, 149.00)
+            """)
+            # noinspection SqlResolve
+            conn.execute("UPDATE einschreibung SET zeitmodell_id = 2 WHERE id = 1")
+            conn.commit()
 
-def test_get_dashboard_data_no_student(controller):
-    """Test: Dashboard-Daten wenn Student nicht gefunden"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=None)
-
-    result = controller.get_dashboard_data(999)
-
-    # Sollte Fallback-Daten enthalten
-    assert result['student_name'] == 'Unbekannt'
-    assert result['student_id'] is None
-    assert 'error' in result
-
-
-def test_get_dashboard_data_no_einschreibung(controller, sample_student):
-    """Test: Dashboard-Daten ohne aktive Einschreibung"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=sample_student)
-    controller._DashboardController__einschreibung_repo.get_aktive_by_student = Mock(
-        side_effect=ValueError("Keine aktive Einschreibung")
-    )
-
-    # Mock SQLite
-    with patch('sqlite3.connect') as mock_connect:
-        mock_conn = MagicMock()
-        mock_conn.__enter__.return_value = mock_conn
-        mock_connect.return_value = mock_conn
-
+        controller = DashboardController(test_db_with_data)
         result = controller.get_dashboard_data(1)
 
-    # Sollte Fallback-Progress-Texte haben
-    assert result['progress_grade'] == 'Noch keine Noten'
-    assert result['progress_time'] == 'Gerade gestartet'
-    assert result['progress_fee'] == 'Keine Gebühren'
+        assert result['max_semester'] == 8
 
 
-def test_get_dashboard_data_time_status_ahead(controller, sample_student, sample_einschreibung):
-    """Test: time_status ist 'ahead' wenn weit voraus"""
-    progress_ahead = Progress(
-        student_id=1,
-        durchschnittsnote=Decimal('2.0'),
-        anzahl_bestandene_module=20,
-        anzahl_gebuchte_module=22,
-        offene_gebuehren=Decimal('0'),
-        aktuelles_semester=2.0,  # ✅ Korrigiert: Student ist in Sem 2
-        erwartetes_semester=3.0  # ✅ Sollte in Sem 3 sein → 1 Sem voraus = +180 Tage
-    )
+# ============================================================================
+# GET_NEXT_EXAM TESTS
+# ============================================================================
 
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=sample_student)
-    controller._DashboardController__einschreibung_repo.get_aktive_by_student = Mock(return_value=sample_einschreibung)
-    controller._DashboardController__progress_repo.get_progress_for_student = Mock(return_value=progress_ahead)
+class TestGetNextExam:
+    """Tests fuer get_next_exam() Methode"""
 
-    mock_texts = {'grade': 'Test', 'time': 'Test', 'fee': 'Test', 'category': 'fast'}
-    controller._DashboardController__progress_text_service.get_all_texts = Mock(return_value=mock_texts)
+    def test_next_exam_exists(self, dashboard_with_exam):
+        """Test: Naechste Pruefung wird gefunden"""
+        result = dashboard_with_exam.get_next_exam(1)
 
-    with patch('sqlite3.connect') as mock_connect:
-        mock_conn = MagicMock()
-        mock_conn.__enter__.return_value = mock_conn
-        mock_conn.execute.return_value.fetchone.return_value = (36,)
-        mock_connect.return_value = mock_conn
+        assert result is not None
+        assert 'modul_name' in result
+        assert 'datum' in result
+        assert 'tage_bis_pruefung' in result
 
-        result = controller.get_dashboard_data(1)
+    def test_next_exam_modul_name(self, dashboard_with_exam):
+        """Test: Modul-Name ist korrekt"""
+        result = dashboard_with_exam.get_next_exam(1)
 
-    # Bei 180 Tagen voraus sollte time_status 'ahead' sein
-    assert result['time_status'] == 'ahead'
+        assert result['modul_name'] == 'Mathematik Grundlagen'
 
+    def test_next_exam_tage_bis(self, dashboard_with_exam):
+        """Test: Tage bis Pruefung werden berechnet"""
+        result = dashboard_with_exam.get_next_exam(1)
 
-def test_get_dashboard_data_time_status_minus(controller, sample_student, sample_einschreibung):
-    """Test: time_status ist 'minus' wenn im Verzug"""
-    progress_behind = Progress(
-        student_id=1,
-        durchschnittsnote=Decimal('2.0'),
-        anzahl_bestandene_module=5,
-        anzahl_gebuchte_module=7,
-        offene_gebuehren=Decimal('0'),
-        aktuelles_semester=4.0,  # ✅ Korrigiert: Student ist in Sem 4
-        erwartetes_semester=3.0  # ✅ Sollte in Sem 3 sein → 1 Sem Verzug = -180 Tage
-    )
+        # Sollte ca. 14 Tage sein
+        assert result['tage_bis_pruefung'] >= 13
+        assert result['tage_bis_pruefung'] <= 15
 
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=sample_student)
-    controller._DashboardController__einschreibung_repo.get_aktive_by_student = Mock(return_value=sample_einschreibung)
-    controller._DashboardController__progress_repo.get_progress_for_student = Mock(return_value=progress_behind)
+    def test_next_exam_art(self, dashboard_with_exam):
+        """Test: Pruefungsart ist enthalten"""
+        result = dashboard_with_exam.get_next_exam(1)
 
-    mock_texts = {'grade': 'Test', 'time': 'Test', 'fee': 'Test', 'category': 'slow'}
-    controller._DashboardController__progress_text_service.get_all_texts = Mock(return_value=mock_texts)
+        assert result['art'] == 'online'
 
-    with patch('sqlite3.connect') as mock_connect:
-        mock_conn = MagicMock()
-        mock_conn.__enter__.return_value = mock_conn
-        mock_conn.execute.return_value.fetchone.return_value = (36,)
-        mock_connect.return_value = mock_conn
+    def test_next_exam_zeit(self, dashboard_with_exam):
+        """Test: Zeitangaben sind formatiert"""
+        result = dashboard_with_exam.get_next_exam(1)
 
-        result = controller.get_dashboard_data(1)
+        assert result['beginn'] == '09:00'
+        assert result['ende'] == '11:00'
 
-    assert result['time_status'] == 'minus'
+    def test_next_exam_ort(self, dashboard_with_exam):
+        """Test: Ort ist enthalten"""
+        result = dashboard_with_exam.get_next_exam(1)
 
+        assert result['ort'] == 'Online-Klausur'
 
-def test_get_dashboard_data_includes_next_exam(controller, sample_student, sample_einschreibung, sample_progress):
-    """Test: Dashboard-Daten enthalten nÃ¤chste PrÃ¼fung"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=sample_student)
-    controller._DashboardController__einschreibung_repo.get_aktive_by_student = Mock(return_value=sample_einschreibung)
-    controller._DashboardController__progress_repo.get_progress_for_student = Mock(return_value=sample_progress)
+    def test_next_exam_no_exam(self, dashboard_with_data):
+        """Test: Keine Pruefung angemeldet gibt None"""
+        result = dashboard_with_data.get_next_exam(1)
 
-    mock_texts = {'grade': 'Test', 'time': 'Test', 'fee': 'Test', 'category': 'medium'}
-    controller._DashboardController__progress_text_service.get_all_texts = Mock(return_value=mock_texts)
+        assert result is None
 
-    mock_exam = {
-        'modul_name': 'Mathematik I',
-        'datum': '2024-06-15',
-        'tage_bis_pruefung': 30,
-        'anmeldemodus': 'Automatisch'
-    }
+    def test_next_exam_nonexistent_login(self, dashboard_with_exam):
+        """Test: Nicht existierender Login gibt None"""
+        result = dashboard_with_exam.get_next_exam(999)
 
-    with patch('sqlite3.connect') as mock_connect:
-        mock_conn = MagicMock()
-        mock_conn.__enter__.return_value = mock_conn
-        mock_conn.execute.return_value.fetchone.return_value = (36,)
-        mock_connect.return_value = mock_conn
+        assert result is None
 
-        with patch.object(controller, 'get_next_exam', return_value=mock_exam):
-            result = controller.get_dashboard_data(1)
+    def test_next_exam_past_exam_ignored(self, test_db_with_data):
+        """Test: Vergangene Pruefungen werden ignoriert"""
+        with sqlite3.connect(test_db_with_data) as conn:
+            # Modulbuchung
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO modulbuchung (id, einschreibung_id, modul_id, status)
+                VALUES (2, 1, 2, 'gebucht')
+            """)
 
-    assert 'next_exam' in result
-    assert result['next_exam'] == mock_exam
+            # Pruefungstermin in der VERGANGENHEIT
+            pruefungsdatum = (date.today() - timedelta(days=7)).isoformat()
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO pruefungstermin (id, modul_id, datum, art)
+                VALUES (1, 2, ?, 'online')
+            """, (pruefungsdatum,))
 
+            # Pruefungsanmeldung
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO pruefungsanmeldung (modulbuchung_id, pruefungstermin_id, status)
+                VALUES (2, 1, 'angemeldet')
+            """)
+            conn.commit()
 
-# ========== get_next_exam Tests ==========
-
-def test_get_next_exam_found(controller, sample_student, sample_einschreibung):
-    """Test: NÃ¤chste PrÃ¼fung wird gefunden"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=sample_student)
-    controller._DashboardController__einschreibung_repo.get_aktive_by_student = Mock(return_value=sample_einschreibung)
-
-    # Mock DB result
-    mock_row = {
-        'modul_name': 'Mathematik I',
-        'pruefungsdatum': '2024-06-15',
-        'anmeldemodus': 'Automatisch'
-    }
-
-    with patch('sqlite3.connect') as mock_connect:
-        mock_conn = MagicMock()
-        mock_conn.__enter__.return_value = mock_conn
-        mock_conn.execute.return_value.fetchone.return_value = mock_row
-        mock_connect.return_value = mock_conn
-
+        controller = DashboardController(test_db_with_data)
         result = controller.get_next_exam(1)
 
-    assert result is not None
-    assert result['modul_name'] == 'Mathematik I'
-    assert result['datum'] == '2024-06-15'
-    assert 'tage_bis_pruefung' in result
+        # Vergangene Pruefung sollte nicht zurueckgegeben werden
+        assert result is None
 
+    def test_next_exam_storniert_ignored(self, test_db_with_data):
+        """Test: Stornierte Pruefungen werden ignoriert"""
+        with sqlite3.connect(test_db_with_data) as conn:
+            # Modulbuchung
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO modulbuchung (id, einschreibung_id, modul_id, status)
+                VALUES (2, 1, 2, 'gebucht')
+            """)
 
-def test_get_next_exam_not_found(controller, sample_student, sample_einschreibung):
-    """Test: Keine PrÃ¼fung gefunden gibt None zurÃ¼ck"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=sample_student)
-    controller._DashboardController__einschreibung_repo.get_aktive_by_student = Mock(return_value=sample_einschreibung)
+            # Pruefungstermin
+            pruefungsdatum = (date.today() + timedelta(days=14)).isoformat()
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO pruefungstermin (id, modul_id, datum, art)
+                VALUES (1, 2, ?, 'online')
+            """, (pruefungsdatum,))
 
-    with patch('sqlite3.connect') as mock_connect:
-        mock_conn = MagicMock()
-        mock_conn.__enter__.return_value = mock_conn
-        mock_conn.execute.return_value.fetchone.return_value = None
-        mock_connect.return_value = mock_conn
+            # Stornierte Pruefungsanmeldung
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO pruefungsanmeldung (modulbuchung_id, pruefungstermin_id, status)
+                VALUES (2, 1, 'storniert')
+            """)
+            conn.commit()
 
+        controller = DashboardController(test_db_with_data)
         result = controller.get_next_exam(1)
 
-    assert result is None
+        assert result is None
 
 
-def test_get_next_exam_no_student(controller):
-    """Test: Keine PrÃ¼fung wenn Student nicht existiert"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=None)
+# ============================================================================
+# GET_CURRENT_SEMESTER TESTS
+# ============================================================================
 
-    result = controller.get_next_exam(999)
+class TestGetCurrentSemester:
+    """Tests fuer get_current_semester() Methode"""
 
-    assert result is None
+    def test_current_semester_returns_int(self, dashboard_with_data):
+        """Test: Ergebnis ist ein Integer"""
+        result = dashboard_with_data.get_current_semester(1)
+
+        assert isinstance(result, int)
+
+    def test_current_semester_valid_range(self, dashboard_with_data):
+        """Test: Semester ist im gueltigen Bereich (1-7)"""
+        result = dashboard_with_data.get_current_semester(1)
+
+        assert result >= 1
+        assert result <= 7
+
+    def test_current_semester_nonexistent_login(self, dashboard_with_data):
+        """Test: Nicht existierender Login gibt None"""
+        result = dashboard_with_data.get_current_semester(999)
+
+        assert result is None
+
+    def test_current_semester_no_einschreibung(self, test_db):
+        """Test: Keine Einschreibung gibt None (Exception wird gefangen)"""
+        # Student ohne Einschreibung erstellen
+        with sqlite3.connect(test_db) as conn:
+            password_hash = ph.hash("TestPassword123!")
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO login (id, student_id, email, password_hash, is_active)
+                VALUES (1, 1, 'test@example.com', ?, 1)
+            """, (password_hash,))
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO student (id, vorname, nachname, matrikel_nr, login_id)
+                VALUES (1, 'Test', 'User', 'IU99999999', 1)
+            """)
+            conn.commit()
+
+        controller = DashboardController(test_db)
+        result = controller.get_current_semester(1)
+
+        # Repository wirft NotFoundError, Controller faengt ab und gibt None zurueck
+        assert result is None
+
+    def test_current_semester_with_progress(self, test_db_with_data):
+        """Test: Semester steigt mit Fortschritt"""
+        # Student hat 1 von 3 Modulen bestanden
+        controller = DashboardController(test_db_with_data)
+        result = controller.get_current_semester(1)
+
+        # Mit 1/3 Modulen bestanden sollte noch Semester 1 sein
+        assert result == 1
 
 
-def test_get_next_exam_no_einschreibung(controller, sample_student):
-    """Test: Keine PrÃ¼fung wenn keine aktive Einschreibung"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=sample_student)
-    controller._DashboardController__einschreibung_repo.get_aktive_by_student = Mock(
-        side_effect=ValueError("Keine Einschreibung")
-    )
+# ============================================================================
+# CALCULATE SEMESTER BY PROGRESS TESTS (Private Method)
+# ============================================================================
 
-    result = controller.get_next_exam(1)
+class TestCalculateSemesterByProgress:
+    """Tests fuer __calculate_semester_by_progress() Methode"""
 
-    assert result is None
+    def test_position_starts_at_one(self, test_db_with_data):
+        """Test: Position startet bei 1.0"""
+        # Entferne die bestandene Modulbuchung
+        with sqlite3.connect(test_db_with_data) as conn:
+            # noinspection SqlResolve
+            conn.execute("DELETE FROM pruefungsleistung")
+            # noinspection SqlResolve
+            conn.execute("UPDATE modulbuchung SET status = 'gebucht'")
+            conn.commit()
+
+        controller = DashboardController(test_db_with_data)
+        # Private Methode aufrufen
+        result = controller._DashboardController__calculate_semester_by_progress(1, 1)
+
+        # Ohne bestandene Module sollte Position ca. 1.0 sein
+        assert result >= 1.0
+        assert result < 2.0
+
+    def test_position_increases_with_progress(self, test_db_with_data):
+        """Test: Position steigt mit Fortschritt"""
+        # Alle Module bestehen
+        with sqlite3.connect(test_db_with_data) as conn:
+            # Module 2 und 3 auch bestehen
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO modulbuchung (einschreibung_id, modul_id, status)
+                VALUES (1, 2, 'bestanden'), (1, 3, 'bestanden')
+            """)
+            conn.commit()
+
+        controller = DashboardController(test_db_with_data)
+        result = controller._DashboardController__calculate_semester_by_progress(1, 1)
+
+        # Mit allen Modulen aus Semester 1 bestanden sollte Position >= 2.0 sein
+        assert result >= 2.0
+
+    def test_position_max_is_seven(self, test_db_with_data):
+        """Test: Position ist maximal 7.0"""
+        controller = DashboardController(test_db_with_data)
+        result = controller._DashboardController__calculate_semester_by_progress(1, 1)
+
+        assert result <= 7.0
+
+    def test_position_partial_progress(self, test_db_with_data):
+        """Test: Teilfortschritt wird korrekt berechnet"""
+        controller = DashboardController(test_db_with_data)
+        result = controller._DashboardController__calculate_semester_by_progress(1, 1)
+
+        # Mit 1/3 Modulen bestanden sollte Position ca. 1.33 sein
+        assert result > 1.0
+        assert result < 2.0
 
 
-def test_get_next_exam_exception_handling(controller):
-    """Test: Exception beim Laden der PrÃ¼fung wird abgefangen"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(
-        side_effect=Exception("DB Error")
-    )
+# ============================================================================
+# EDGE CASES
+# ============================================================================
 
-    result = controller.get_next_exam(1)
+class TestEdgeCases:
+    """Tests fuer Randfaelle"""
 
-    assert result is None
+    def test_empty_database(self, dashboard_controller):
+        """Test: Leere Datenbank verursacht keinen Crash"""
+        result = dashboard_controller.get_dashboard_data(1)
+
+        # Sollte Fallback-Daten zurueckgeben
+        assert result is not None
+        assert result['student'] is None
+
+    def test_student_without_login(self, test_db):
+        """Test: Student ohne Login-Verknuepfung"""
+        with sqlite3.connect(test_db) as conn:
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO student (id, vorname, nachname, matrikel_nr)
+                VALUES (1, 'Orphan', 'Student', 'IU00000000')
+            """)
+            conn.commit()
+
+        controller = DashboardController(test_db)
+        result = controller.get_student_by_auth_user(1)
+
+        # Kein Student mit dieser login_id
+        assert result is None
+
+    def test_multiple_calls_same_controller(self, dashboard_with_data):
+        """Test: Mehrere Aufrufe mit demselben Controller"""
+        result1 = dashboard_with_data.get_dashboard_data(1)
+        result2 = dashboard_with_data.get_dashboard_data(1)
+
+        assert result1['student_id'] == result2['student_id']
+        assert result1['student_name'] == result2['student_name']
+
+    def test_concurrent_controllers(self, test_db_with_data):
+        """Test: Mehrere Controller auf derselben DB"""
+        controller1 = DashboardController(test_db_with_data)
+        controller2 = DashboardController(test_db_with_data)
+
+        result1 = controller1.get_student_by_auth_user(1)
+        result2 = controller2.get_student_by_auth_user(1)
+
+        assert result1['id'] == result2['id']
 
 
-# ========== Integration/Edge Case Tests ==========
+# ============================================================================
+# ZEITMODELL TESTS
+# ============================================================================
 
-def test_dashboard_data_structure_complete(controller, sample_student, sample_einschreibung, sample_progress):
-    """Test: Dashboard-Daten enthalten alle erforderlichen Felder"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=sample_student)
-    controller._DashboardController__einschreibung_repo.get_aktive_by_student = Mock(return_value=sample_einschreibung)
-    controller._DashboardController__progress_repo.get_progress_for_student = Mock(return_value=sample_progress)
+class TestZeitmodell:
+    """Tests fuer verschiedene Zeitmodelle"""
 
-    mock_texts = {'grade': 'Test', 'time': 'Test', 'fee': 'Test', 'category': 'medium'}
-    controller._DashboardController__progress_text_service.get_all_texts = Mock(return_value=mock_texts)
-
-    with patch('sqlite3.connect') as mock_connect:
-        mock_conn = MagicMock()
-        mock_conn.__enter__.return_value = mock_conn
-        mock_conn.execute.return_value.fetchone.return_value = (36,)
-        mock_connect.return_value = mock_conn
-
+    def test_vollzeit_max_semester(self, test_db_with_data):
+        """Test: Vollzeit hat max_semester 7"""
+        controller = DashboardController(test_db_with_data)
         result = controller.get_dashboard_data(1)
 
-    # PrÃ¼fe alle erforderlichen Felder
-    required_fields = [
-        'student_name', 'student_id', 'current_semester', 'max_semester',
-        'car_x_percent', 'car_y_percent', 'car_rotation', 'car_flip',
-        'progress_grade', 'progress_time', 'progress_fee', 'grade_category',
-        'time_status', 'next_exam', 'image_svg', 'original_image'
-    ]
+        assert result['max_semester'] == 7
 
-    for field in required_fields:
-        assert field in result, f"Feld '{field}' fehlt in Dashboard-Daten"
+    def test_teilzeit_i_max_semester(self, test_db_with_data):
+        """Test: Teilzeit I hat max_semester 8"""
+        with sqlite3.connect(test_db_with_data) as conn:
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO zeitmodell (id, name, dauer_monate, kosten_monat)
+                VALUES (2, 'Teilzeit I', 48, 149.00)
+            """)
+            # noinspection SqlResolve
+            conn.execute("UPDATE einschreibung SET zeitmodell_id = 2")
+            conn.commit()
 
-
-def test_car_position_interpolation_accuracy(controller):
-    """Test: Auto-Position wird korrekt interpoliert"""
-    # Test Semester 1.5 (Mitte zwischen 1 und 2)
-    pos = controller.get_car_position_for_semester(1.5)
-    pos1 = controller.SEMESTER_POSITIONS[1]
-    pos2 = controller.SEMESTER_POSITIONS[2]
-
-    # Sollte exakt in der Mitte sein
-    expected_x = (pos1['x_percent'] + pos2['x_percent']) / 2
-    expected_y = (pos1['y_percent'] + pos2['y_percent']) / 2
-
-    assert abs(pos['x_percent'] - expected_x) < 0.001
-    assert abs(pos['y_percent'] - expected_y) < 0.001
-
-
-def test_max_semester_calculation(controller, sample_student, sample_einschreibung, sample_progress):
-    """Test: max_semester wird korrekt aus Zeitmodell berechnet"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(return_value=sample_student)
-    controller._DashboardController__einschreibung_repo.get_aktive_by_student = Mock(return_value=sample_einschreibung)
-    controller._DashboardController__progress_repo.get_progress_for_student = Mock(return_value=sample_progress)
-
-    mock_texts = {'grade': 'Test', 'time': 'Test', 'fee': 'Test', 'category': 'medium'}
-    controller._DashboardController__progress_text_service.get_all_texts = Mock(return_value=mock_texts)
-
-    # Test mit 48 Monaten = 8 Semester
-    with patch('sqlite3.connect') as mock_connect:
-        mock_conn = MagicMock()
-        mock_conn.__enter__.return_value = mock_conn
-        mock_conn.execute.return_value.fetchone.return_value = (48,)
-        mock_connect.return_value = mock_conn
-
+        controller = DashboardController(test_db_with_data)
         result = controller.get_dashboard_data(1)
 
-    # 48 Monate / 6 Monate pro Semester + 1 = 9
-    assert result['max_semester'] == 9
+        assert result['max_semester'] == 8
 
+    def test_teilzeit_ii_max_semester(self, test_db_with_data):
+        """Test: Teilzeit II hat max_semester 10"""
+        with sqlite3.connect(test_db_with_data) as conn:
+            # noinspection SqlResolve
+            conn.execute("""
+                INSERT INTO zeitmodell (id, name, dauer_monate, kosten_monat)
+                VALUES (3, 'Teilzeit II', 72, 119.00)
+            """)
+            # noinspection SqlResolve
+            conn.execute("UPDATE einschreibung SET zeitmodell_id = 3")
+            conn.commit()
 
-def test_fallback_data_on_exception(controller):
-    """Test: Fallback-Daten bei Exception"""
-    controller._DashboardController__student_repo.get_by_login_id = Mock(
-        side_effect=Exception("Critical Error")
-    )
+        controller = DashboardController(test_db_with_data)
+        result = controller.get_dashboard_data(1)
 
-    result = controller.get_dashboard_data(1)
-
-    # Sollte Fallback-Daten zurÃ¼ckgeben
-    assert result['student_name'] == 'Unbekannt'
-    assert result['progress_grade'] == 'Keine Daten'
-    assert 'error' in result
+        assert result['max_semester'] == 10

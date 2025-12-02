@@ -185,10 +185,11 @@
 
 .miniature-car {
     position: absolute;
-    width: 95px;
+    width: 15%;  /* Von 95px auf 12% erhöht für bessere Sichtbarkeit */
     height: auto;
     filter: none;
     z-index: 10;
+    transform-origin: center center;
 }
 
 /* Close Button */

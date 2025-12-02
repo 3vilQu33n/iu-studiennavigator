@@ -25,12 +25,7 @@
              class="infotainment-bg"
              style="width: 100%; height: auto; display: block;">
 
-        <!-- 2. Header -->
-        <div class="studiennavigator-header">
-            {{ student_name.split()[0] }}'s Studiennavigator
-        </div>
-
-        <!-- 3. Pfad -->
+        <!-- 3. Pfad (wird inline geladen fÃ¼r DOM-Zugriff) -->
         <img src="{{ url_for('static', filename='uploads/Pfad.svg') }}"
              alt="Studienpfad"
              class="path-overlay"
@@ -41,21 +36,20 @@
                     height: 75%;
                     pointer-events: none;">
 
-        <!-- 4. Auto -->
+        <!-- 4. Auto - Position wird per JavaScript aus SVG-Pfad berechnet -->
         <img src="{{ url_for('static', filename='uploads/Car.svg') }}"
              alt="Auto"
              class="car-overlay"
              style="position: absolute;
-                    left: {{ car_x_percent * 100 }}%;
-                    top: {{ car_y_percent * 100 }}%;
-                    width: 4%;
-                    transform: translate(-50%, -50%) rotate({{ car_rotation }}deg){% if car_flip %} scaleX(-1){% endif %};
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
                     cursor: pointer;
                     z-index: 10;">
     </div>
 </div>
 
-<!-- JavaScript-Variablen fuer Popup -->
+<!-- JavaScript-Variablen fuer Popup und Positionierung -->
 <script>
 // Progress-Daten
 const progressGrade = "{{ progress_grade }}";
@@ -64,24 +58,29 @@ const progressFee = "{{ progress_fee }}";
 const gradeCategory = "{{ grade_category }}";
 const timeStatus = "{{ time_status }}";
 
-// Auto-Position fuer Miniatur
-const carXPercent = {{ car_x_percent }};
-const carYPercent = {{ car_y_percent }};
+// Semester-Position fÃ¼r SVG-Pfad-basierte Auto-Positionierung
+const currentSemesterPosition = {{ current_semester | default(1) }};
+
+// Auto-Position fÃ¼r Miniatur im Popup (Fallback-Werte)
+const carXPercent = {{ car_x_percent | default(0.5) }};
+const carYPercent = {{ car_y_percent | default(0.5) }};
 const carData = {
-    x_percent: {{ car_x_percent }},
-    y_percent: {{ car_y_percent }},
-    angle: {{ car_rotation }},
+    x_percent: {{ car_x_percent | default(0.5) }},
+    y_percent: {{ car_y_percent | default(0.5) }},
+    angle: {{ car_rotation | default(0) }},
     flip: {{ 'true' if car_flip else 'false' }}
 };
 
 // Naechste Pruefung
 const nextExam = {{ next_exam | tojson if next_exam else 'null' }};
 
-console.log('Auto-Position:', carXPercent, carYPercent);
-console.log('Naechste Pruefung:', nextExam);
+console.log('ðŸš— Semester-Position:', currentSemesterPosition);
+console.log('ðŸ“… Naechste Pruefung:', nextExam);
 </script>
 
-<!-- VERSTECKTES TEMPLATE FUER INFOTAINMENT-POPUP -->
+<!-- ============================================================ -->
+<!-- TEMPLATE: Infotainment-Popup -->
+<!-- ============================================================ -->
 <template id="infotainment-popup-template">
     <div class="infotainment-popup">
         <div class="infotainment-content">
@@ -132,8 +131,136 @@ console.log('Naechste Pruefung:', nextExam);
                         <img src="{{ url_for('static', filename='uploads/Pfad_Popup.svg') }}"
                              alt="Studienpfad" class="miniature-pfad">
                         <img src="{{ url_for('static', filename='uploads/Car.svg') }}"
-                             alt="Deine Position" class="miniature-car" id="popup-car">
+                             alt="Auto" class="miniature-car"
+                             style="position: absolute; width: 8%; z-index: 10;">
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- ============================================================ -->
+<!-- TEMPLATE: Semester-Modal -->
+<!-- ============================================================ -->
+<template id="semester-modal-template">
+    <div class="semester-modal">
+        <div class="semester-modal-content">
+            <div class="modal-header">
+                <h2 id="semester-modal-title">Semester</h2>
+                <button class="close-modal" id="close-semester-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="module-grid" id="semester-modal-modules">
+                    <!-- Module werden per JS eingefÃ¼gt -->
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- ============================================================ -->
+<!-- TEMPLATE: Einzelnes Modul als Karte (Pflichtmodul) -->
+<!-- ============================================================ -->
+<template id="module-item-template">
+    <div class="modul-card">
+        <div class="modul-header">
+            <h3 class="modul-name"></h3>
+            <span class="ects-badge"></span>
+        </div>
+        <div class="modul-info">
+            <span class="pflichtgrad"></span>
+            <span class="note"></span>
+        </div>
+        <div class="modul-status">
+            <span class="status-badge"></span>
+        </div>
+        <button class="book-btn">Modul buchen</button>
+        <button class="exam-btn">Pruefung anmelden</button>
+        <div class="exam-info"></div>
+    </div>
+</template>
+
+<!-- ============================================================ -->
+<!-- TEMPLATE: Wahlmodul-Karte mit Dropdown -->
+<!-- ============================================================ -->
+<template id="wahlmodul-card-template">
+    <div class="modul-card wahlmodul-card">
+        <div class="modul-header">
+            <h3 class="modul-name">Wahlmodul</h3>
+            <span class="ects-badge">10 ECTS</span>
+        </div>
+        <div class="modul-info">
+            <span class="pflichtgrad wahlbereich-label"></span>
+            <span class="note"></span>
+        </div>
+
+        <!-- Dropdown fuer Wahlmodul-Auswahl (nur wenn noch nicht gebucht) -->
+        <div class="wahlmodul-select-wrapper">
+            <select class="wahlmodul-select">
+                <option value="">-- Modul waehlen --</option>
+            </select>
+        </div>
+
+        <!-- Status-Anzeige (wenn bereits gebucht) -->
+        <div class="modul-status">
+            <span class="status-badge"></span>
+        </div>
+
+        <!-- Gewaehltes Modul anzeigen (wenn gebucht) -->
+        <div class="gewaehlt-info" style="display: none;">
+            <span class="gewaehlt-label">Gewaehlt:</span>
+            <span class="gewaehlt-name"></span>
+        </div>
+
+        <button class="book-btn">Modul buchen</button>
+        <button class="exam-btn">Pruefung anmelden</button>
+        <div class="exam-info"></div>
+    </div>
+</template>
+
+<!-- ============================================================ -->
+<!-- TEMPLATE: Exam-Modal (PrÃ¼fungsanmeldung) -->
+<!-- ============================================================ -->
+<template id="exam-modal-template">
+    <div class="exam-modal">
+        <div class="exam-modal-content">
+            <div class="exam-modal-header">
+                <h3>PrÃ¼fung anmelden</h3>
+                <button class="close-modal" id="close-exam-modal">&times;</button>
+            </div>
+
+            <div class="exam-modal-body">
+                <p class="exam-modul-name" id="exam-modul-name"></p>
+
+                <div class="form-group">
+                    <label for="exam-date">PrÃ¼fungsdatum:</label>
+                    <input type="date" id="exam-date" name="exam_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="exam-mode">PrÃ¼fungsform:</label>
+                    <select id="exam-mode" name="exam_mode" required>
+                        <option value="">-- Bitte wÃ¤hlen --</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="klausur-typ-gruppe" style="display: none;">
+                    <label for="klausur-typ">Klausur-Art:</label>
+                    <select id="klausur-typ" name="klausur_typ">
+                        <option value="">-- Bitte wÃ¤hlen --</option>
+                        <option value="online">Online</option>
+                        <option value="praesenz">PrÃ¤senz</option>
+                    </select>
+                </div>
+
+                <div class="exam-modal-buttons">
+                    <button type="button" class="exam-submit-btn" id="exam-submit-btn">
+                        Anmelden
+                    </button>
+                    <button type="button" class="exam-cancel-btn" id="exam-cancel-btn">
+                        Abbrechen
+                    </button>
                 </div>
             </div>
         </div>
