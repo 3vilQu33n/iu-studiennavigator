@@ -64,7 +64,7 @@ def _resolve_db_path() -> Path:
     # parent = .../repositories/
     # parent.parent = .../dashboardProject/
     project_root = Path(__file__).parent.parent
-    p = (project_root / "dashboard.db").resolve()
+    p = (project_root / "data/dashboard.db").resolve()
 
     logger.debug("DB path fallback -> %s", p)
     if not p.exists():
