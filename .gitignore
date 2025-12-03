@@ -3,12 +3,13 @@
 # ==============================================================================
 
 # ===== Datenbank =====
-# *.db Auskommentiert, weil Demo-DB ins Repo soll
+# Ignoriere alle DB-Dateien im Root und Unterverzeichnissen
+*.db
 *.sqlite
 *.db-journal
 *.db-wal
 *.db-shm
-# dashboard.db Auskommentiert für Demo-DB
+# Ausnahme: Demo-DB im data/ Ordner wird explizit committed (siehe Docker Sektion)
 
 # ===== Python =====
 __pycache__/
@@ -63,8 +64,10 @@ htmlcov/
 .tox/
 
 # ===== Docker =====
-# Docker persistent data (wird beim Container-Start erstellt)
-data/
+# Docker persistent data - ABER Demo-DB und Struktur committen
+data/*
+!data/dashboard.db
+!data/.gitkeep
 .docker/
 
 # ===== Dokumentation =====
