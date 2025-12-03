@@ -115,7 +115,7 @@ from controllers import (
 # ============================================================================
 
 # Database
-DB_PATH = PROJECT_ROOT / os.getenv('DATABASE_PATH', 'dashboard.db')
+DB_PATH = PROJECT_ROOT / os.getenv('DB_PATH', 'data/dashboard.db')
 TEST_DB_PATH = PROJECT_ROOT / "test.db"
 
 # Flask Secret Key
