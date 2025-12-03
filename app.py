@@ -37,7 +37,7 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', os.getenv('
 mail = Mail(app)
 
 # Datenbank-Pfad (unterstuetzt Docker-Volume)
-DB_PATH = Path(os.getenv('DATABASE_PATH', Path(__file__).parent / 'dashboard.db'))
+DB_PATH = Path(os.getenv('DB_PATH', Path(__file__).parent / 'data' / 'dashboard.db'))
 
 login_manager = LoginManager()
 login_manager.init_app(app)
