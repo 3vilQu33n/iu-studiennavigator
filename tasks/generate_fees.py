@@ -33,7 +33,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Datenbank-Pfad
-DB_PATH = Path(__file__).parent.parent / 'dashboard.db'
+DB_PATH = Path(__file__).parent.parent / 'data' / 'dashboard.db'
 
 
 def generate_monthly_fees():

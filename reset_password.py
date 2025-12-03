@@ -12,7 +12,7 @@ from pathlib import Path
 from argon2 import PasswordHasher
 
 # Konfiguration
-DB_PATH = Path(__file__).parent / 'dashboard.db'
+DB_PATH = Path(__file__).parent / 'data' / 'dashboard.db'
 ph = PasswordHasher()
 
 
