@@ -70,14 +70,37 @@ data/*
 !data/.gitkeep
 .docker/
 
-# ===== Dokumentation =====
-# LaTeX-Ordner (akademische Dokumente, nicht fürs Portfolio)
-docs/
+# ===== LaTeX & Dokumentation =====
+# LaTeX Output-Ordner komplett ignorieren (enthält PDFs + Hilfsdateien)
 out/
 
-# PDFs (nicht ins Portfolio-Repo)
+# LaTeX-Hilfsdateien (falls .tex-Dateien im Root liegen)
+*.aux
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Ignoriere docs/ ABER behalte docs/images/ für README Screenshots
+docs/*
+!docs/images/
+!docs/images/*.png
+!docs/images/*.jpg
+!docs/images/*.jpeg
+!docs/images/*.gif
+!docs/images/*.svg
+
+# PDFs ignorieren (werden aus out/ für Abgabe kopiert, nicht ins Repo)
 *.pdf
+
+# LaTeX-Quelldateien (.tex) - IM ROOT BEHALTEN für Transparenz
+# (zeigt, dass du LaTeX nutzt, aber ohne Hilfsdateien)
+# Falls du sie NICHT committen willst, auskommentieren:
+# *.tex
 
 # ===== Projekt-spezifisch =====
 # Flask Session
 flask_session/
+
+# Position Cache (dynamisch generiert)
+position_cache.json
