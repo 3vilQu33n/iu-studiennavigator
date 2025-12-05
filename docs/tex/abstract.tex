@@ -1,0 +1,95 @@
+\documentclass[11pt,a4paper]{article}
+
+% Pakete
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[margin=2cm]{geometry}
+\usepackage{helvet} % Arial-ähnliche Schriftart
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{parskip} % Absätze mit 6pt Abstand
+\setlength{\parskip}{6pt}
+\usepackage{setspace}
+\onehalfspacing % 1,5-facher Zeilenabstand
+
+% WICHTIG: Silbentrennung aktivieren
+\hyphenation{Studien-fort-schritts-Ver-waltung Auto-motive-Info-tainment-Meta-pher Semester-Meilen-steinen objekt-orientierte Programmierung}
+\sloppy % Erlaubt etwas flexiblere Zeilenumbrüche für bessere Silbentrennung
+
+% Hyperref Setup
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    pdftitle={Abstract: IU Studiennavigator},
+    pdfauthor={Teresa Ignatzek}
+}
+
+% Titel-Formatierung (12pt für Überschriften)
+\usepackage{titlesec}
+\titleformat{\section}{\fontsize{12}{14}\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+% Keine Seitenzahlen
+\pagestyle{empty}
+
+\begin{document}
+
+% Header
+\noindent
+\textbf{\large Abstract: IU Studiennavigator}\\[0.2cm]
+\textbf{Portfolio-Projekt:} Objektorientierte Programmierung mit Python\\
+\textbf{Studentin:} Teresa Ignatzek\\
+\textbf{Datum:} \today
+
+\vspace{0.5cm}
+
+\section*{Projektzusammenfassung}
+
+Im Rahmen des Portfolio-Projekts wurde der \textbf{IU Studiennavigator} entwickelt – eine webbasierte Studienfortschritts-Verwaltung mit innovativer Automotive-Infotainment-Metapher. Die Anwendung visualisiert den akademischen Fortschritt mittels eines interaktiven Fahrzeugs, das sich entlang einer SVG-Roadmap zwischen Semester-Meilensteinen bewegt.
+
+Das System demonstriert fortgeschrittene objektorientierte Programmierung in Python mit strikter Anwendung der OOP-Prinzipien (Komposition, Aggregation, Vererbung, Polymorphie, Encapsulation) und implementiert eine saubere MVC-Architektur mit Repository Pattern.
+
+\section*{Herangehensweise}
+
+Das Projekt wurde in drei strukturierten Phasen entwickelt:
+
+\textbf{Phase 1 – Konzeption:} Analyse der Anforderungen, Erstellung eines UML-Klassendiagramms mit Entity-Klassen, kritische Diskussion der Modellierungsentscheidungen (Komposition vs. Aggregation), Machbarkeitsanalyse für die Python-Implementierung.
+
+\textbf{Phase 2 – Reflexion \& Entwurf:} Untersuchung der Umsetzung objektorientierter Konzepte in Python, Erstellung der Gesamtarchitektur mit zusätzlichen Controller-, Repository- und Service-Klassen, Erweiterung des UML-Diagramms zur vollständigen Systemarchitektur.
+
+\textbf{Phase 3 – Implementierung:} Entwicklung des funktionsfähigen Prototyps mit Flask-Backend, SQLite-Datenbank, umfangreicher Test-Suite (1000+ Tests), und innovativem SVG-basiertem Frontend mit dynamischer Fahrzeugpositionierung entlang tatsächlicher Pfadkoordinaten.
+
+\section*{Erfolge und Herausforderungen}
+
+\subsection*{Was lief besonders gut}
+
+Die strikte Anwendung objektorientierter Prinzipien führte zu einer wartbaren, erweiterbaren Codebasis. Die Automotive-Metapher erwies sich als intuitive und kreative Visualisierung des Studienfortschritts. Die SVG-basierte dynamische Positionierung ermöglicht responsive Darstellung ohne hardcodierte Pixel-Werte. Das Repository Pattern mit DBGateway sorgt für klare Trennung von Business-Logik und Datenzugriff.
+
+Die umfangreiche Test-Suite (über 1000 Tests) mit hoher Coverage gewährleistet Codequalität und erleichtert Refactoring. Die Implementierung von Komposition (Student ◆→ Login), Aggregation (Student ◇→ Einschreibung) und Vererbung (Pruefungsleistung extends Modulbuchung) demonstriert tiefes Verständnis der OOP-Beziehungen.
+
+\subsection*{Herausforderungen}
+
+Die größte technische Herausforderung war die präzise Berechnung der Fahrzeugposition entlang komplexer SVG-Pfade. Die Koordinatentransformation zwischen Haupt-Dashboard und Popup-Miniaturansicht erforderte sorgfältiges Debugging. UTF-8-Encoding-Probleme mit deutschen Umlauten mussten systematisch über alle Python-Dateien hinweg behoben werden.
+
+Die Balance zwischen akademischen Anforderungen (strikte private Methoden mit \texttt{\_\_double\_underscore}) und praktischer Wartbarkeit erforderte sorgfältige Abwägung. Die Migration der Datenbankstruktur von impliziten zu expliziten Many-to-Many-Beziehungen für das Prüfungsarten-System war komplex, verbesserte aber die Flexibilität erheblich.
+
+\section*{Besondere Aspekte}
+
+Besonders stolz bin ich auf die innovative Visualisierung: Die Automotive-Metapher verbindet Gaming-Elemente mit akademischer Datenverwaltung und macht Studienfortschritt intuitiv erfassbar. Die Verwendung echter SVG-Pfadkoordinaten statt hardcodierter Positionen ermöglicht echte Responsiveness.
+
+Die strikte Architektur mit minimalen public Interfaces und umfangreichen private Methoden demonstriert professionelles Software-Design. Die Dual-Repository-Strategie (akademische Version mit realen Daten, Portfolio-Version mit Demo-Daten) zeigt durchdachtes Projektmanagement.
+
+Die Docker-Integration ermöglicht unkompliziertes Deployment und demonstriert DevOps-Kenntnisse über reine Programmierung hinaus.
+
+\section*{Erkenntnisse und Ausblick}
+
+Das Projekt verdeutlichte die praktische Bedeutung objektorientierter Prinzipien: Komposition und Aggregation sind mehr als theoretische Konzepte – sie bestimmen Lifecycle-Management und Systemarchitektur fundamental. Test-Driven Development mit hoher Coverage ist unverzichtbar für robuste Anwendungen.
+
+Die Ergebnisse sind vielfältig verwendbar: als Portfolio-Projekt für Bewerbungen, als Basis für erweiterte Features (Notenspiegel, Modulempfehlungen, Studienplan-Generator), und als Demonstration moderner Python-Webentwicklung. Eine Containerisierung mit Docker wurde bereits implementiert und ermöglicht flexibles Deployment.
+
+\vspace{0.3cm}
+\noindent
+\textit{Dieses Projekt demonstriert, dass objektorientierte Programmierung nicht nur theoretische Eleganz, sondern praktischen Mehrwert für wartbare, erweiterbare Softwaresysteme bietet.}
+
+\end{document}

@@ -1,0 +1,118 @@
+\documentclass[11pt,a4paper]{article}
+
+% Pakete
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[margin=2cm]{geometry}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+
+% Formalia gemäß Aufgabenstellung
+\usepackage{setspace}
+\onehalfspacing % 1,5-facher Zeilenabstand
+\setlength{\parskip}{6pt} % 6pt Absatzabstand
+\setlength{\itemsep}{0pt}
+
+% WICHTIG: Silbentrennung aktivieren
+\hyphenation{Installations-anleitung Studien-navigator Flask-Weban-wendung Auto-motive-Info-tainment-Meta-pher}
+\sloppy % Erlaubt etwas flexiblere Zeilenumbrüche
+
+% Hyperref Setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    pdftitle={Installationsanleitung IU Studiennavigator},
+    pdfauthor={Teresa Ignatzek}
+}
+
+\pagestyle{empty}
+
+\usepackage{titlesec}
+\titleformat{\section}{\fontsize{12}{14}\bfseries}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{6pt}{3pt}
+\titleformat{\subsection}{\fontsize{12}{14}\bfseries}{\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{4pt}{2pt}
+
+\begin{document}
+
+% Header
+\noindent
+\textbf{\large Installationsanleitung: IU Studiennavigator}\\[0.2cm]
+\textbf{Projekt:} Objektorientierte Programmierung mit Python (DLBDSOOFPP01\_D)\\
+\textbf{Studentin:} Teresa Ignatzek | \textbf{Datum:} \today
+
+\vspace{0.3cm}
+
+% GitHub-Link kompakt
+\noindent
+\colorbox{lightgray}{\parbox{\textwidth}{
+\textbf{GitHub:} \url{https://github.com/3vilQu33n/iu-studiennavigator}
+}}
+
+\vspace{0.3cm}
+
+\section*{Systembeschreibung}
+Der \textbf{IU Studiennavigator} ist eine Flask-Webanwendung zur Verwaltung des Studienfortschritts mit innovativer Automotive-Infotainment-Metapher und dynamischer SVG-Roadmap-Visualisierung. Plattformunabhängig (Windows, macOS, Linux).
+
+\section*{Voraussetzungen}
+Python 3.12+, pip, moderner Browser (Chrome/Firefox/Safari/Edge), Git (optional)
+
+\section*{Installation}
+
+\noindent\textbf{1. Repository herunterladen}
+\begin{verbatim}
+git clone https://github.com/3vilQu33n/iu-studiennavigator
+cd iu-studiennavigator
+\end{verbatim}
+
+\noindent\textbf{2. Dependencies installieren}
+\begin{verbatim}
+pip install -r requirements.txt
+\end{verbatim}
+\textit{Hinweis:} Auf macOS/Linux ggf. \texttt{pip3} verwenden.
+
+\noindent\textbf{3. Anwendung starten}
+\begin{verbatim}
+python app.py
+\end{verbatim}
+\textit{Hinweis:} Auf macOS/Linux ggf. \texttt{python3} verwenden.
+
+\noindent\textbf{4. Browser öffnen:} \url{http://localhost:5050}
+
+\section*{Demo-Login}
+\textbf{E-Mail:} \texttt{demo.student@study.ignatzek.org} | \textbf{Passwort:} \texttt{DemoStudent\#2024}
+
+\section*{Alternative: Docker-Installation}
+\begin{verbatim}
+# Image bauen
+docker build -t iu-studiennavigator:latest .
+
+# Container starten
+docker run -d --name iu-studiennavigator \
+  --restart unless-stopped -p 5050:5000 \
+  -v $(pwd)/data:/app/data --env-file .env \
+  iu-studiennavigator:latest
+\end{verbatim}
+Anwendung dann unter: \url{http://localhost:5050}\\
+\textit{Hinweis:} Für Unraid siehe Deployment-Dokumentation im Repository.
+
+\section*{Funktionsübersicht}
+Dashboard (Automotive-Roadmap), Semester-Ansicht, Modulbuchung, Prüfungsanmeldung (Two-Stage Dropdown), Gebührenverwaltung
+
+\section*{Tech Stack}
+Flask 3.0.3, SQLite3, Python 3.12+, MVC mit Repository Pattern, Vanilla JavaScript/CSS/SVG, Docker
+
+\section*{Fehlerbehebung}
+\textbf{Port belegt:} In \texttt{app.py} Port ändern: \texttt{app.run(debug=True, port=5001)}\\
+\textbf{Module fehlen:} \texttt{pip install --upgrade -r requirements.txt}\\
+\textbf{Tests:} \texttt{pytest} (über 1000 Tests verfügbar)
+
+\vspace{0.2cm}
+\noindent
+\textit{Kontakt: teresa@ignatzek.de}
+
+\end{document}

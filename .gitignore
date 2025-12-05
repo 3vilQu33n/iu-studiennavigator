@@ -81,7 +81,7 @@ out/
 *.fdb_latexmk
 *.synctex.gz
 
-# Ignoriere docs/ ABER behalte docs/images/ für README Screenshots
+# Ignoriere docs/ ABER behalte docs/images/ und docs/tex/ als Ausnahmen
 docs/*
 !docs/images/
 !docs/images/*.png
@@ -89,13 +89,14 @@ docs/*
 !docs/images/*.jpeg
 !docs/images/*.gif
 !docs/images/*.svg
+!docs/tex/
+!docs/tex/*.tex
 
 # PDFs ignorieren (werden aus out/ für Abgabe kopiert, nicht ins Repo)
 *.pdf
 
-# LaTeX-Quelldateien (.tex) - IM ROOT BEHALTEN für Transparenz
-# (zeigt, dass du LaTeX nutzt, aber ohne Hilfsdateien)
-# Falls du sie NICHT committen willst, auskommentieren:
+# LaTeX-Quelldateien (.tex) im Root KÖNNEN committed werden
+# Falls du sie NICHT committen willst, aktiviere:
 # *.tex
 
 # ===== Projekt-spezifisch =====
