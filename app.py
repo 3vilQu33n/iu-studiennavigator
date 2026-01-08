@@ -1,12 +1,13 @@
 # app.py
 from flask import Flask, render_template, jsonify, request, redirect, url_for, flash, session
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
-from flask_mailman import Mail, EmailMessage
+from flask_mail import Mail, Message
 from dotenv import load_dotenv
 import logging
 import sqlite3
 from pathlib import Path
 import os
+from datetime import datetime, timedelta, time
 
 # .env Datei laden (vor os.getenv Aufrufen)
 load_dotenv()
@@ -15,6 +16,7 @@ from controllers import AuthController, DashboardController, SemesterController
 from repositories import PruefungsterminRepository, PruefungsanmeldungRepository, ModulbuchungRepository
 from utils.login import User
 from models import Pruefungsanmeldung
+from models import Pruefungstermin
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -37,7 +39,7 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', os.getenv('
 mail = Mail(app)
 
 # Datenbank-Pfad (unterstuetzt Docker-Volume)
-DB_PATH = Path(os.getenv('DB_PATH', Path(__file__).parent / 'data' / 'dashboard.db'))
+DB_PATH = Path(os.getenv('DATABASE_PATH', Path(__file__).parent / 'data' / 'dashboard.db'))
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -198,23 +200,23 @@ def forgot_password():
             logger.info(f"Reset-Code fuer {email}: {reset_code}")
 
             try:
-                msg = EmailMessage(
+                msg = Message(
                     subject='Dein Passwort-Reset-Code',
+                    recipients=[email],
                     body=f'''Hallo,
 
-            du hast einen Passwort-Reset angefordert.
+du hast einen Passwort-Reset angefordert.
 
-            Dein Reset-Code: {reset_code}
+Dein Reset-Code: {reset_code}
 
-            Dieser Code ist 15 Minuten gueltig.
+Dieser Code ist 15 Minuten gueltig.
 
-            Falls du diese Anfrage nicht gestellt hast, ignoriere diese E-Mail.
+Falls du diese Anfrage nicht gestellt hast, ignoriere diese E-Mail.
 
-            Viele Gruesse
-            Dein Studiennavigator-Team''',
-                    to=[email]
+Viele Gruesse
+Dein Studiennavigator-Team'''
                 )
-                msg.send()
+                mail.send(msg)
                 flash('Ein Reset-Code wurde an deine E-Mail-Adresse gesendet.', 'success')
             except Exception as e:
                 logger.warning(f"E-Mail konnte nicht versendet werden: {e}")
@@ -442,10 +444,69 @@ def pruefung_anmelden():
             return jsonify({'success': False, 'error': 'Keine Daten empfangen'}), 400
 
         modulbuchung_id = data.get('modulbuchung_id')
+
+        # OPTION 1: pruefungstermin_id direkt angegeben
         pruefungstermin_id = data.get('pruefungstermin_id')
 
-        if not all([modulbuchung_id, pruefungstermin_id]):
-            return jsonify({'success': False, 'error': 'Modulbuchung-ID und Pruefungstermin-ID erforderlich'}), 400
+        # OPTION 2: Datum + Modus angegeben (dann Termin suchen/erstellen)
+        pruefungsdatum = data.get('pruefungsdatum')
+        anmeldemodus = data.get('anmeldemodus')
+
+        if not modulbuchung_id:
+            return jsonify({'success': False, 'error': 'Modulbuchung-ID erforderlich'}), 400
+
+        # Wenn pruefungstermin_id fehlt, versuche anhand von Datum+Modus zu finden
+        if not pruefungstermin_id and pruefungsdatum and anmeldemodus:
+            # Hole modulbuchung um modul_id zu bekommen
+            modulbuchung = modulbuchung_repo.get_by_id(modulbuchung_id)
+            if not modulbuchung:
+                return jsonify({'success': False, 'error': 'Modulbuchung nicht gefunden'}), 404
+
+            # Mapping: Frontend-Werte zu DB-erlaubten Werten
+            # Frontend kann senden: 'K', 'PO', 'P', 'W', 'online', 'praesenz'
+            # DB erlaubt: 'online', 'praesenz', 'projekt', 'workbook'
+            art_mapping = {
+                'K': 'online',  # Klausur ohne Unterteilung → online
+                'PO': 'projekt',  # Portfolio → projekt
+                'P': 'projekt',  # Projekt → projekt
+                'W': 'workbook',  # Workbook → workbook
+                'online': 'online',  # online bleibt online
+                'praesenz': 'praesenz'  # praesenz bleibt praesenz
+            }
+
+            db_art = art_mapping.get(anmeldemodus.lower() if isinstance(anmeldemodus, str) else anmeldemodus, 'online')
+
+            # Suche passenden Termin
+            alle_termine = pruefungstermin_repo.find_verfuegbare_termine(modulbuchung.modul_id)
+            passende_termine = [
+                t for t in alle_termine
+                if t.datum.strftime('%Y-%m-%d') == pruefungsdatum and t.art.lower() == db_art.lower()
+            ]
+
+            if passende_termine:
+                pruefungstermin_id = passende_termine[0].id
+            else:
+                # Kein passender Termin gefunden - erstelle einen neuen
+                datum_obj = datetime.strptime(pruefungsdatum, '%Y-%m-%d').date()
+                anmeldeschluss = datetime.combine(datum_obj - timedelta(days=7), time(23, 59))  # 7 Tage vorher, 23:59
+
+                neuer_termin = Pruefungstermin(
+                    id=0,
+                    modul_id=modulbuchung.modul_id,
+                    datum=datum_obj,
+                    beginn=time(10, 0),  # 10:00 Uhr
+                    ende=time(12, 0),  # 12:00 Uhr (2 Stunden)
+                    art=db_art,  # Verwende gemappten Wert!
+                    ort="Online" if db_art == "online" else "Campus",
+                    anmeldeschluss=anmeldeschluss,
+                    kapazitaet=None,
+                    beschreibung=None
+                )
+                pruefungstermin_id = pruefungstermin_repo.create(neuer_termin)
+
+        if not pruefungstermin_id:
+            return jsonify(
+                {'success': False, 'error': 'Pruefungstermin-ID erforderlich oder Datum+Modus ungültig'}), 400
 
         if pruefungsanmeldung_repo.hat_aktive_anmeldung(modulbuchung_id):
             return jsonify({'success': False, 'error': 'Bereits angemeldet'})

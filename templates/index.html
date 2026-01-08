@@ -25,7 +25,7 @@
              class="infotainment-bg"
              style="width: 100%; height: auto; display: block;">
 
-        <!-- 3. Pfad (wird inline geladen fÃ¼r DOM-Zugriff) -->
+        <!-- 3. Pfad (wird inline geladen fÃƒÂ¼r DOM-Zugriff) -->
         <img src="{{ url_for('static', filename='uploads/Pfad.svg') }}"
              alt="Studienpfad"
              class="path-overlay"
@@ -37,7 +37,7 @@
                     pointer-events: none;">
 
         <!-- 4. Auto - Position wird per JavaScript aus SVG-Pfad berechnet -->
-        <img src="{{ url_for('static', filename='uploads/car.svg') }}"
+        <img src="{{ url_for('static', filename='uploads/Car.svg') }}"
              alt="Auto"
              class="car-overlay"
              style="position: absolute;
@@ -58,10 +58,10 @@ const progressFee = "{{ progress_fee }}";
 const gradeCategory = "{{ grade_category }}";
 const timeStatus = "{{ time_status }}";
 
-// Semester-Position fÃ¼r SVG-Pfad-basierte Auto-Positionierung
+// Semester-Position fÃƒÂ¼r SVG-Pfad-basierte Auto-Positionierung
 const currentSemesterPosition = {{ current_semester | default(1) }};
 
-// Auto-Position fÃ¼r Miniatur im Popup (Fallback-Werte)
+// Auto-Position fÃƒÂ¼r Miniatur im Popup (Fallback-Werte)
 const carXPercent = {{ car_x_percent | default(0.5) }};
 const carYPercent = {{ car_y_percent | default(0.5) }};
 const carData = {
@@ -74,8 +74,8 @@ const carData = {
 // Naechste Pruefung
 const nextExam = {{ next_exam | tojson if next_exam else 'null' }};
 
-console.log('ðŸš— Semester-Position:', currentSemesterPosition);
-console.log('ðŸ“… Naechste Pruefung:', nextExam);
+console.log('Ã°Å¸Å¡â€” Semester-Position:', currentSemesterPosition);
+console.log('Ã°Å¸â€œâ€¦ Naechste Pruefung:', nextExam);
 </script>
 
 <!-- ============================================================ -->
@@ -130,8 +130,9 @@ console.log('ðŸ“… Naechste Pruefung:', nextExam);
                     <div class="miniature-wrapper">
                         <img src="{{ url_for('static', filename='uploads/Pfad_Popup.svg') }}"
                              alt="Studienpfad" class="miniature-pfad">
-                        <img src="{{ url_for('static', filename='uploads/car.svg') }}"
-                             alt="Auto" class="miniature-car">
+                        <img src="{{ url_for('static', filename='uploads/Car.svg') }}"
+                             alt="Auto" class="miniature-car"
+                             style="position: absolute; width: 8%; z-index: 10;">
                     </div>
                 </div>
             </div>
@@ -151,7 +152,7 @@ console.log('ðŸ“… Naechste Pruefung:', nextExam);
             </div>
             <div class="modal-body">
                 <div class="module-grid" id="semester-modal-modules">
-                    <!-- Module werden per JS eingefÃ¼gt -->
+                    <!-- Module werden per JS eingefÃƒÂ¼gt -->
                 </div>
             </div>
         </div>
@@ -219,13 +220,13 @@ console.log('ðŸ“… Naechste Pruefung:', nextExam);
 </template>
 
 <!-- ============================================================ -->
-<!-- TEMPLATE: Exam-Modal (PrÃ¼fungsanmeldung) -->
+<!-- TEMPLATE: Exam-Modal (Prüfungsanmeldung) -->
 <!-- ============================================================ -->
 <template id="exam-modal-template">
     <div class="exam-modal">
         <div class="exam-modal-content">
             <div class="exam-modal-header">
-                <h3>PrÃ¼fung anmelden</h3>
+                <h3>Prüfung anmelden</h3>
                 <button class="close-modal" id="close-exam-modal">&times;</button>
             </div>
 
@@ -233,23 +234,23 @@ console.log('ðŸ“… Naechste Pruefung:', nextExam);
                 <p class="exam-modul-name" id="exam-modul-name"></p>
 
                 <div class="form-group">
-                    <label for="exam-date">PrÃ¼fungsdatum:</label>
+                    <label for="exam-date">Prüfungsdatum:</label>
                     <input type="date" id="exam-date" name="exam_date" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="exam-mode">PrÃ¼fungsform:</label>
+                    <label for="exam-mode">Prüfungsform:</label>
                     <select id="exam-mode" name="exam_mode" required>
-                        <option value="">-- Bitte wÃ¤hlen --</option>
+                        <option value="">-- Bitte wählen --</option>
                     </select>
                 </div>
 
                 <div class="form-group" id="klausur-typ-gruppe" style="display: none;">
                     <label for="klausur-typ">Klausur-Art:</label>
                     <select id="klausur-typ" name="klausur_typ">
-                        <option value="">-- Bitte wÃ¤hlen --</option>
+                        <option value="">-- Bitte wählen --</option>
                         <option value="online">Online</option>
-                        <option value="praesenz">PrÃ¤senz</option>
+                        <option value="praesenz">Präsenz</option>
                     </select>
                 </div>
 

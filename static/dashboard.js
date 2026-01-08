@@ -182,20 +182,20 @@ function positionCarOnPath(svgElement, positioner, semesterPosition) {
     carOverlay.style.top = `${yPercentInContainer}%`;
     carOverlay.style.transform = `translate(-50%, -50%) rotate(${pos.rotation}deg)`;
 
-    // Flip-Logik: Wenn Rotation > 90° oder < -90°, Auto spiegeln
+    // Flip-Logik: Wenn Rotation > 90Â° oder < -90Â°, Auto spiegeln
     if (Math.abs(pos.rotation) > 90) {
         carOverlay.style.transform += ' scaleY(-1)';
     }
 
-    console.log(`🚗 Auto positioniert:`);
+    console.log(`ðŸš— Auto positioniert:`);
     console.log(`  - SVG-Position: (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)})`);
     console.log(`  - SVG-Prozent: (${xPercentInSvg.toFixed(1)}%, ${yPercentInSvg.toFixed(1)}%)`);
     console.log(`  - Container-Prozent: (${xPercentInContainer.toFixed(1)}%, ${yPercentInContainer.toFixed(1)}%)`);
-    console.log(`  - Rotation: ${pos.rotation.toFixed(1)}°`);
+    console.log(`  - Rotation: ${pos.rotation.toFixed(1)}Â°`);
 }
 
 // ============================================================================
-// AUTO-CLICK â†’ Infotainment-Popup (Template-basiert)
+// AUTO-CLICK Ã¢â€ â€™ Infotainment-Popup (Template-basiert)
 // ============================================================================
 
 function initCarClick() {
@@ -329,7 +329,7 @@ function initPopupCarPositioning() {
     // Lade SVG inline (mit Cache-Busting)
     var cacheBuster = '?t=' + Date.now();
     var fetchUrl = miniaturePfad.src + cacheBuster;
-    console.log('🔗 Popup SVG URL:', fetchUrl);
+    console.log('ðŸ”— Popup SVG URL:', fetchUrl);
     fetch(fetchUrl)
         .then(response => response.text())
         .then(svgContent => {
@@ -371,7 +371,7 @@ function initPopupCarPositioning() {
                 const pos = positioner.calculatePosition(semesterPosition);
 
                 if (pos) {
-                    console.log(`📍 Semester ${semesterPosition}: Pfad-Koordinaten x=${pos.x.toFixed(1)}, y=${pos.y.toFixed(1)}, rot=${pos.rotation.toFixed(1)}°`);
+                    console.log(`ðŸ“ Semester ${semesterPosition}: Pfad-Koordinaten x=${pos.x.toFixed(1)}, y=${pos.y.toFixed(1)}, rot=${pos.rotation.toFixed(1)}Â°`);
 
                     // ViewBox fuer Prozent-Umrechnung
                     const viewBox = svgElement.viewBox.baseVal;
@@ -401,7 +401,7 @@ function initPopupPathPositioner(svgElement) {
     const paths = {};
     const pathLengths = {};
 
-    console.log('🔍 Popup: Suche Pfade...');
+    console.log('ðŸ” Popup: Suche Pfade...');
 
     for (let i = 1; i <= 7; i++) {
         // Suche nach dem Mittellinienpfad mit querySelector (zuverlaessiger als getElementById)
@@ -411,9 +411,9 @@ function initPopupPathPositioner(svgElement) {
         if (pathElement && pathElement.getTotalLength) {
             paths[i] = pathElement;
             pathLengths[i] = pathElement.getTotalLength();
-            console.log(`  ✓ Pfad ${i}: ${pathElement.id} (Laenge: ${pathLengths[i].toFixed(1)})`);
+            console.log(`  âœ“ Pfad ${i}: ${pathElement.id} (Laenge: ${pathLengths[i].toFixed(1)})`);
         } else {
-            console.warn(`  ✗ Pfad ${i}: nicht gefunden oder keine getTotalLength`);
+            console.warn(`  âœ— Pfad ${i}: nicht gefunden oder keine getTotalLength`);
         }
     }
 
@@ -422,7 +422,7 @@ function initPopupPathPositioner(svgElement) {
         return null;
     }
 
-    console.log(`📍 Popup: ${Object.keys(paths).length} Pfade geladen`);
+    console.log(`ðŸ“ Popup: ${Object.keys(paths).length} Pfade geladen`);
 
     return {
         paths: paths,
@@ -597,7 +597,7 @@ function initSemesterSigns() {
                 bachelorSign.addEventListener('click', (e) => {
                     e.stopPropagation();
                     console.log('Klick auf Bachelor-Schild');
-                    showNotification('Bachelor-Abschluss! ðŸŽ‰', 'success');
+                    showNotification('Bachelor-Abschluss! Ã°Å¸Å½â€°', 'success');
                 });
 
                 bachelorSign.addEventListener('mouseenter', () => {
@@ -1137,7 +1137,7 @@ async function submitExamRegistration(modulbuchungId, semester) {
     console.log('Payload:', JSON.stringify(payload));
 
     try {
-        var response = await fetch('/api/register-exam', {
+        var response = await fetch('/api/pruefung-anmelden', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

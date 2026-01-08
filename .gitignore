@@ -105,3 +105,11 @@ flask_session/
 
 # Position Cache (dynamisch generiert)
 position_cache.json
+
+
+# ===== Temporäre Fix-/Analyse-Scripts =====
+fix_*.py
+fix_*.sql
+analyze_*.py
+DB_FIX_*.md
+HOTFIX_*.md
