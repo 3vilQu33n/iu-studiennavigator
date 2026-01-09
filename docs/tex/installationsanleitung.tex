@@ -86,7 +86,44 @@ python app.py
 \section*{Demo-Login}
 \textbf{E-Mail:} \texttt{demo.student@study.ignatzek.org} | \textbf{Passwort:} \texttt{DemoStudent\#2024}
 
+\section*{Test-Script für Dozenten/Prüfer}
+Für die Demonstration der Dashboard-Funktionalität (Auto-Bewegung auf Roadmap) steht ein interaktives Test-Script zur Verfügung:
+
+\begin{verbatim}
+python3 set_exam_date_past.py
+\end{verbatim}
+
+\textbf{Empfohlener Demo-Workflow:}
+\begin{enumerate}[itemsep=2pt]
+    \item \textbf{Option 8}: Einschreibedatum zurücksetzen (z.B. 90 Tage)
+    \item \textbf{Option 7}: SCHNELLTEST ausführen
+    \begin{itemize}[itemsep=0pt]
+        \item Termin-ID eingeben (z.B. 1)
+        \item Tage zurück: 30
+        \item Note: 2.0
+    \end{itemize}
+    \item Dashboard im Browser neu laden
+    \item \textbf{Ergebnis}: Auto hat sich bewegt! 🚗
+    \item \textbf{Option 5}: Noten-Übersicht anzeigen
+\end{enumerate}
+
+\textit{Hinweis:} Das Script verhindert logische Fehler (z.B. Prüfung vor Einschreibung). Detaillierte Anleitung in \texttt{README\_set\_exam\_date\_past.md}
+
 \section*{Alternative: Docker-Installation}
+\begin{verbatim}
+# Image bauen
+docker build -t iu-studiennavigator:latest .
+
+# Container starten
+docker run -d --name iu-studiennavigator \
+  --restart unless-stopped -p 5050:5000 \
+  -v $(pwd)/data:/app/data --env-file .env \
+  iu-studiennavigator:latest
+\end{verbatim}
+Anwendung dann unter: \url{http://localhost:5050}\\
+\textit{Hinweis:} Für Unraid siehe Deployment-Dokumentation im Repository.
+
+\section*{Funktionsübersicht}
 \begin{verbatim}
 # Image bauen
 docker build -t iu-studiennavigator:latest .
