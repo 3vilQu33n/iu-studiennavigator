@@ -2,6 +2,8 @@
 
 Ein interaktives Dashboard-System zur Visualisierung und Verwaltung des Studienfortschritts an der IU Internationale Hochschule.
 
+> **📌 Hinweis für Dozenten/Prüfer:** Das System ist live verfügbar unter [study.ignatzek.org](https://study.ignatzek.org) und kann mit dem Demo-Account getestet werden. Für die Demonstration der Roadmap-Funktionalität (Auto-Bewegung) steht ein Test-Script zur Verfügung - siehe Abschnitt "Testing & Demo für Prüfer".
+
 ## 📋 Projektübersicht
 
 Der IU Studiennavigator ist eine Flask-basierte Webanwendung, die Studierenden einen intuitiven Überblick über ihren akademischen Fortschritt bietet. Das System verwendet eine automobile Infotainment-Metapher mit einer interaktiven SVG-Roadmap, auf der Studierende ihre Reise durch die Semester verfolgen können.
@@ -138,6 +140,8 @@ iu-studiennavigator/
 ├── app.py                      # Flask-Hauptanwendung
 ├── config.py                   # Konfiguration
 ├── requirements.txt            # Python-Dependencies
+├── set_exam_date_past.py      # Test-Script für Prüfungen & Noten
+├── README_set_exam_date_past.md # Anleitung für Test-Script
 │
 ├── controllers/                # Business Logic Layer
 │   ├── __init__.py
@@ -310,6 +314,47 @@ Das System enthält vorkonfigurierte Demo-Accounts mit realistischen Testdaten:
 | demo.student@study.ignatzek.org | DemoStudent#2024 | Demo Student mit Beispieldaten |
 
 **Hinweis:** Aus Datenschutzgründen wurden in der öffentlichen Version alle persönlichen Daten durch Demo-Daten ersetzt.
+
+## 🧪 Testing & Demo für Prüfer
+
+### Test-Script: Prüfungstermine & Noten
+
+Für die Demonstration der Dashboard-Funktionalität (Auto-Bewegung auf der Roadmap) steht ein interaktives Test-Script zur Verfügung:
+
+```bash
+python3 set_exam_date_past.py
+```
+
+**Features des Test-Scripts:**
+- ✅ Prüfungstermine in die Vergangenheit verschieben
+- ✅ Noten für Module eintragen
+- ✅ Einschreibedaten anpassen
+- ✅ Noten-Übersicht anzeigen
+- ✅ SCHNELLTEST-Modus für schnelle Demo
+
+**Empfohlener Demo-Workflow:**
+
+1. **Einschreibedatum anpassen** (Option 8)
+   - Einschreibungs-ID wählen (z.B. 1)
+   - Tage zurücksetzen (z.B. 90)
+
+2. **SCHNELLTEST ausführen** (Option 7)
+   - Termin-ID eingeben (z.B. 1)
+   - Tage zurück (z.B. 30)
+   - Note eingeben (z.B. 2.0)
+   - → Automatisch: Termin zurückgesetzt + Note eingetragen
+
+3. **Dashboard neu laden**
+   - Auto hat sich auf der Roadmap bewegt! 🚗
+   - Fortschritt wurde aktualisiert
+
+4. **Noten-Übersicht** (Option 5)
+   - Zeigt alle Module mit Noten
+   - Status-Übersicht
+
+**Wichtig:** Das Script verhindert logische Fehler (z.B. Prüfung vor Einschreibung) und gibt klare Anweisungen bei Konflikten.
+
+Detaillierte Anleitung: Siehe `README_set_exam_date_past.md`
 
 ## 📸 Screenshots
 
