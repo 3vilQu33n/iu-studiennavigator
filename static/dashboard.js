@@ -182,20 +182,20 @@ function positionCarOnPath(svgElement, positioner, semesterPosition) {
     carOverlay.style.top = `${yPercentInContainer}%`;
     carOverlay.style.transform = `translate(-50%, -50%) rotate(${pos.rotation}deg)`;
 
-    // Flip-Logik: Wenn Rotation > 90Â° oder < -90Â°, Auto spiegeln
+    // Flip-Logik: Wenn Rotation > 90Ã‚Â° oder < -90Ã‚Â°, Auto spiegeln
     if (Math.abs(pos.rotation) > 90) {
         carOverlay.style.transform += ' scaleY(-1)';
     }
 
-    console.log(`ðŸš— Auto positioniert:`);
+    console.log(`Ã°Å¸Å¡â€” Auto positioniert:`);
     console.log(`  - SVG-Position: (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)})`);
     console.log(`  - SVG-Prozent: (${xPercentInSvg.toFixed(1)}%, ${yPercentInSvg.toFixed(1)}%)`);
     console.log(`  - Container-Prozent: (${xPercentInContainer.toFixed(1)}%, ${yPercentInContainer.toFixed(1)}%)`);
-    console.log(`  - Rotation: ${pos.rotation.toFixed(1)}Â°`);
+    console.log(`  - Rotation: ${pos.rotation.toFixed(1)}Ã‚Â°`);
 }
 
 // ============================================================================
-// AUTO-CLICK Ã¢â€ â€™ Infotainment-Popup (Template-basiert)
+// AUTO-CLICK ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Infotainment-Popup (Template-basiert)
 // ============================================================================
 
 function initCarClick() {
@@ -329,7 +329,7 @@ function initPopupCarPositioning() {
     // Lade SVG inline (mit Cache-Busting)
     var cacheBuster = '?t=' + Date.now();
     var fetchUrl = miniaturePfad.src + cacheBuster;
-    console.log('ðŸ”— Popup SVG URL:', fetchUrl);
+    console.log('Ã°Å¸â€â€” Popup SVG URL:', fetchUrl);
     fetch(fetchUrl)
         .then(response => response.text())
         .then(svgContent => {
@@ -371,7 +371,7 @@ function initPopupCarPositioning() {
                 const pos = positioner.calculatePosition(semesterPosition);
 
                 if (pos) {
-                    console.log(`ðŸ“ Semester ${semesterPosition}: Pfad-Koordinaten x=${pos.x.toFixed(1)}, y=${pos.y.toFixed(1)}, rot=${pos.rotation.toFixed(1)}Â°`);
+                    console.log(`Ã°Å¸â€œÂ Semester ${semesterPosition}: Pfad-Koordinaten x=${pos.x.toFixed(1)}, y=${pos.y.toFixed(1)}, rot=${pos.rotation.toFixed(1)}Ã‚Â°`);
 
                     // ViewBox fuer Prozent-Umrechnung
                     const viewBox = svgElement.viewBox.baseVal;
@@ -401,7 +401,7 @@ function initPopupPathPositioner(svgElement) {
     const paths = {};
     const pathLengths = {};
 
-    console.log('ðŸ” Popup: Suche Pfade...');
+    console.log('Ã°Å¸â€Â Popup: Suche Pfade...');
 
     for (let i = 1; i <= 7; i++) {
         // Suche nach dem Mittellinienpfad mit querySelector (zuverlaessiger als getElementById)
@@ -411,9 +411,9 @@ function initPopupPathPositioner(svgElement) {
         if (pathElement && pathElement.getTotalLength) {
             paths[i] = pathElement;
             pathLengths[i] = pathElement.getTotalLength();
-            console.log(`  âœ“ Pfad ${i}: ${pathElement.id} (Laenge: ${pathLengths[i].toFixed(1)})`);
+            console.log(`  Ã¢Å“â€œ Pfad ${i}: ${pathElement.id} (Laenge: ${pathLengths[i].toFixed(1)})`);
         } else {
-            console.warn(`  âœ— Pfad ${i}: nicht gefunden oder keine getTotalLength`);
+            console.warn(`  Ã¢Å“â€” Pfad ${i}: nicht gefunden oder keine getTotalLength`);
         }
     }
 
@@ -422,7 +422,7 @@ function initPopupPathPositioner(svgElement) {
         return null;
     }
 
-    console.log(`ðŸ“ Popup: ${Object.keys(paths).length} Pfade geladen`);
+    console.log(`Ã°Å¸â€œÂ Popup: ${Object.keys(paths).length} Pfade geladen`);
 
     return {
         paths: paths,
@@ -597,7 +597,7 @@ function initSemesterSigns() {
                 bachelorSign.addEventListener('click', (e) => {
                     e.stopPropagation();
                     console.log('Klick auf Bachelor-Schild');
-                    showNotification('Bachelor-Abschluss! Ã°Å¸Å½â€°', 'success');
+                    showNotification('Bachelor-Abschluss! ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â°', 'success');
                 });
 
                 bachelorSign.addEventListener('mouseenter', () => {
@@ -808,12 +808,28 @@ function createPflichtmodulCard(modul, template, semester) {
         });
     }
 
-    // Pruefungsinfo (wenn bereits angemeldet)
-    if (modul.pruefung_angemeldet && modul.pruefung_info) {
+    // Pruefungsinfo (wenn bereits angemeldet oder absolviert)
+    if (modul.note) {
+        // Prüfung wurde absolviert - zeige Note und Status
         examInfo.style.display = 'block';
-        examInfo.innerHTML = '<strong>Pruefung angemeldet:</strong><br>' +
-            'Datum: ' + formatDate(modul.pruefung_info.datum) + '<br>' +
-            'Art: ' + getPruefungsartLabel(modul.pruefung_info.art);
+        const statusText = modul.status === 'bestanden' ? 'Bestanden' :
+                          modul.status === 'anerkannt' ? 'Anerkannt' : 'Nicht bestanden';
+        const statusClass = modul.status === 'bestanden' || modul.status === 'anerkannt' ? 'status-success' : 'status-fail';
+        examInfo.innerHTML = '<strong>Prüfung absolviert:</strong><br>' +
+            '<span class="' + statusClass + '">' + statusText + ' - Note: ' + modul.note + '</span><br>' +
+            'Art: ' + getPruefungsartLabel(modul.anmeldemodus) + '<br>' +
+            'Datum: ' + formatDate(modul.leistungsdatum || modul.pruefungsdatum);
+    } else if (modul.pruefungsdatum || (modul.pruefung_angemeldet && modul.pruefung_info)) {
+        // Prüfung nur angemeldet, noch nicht absolviert
+        examInfo.style.display = 'block';
+
+        // Hole Datum und Art aus verschiedenen Quellen
+        const datum = modul.pruefungsdatum || (modul.pruefung_info ? modul.pruefung_info.datum : null);
+        const art = modul.pruefungstermin_art || (modul.pruefung_info ? modul.pruefung_info.art : null);
+
+        examInfo.innerHTML = '<strong>Prüfung angemeldet:</strong><br>' +
+            (datum ? 'Datum: ' + formatDate(datum) + '<br>' : '') +
+            (art ? 'Art: ' + getPruefungsartLabel(art) : 'Art: wird geladen...');
     }
 
     return moduleFragment;

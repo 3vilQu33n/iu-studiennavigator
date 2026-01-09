@@ -81,3 +81,13 @@
     transform: scale(1.05);
     box-shadow: 0 5px 20px rgba(107, 114, 128, 0.4);
 }
+/* Status-Anzeige für absolvierte Prüfungen */
+.status-success {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.status-fail {
+    color: #f44336;
+    font-weight: bold;
+}

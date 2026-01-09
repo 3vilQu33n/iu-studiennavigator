@@ -11,7 +11,7 @@ if not logger.handlers:
 
 
 class SemesterController:
-    """Controller für Semester-/Modulbuchungs-Logik
+    """Controller fÃ¼r Semester-/Modulbuchungs-Logik
 
     Alle Methoden sind PUBLIC, da sie von Flask-Routes aufgerufen werden.
     """
@@ -32,14 +32,14 @@ class SemesterController:
     ) -> dict:
         """PUBLIC: Liefert alle Module eines Semesters mit Buchungsstatus
 
-        Für Semester 5 und 6 werden Wahlmodule separat gruppiert zurückgegeben.
+        FÃ¼r Semester 5 und 6 werden Wahlmodule separat gruppiert zurÃ¼ckgegeben.
 
         Args:
             login_id: ID aus login-Tabelle (current_user.id)
             semester_nr: Semesternummer (1-7)
 
         Returns:
-            Dictionary mit success, semester, modules, wahlmodule (für Sem 5+6)
+            Dictionary mit success, semester, modules, wahlmodule (fÃ¼r Sem 5+6)
         """
         try:
             # 1. Student laden
@@ -72,7 +72,7 @@ class SemesterController:
             for mb in module_buchungen:
                 module_dict = mb.to_dict()
 
-                # Füge modulbuchung_id und Prüfungsdaten hinzu
+                # FÃ¼ge modulbuchung_id und PrÃ¼fungsdaten hinzu
                 module_dict = self.__enrich_module_data(module_dict, mb, student.id)
 
                 if mb.wahlbereich:
@@ -83,7 +83,7 @@ class SemesterController:
                     # Pflichtmodul
                     pflicht_modules.append(module_dict)
 
-            # 5. Hole bereits gebuchte Wahlmodule (für Filter in Wahlbereich C)
+            # 5. Hole bereits gebuchte Wahlmodule (fÃ¼r Filter in Wahlbereich C)
             gebuchte_wahlmodule = self.__modul_repo.get_gebuchte_wahlmodule(
                 studiengang_id=studiengang_id,
                 student_id=student.id
@@ -99,7 +99,7 @@ class SemesterController:
 
             logger.info(f"Lade {len(pflicht_modules)} Pflichtmodule und "
                         f"{sum(len(v) for v in wahlmodule_dict.values())} Wahlmodule "
-                        f"für Semester {semester_nr}")
+                        f"fÃ¼r Semester {semester_nr}")
 
             return {
                 'success': True,
@@ -128,7 +128,7 @@ class SemesterController:
                     'B': {...} oder None,
                     'C': {...} oder None
                 },
-                'complete': True/False  # Alle 3 Wahlmodule gewählt?
+                'complete': True/False  # Alle 3 Wahlmodule gewÃ¤hlt?
             }
         """
         try:
@@ -160,13 +160,13 @@ class SemesterController:
             login_id: int,
             modul_id: int
     ) -> dict:
-        """PUBLIC: Bucht ein Modul für den Studenten
+        """PUBLIC: Bucht ein Modul fÃ¼r den Studenten
 
         SEMESTERBASIERTE BUCHUNGSLOGIK:
         - Student kann NUR Module aus dem AKTUELLEN Semester buchen
         - Student kann auch Module aus dem VORHERIGEN Semester buchen (Nachholer)
-        - Module aus ZUKÜNFTIGEN Semestern sind GESPERRT
-        - Um ins NÄCHSTE Semester zu kommen, muss das AKTUELLE Semester komplett abgeschlossen sein
+        - Module aus ZUKÃœNFTIGEN Semestern sind GESPERRT
+        - Um ins NÃ„CHSTE Semester zu kommen, muss das AKTUELLE Semester komplett abgeschlossen sein
 
         WAHLMODUL-VALIDIERUNG:
         - Pro Wahlbereich (A, B, C) nur 1 Modul erlaubt
@@ -198,7 +198,7 @@ class SemesterController:
                 modul_info = con.execute(
                     """SELECT sgm.semester, sgm.wahlbereich, m.name
                        FROM studiengang_modul sgm
-                       JOIN modul m ON m.id = sgm.modul_id
+                                JOIN modul m ON m.id = sgm.modul_id
                        WHERE sgm.studiengang_id = ?
                          AND sgm.modul_id = ?
                        LIMIT 1""",
@@ -208,7 +208,7 @@ class SemesterController:
                 if not modul_info:
                     return {
                         'success': False,
-                        'error': 'Modul gehört nicht zu deinem Studiengang'
+                        'error': 'Modul gehÃ¶rt nicht zu deinem Studiengang'
                     }
 
                 modul_semester = modul_info[0]
@@ -254,7 +254,7 @@ class SemesterController:
                         'success': False,
                         'error': f'Dieses Modul ist aus Semester {modul_semester}. '
                                  f'Du befindest dich aktuell in Semester {aktuelles_semester}. '
-                                 f'Schließe erst alle Module des aktuellen Semesters ab, um ins nächste Semester zu gelangen.'
+                                 f'SchlieÃŸe erst alle Module des aktuellen Semesters ab, um ins nÃ¤chste Semester zu gelangen.'
                     }
 
                 elif modul_semester < aktuelles_semester - 1:
@@ -264,7 +264,7 @@ class SemesterController:
                     logger.info(f"Buchung erlaubt: Modul aus Semester {modul_semester}, "
                                 f"Student in Semester {aktuelles_semester}")
 
-                # 7. Prüfen ob bereits gebucht
+                # 7. PrÃ¼fen ob bereits gebucht
                 existing = con.execute(
                     """SELECT id
                        FROM modulbuchung
@@ -290,7 +290,7 @@ class SemesterController:
 
             wahlbereich_info = f" (Wahlbereich {wahlbereich})" if wahlbereich else ""
             logger.info(f"Modul {modul_id} '{modul_name}'{wahlbereich_info} "
-                        f"(Semester {modul_semester}) erfolgreich gebucht für Student {student.id}")
+                        f"(Semester {modul_semester}) erfolgreich gebucht fÃ¼r Student {student.id}")
 
             return {
                 'success': True,
@@ -308,19 +308,25 @@ class SemesterController:
 
     def __enrich_module_data(self, module_dict: dict, mb, student_id: int) -> dict:
         """PRIVATE: Fügt modulbuchung_id und Prüfungsdaten zu Modul-Dict hinzu"""
-        if mb.status in ('gebucht', 'bestanden', 'nicht_bestanden'):
+        if mb.status in ('gebucht', 'bestanden', 'nicht_bestanden', 'anerkannt'):
             try:
                 with sqlite3.connect(self.db_path) as con:
                     con.row_factory = sqlite3.Row
                     result = con.execute(
-                        """SELECT mb.id    as modulbuchung_id,
+                        """SELECT mb.id             as modulbuchung_id,
                                   pa.pruefungstermin_id,
-                                  pt.datum as pruefungsdatum
+                                  pt.datum          as pruefungsdatum,
+                                  pt.art            as pruefungstermin_art,
+                                  pl.note,
+                                  pl.anmeldemodus,
+                                  pl.versuch,
+                                  pl.pruefungsdatum as leistungsdatum
                            FROM modulbuchung mb
                                     JOIN einschreibung e ON mb.einschreibung_id = e.id
                                     LEFT JOIN pruefungsanmeldung pa ON pa.modulbuchung_id = mb.id
-                               AND pa.status = 'angemeldet'
+                               AND pa.status IN ('angemeldet', 'absolviert')
                                     LEFT JOIN pruefungstermin pt ON pt.id = pa.pruefungstermin_id
+                                    LEFT JOIN pruefungsleistung pl ON pl.modulbuchung_id = mb.id
                            WHERE e.student_id = ?
                              AND mb.modul_id = ?
                            LIMIT 1""",
@@ -331,9 +337,22 @@ class SemesterController:
                         module_dict['modulbuchung_id'] = result['modulbuchung_id']
                         module_dict['pruefungsdatum'] = result['pruefungsdatum']
 
-                        if result['pruefungsdatum']:
+                        # Füge Prüfungsleistungsdaten hinzu (wenn vorhanden)
+                        if result['note']:
+                            module_dict['note'] = result['note']
+                            # Verwende anmeldemodus, falls gesetzt, sonst pruefungstermin_art als Fallback
+                            module_dict['anmeldemodus'] = result['anmeldemodus'] or result['pruefungstermin_art']
+                            module_dict['versuch'] = result['versuch']
+                            module_dict['leistungsdatum'] = result['leistungsdatum']
+                            module_dict['status'] = mb.status  # 'bestanden' oder 'nicht_bestanden'
+                            logger.info(
+                                f"Modul {mb.name}: Prüfungsleistung vorhanden - Note {result['note']}, Modus: {module_dict['anmeldemodus']}")
+                        elif result['pruefungsdatum']:
+                            # Prüfung angemeldet, aber noch keine Leistung
+                            module_dict['pruefungstermin_art'] = result['pruefungstermin_art']
                             module_dict['status'] = 'angemeldet'
-                            logger.info(f"Modul {mb.name}: Prüfung am {result['pruefungsdatum']}")
+                            logger.info(
+                                f"Modul {mb.name}: Prüfung am {result['pruefungsdatum']}, Art: {result['pruefungstermin_art']}")
                         else:
                             logger.info(f"Modul {mb.name}: Gebucht, aber noch keine Prüfung angemeldet")
                     else:
@@ -365,13 +384,13 @@ class SemesterController:
         - Pro Wahlbereich nur 1 Modul
         - Modul aus C darf nicht identisch mit bereits gebuchtem aus A sein
         """
-        # 1. Prüfe ob im Wahlbereich bereits ein Modul gebucht ist
+        # 1. PrÃ¼fe ob im Wahlbereich bereits ein Modul gebucht ist
         bereits_gebucht = con.execute(
             """SELECT m.name
                FROM modulbuchung mb
-               JOIN studiengang_modul sgm ON sgm.modul_id = mb.modul_id
-                                         AND sgm.studiengang_id = ?
-               JOIN modul m ON m.id = mb.modul_id
+                        JOIN studiengang_modul sgm ON sgm.modul_id = mb.modul_id
+                   AND sgm.studiengang_id = ?
+                        JOIN modul m ON m.id = mb.modul_id
                WHERE mb.einschreibung_id = ?
                  AND sgm.wahlbereich = ?
                  AND sgm.semester = ?""",
@@ -386,13 +405,13 @@ class SemesterController:
                          f"Pro Wahlbereich ist nur 1 Modul erlaubt."
             }
 
-        # 2. Für Wahlbereich C: Prüfe ob Modul bereits in A gebucht wurde
+        # 2. FÃ¼r Wahlbereich C: PrÃ¼fe ob Modul bereits in A gebucht wurde
         if wahlbereich == 'C':
             modul_in_a = con.execute(
                 """SELECT mb.id
                    FROM modulbuchung mb
-                   JOIN studiengang_modul sgm ON sgm.modul_id = mb.modul_id
-                                             AND sgm.studiengang_id = ?
+                            JOIN studiengang_modul sgm ON sgm.modul_id = mb.modul_id
+                       AND sgm.studiengang_id = ?
                    WHERE mb.einschreibung_id = ?
                      AND mb.modul_id = ?
                      AND sgm.wahlbereich = 'A'""",
@@ -403,7 +422,7 @@ class SemesterController:
                 return {
                     'success': False,
                     'error': "Dieses Modul wurde bereits in Wahlbereich A gebucht. "
-                             "Im Wahlbereich C muss ein anderes Modul gewählt werden."
+                             "Im Wahlbereich C muss ein anderes Modul gewÃ¤hlt werden."
                 }
 
         return {'success': True}
